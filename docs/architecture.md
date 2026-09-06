@@ -2,6 +2,8 @@
 
 This note records foundation decisions for the ACME Salary Management System. Domain schema, auth, and product features are intentionally not implemented yet; they will be driven by TDD.
 
+**Source of truth for product scope:** [`documents/Salary Management System Requirements - Incubyte.pdf`](../documents/Salary%20Management%20System%20Requirements%20-%20Incubyte.pdf). Other briefs are not authoritative if they conflict with that PDF.
+
 ## Project structure
 
 ```
@@ -68,9 +70,12 @@ A component library (e.g. MUI) is **not** added yet. It should be chosen when th
 
 ## Other setup decisions
 
-- **Auth:** JWT secret is in env only. Session vs JWT cookie will be decided with the first auth tests. Suggestion from requirements: `hr_manager` + `hr_viewer` so 403 cases are testable.
+- **Auth:** JWT secret is in env only. Session vs JWT cookie will be decided with the first auth tests. The Incubyte spec names **HR Manager** and **Employee** (own salary + own payslips). Simple predefined RBAC is the planned approach, pending confirmation in the spec.
+- **Currency:** MVP stores and displays salaries in **INR** (conversion / other defaults are an open question in the spec).
+- **Salary model:** history is retained on change; attributes include amount **components** (base, bonus, incentives, etc.), effective date, and last updated date. Exact component schema will be locked in TDD.
+- **Payslips:** in MVP (HR can generate/view for employees; employees can generate/view their own). Not payroll processing (gross-to-net, bank files).
+- **Dashboard:** detailed analytics are **post-MVP**. Do not treat a full dashboard as a v1 requirement unless the spec is updated.
 - **CORS:** Vite proxies `/api` to the backend in development; Express also allows `CORS_ORIGIN`. Production can sit behind a same-origin reverse proxy.
-- **API prefix:** `/api/v1/` as in the requirements.
+- **API prefix:** `/api/v1/`.
 - **Health:** `GET /api/v1/health` is unauthenticated liveness (process + SQLite reachable). It is infrastructure, not a salary feature.
-- **Payslips / payroll / tax:** explicitly out of scope in the requirements, even if mentioned conversationally.
 - **JavaScript, not TypeScript:** matches the stated React.js / Node.js stack and keeps the TDD loop small. Can be revisited if the team wants types.

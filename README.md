@@ -8,16 +8,18 @@ This repository is a **monorepo**: React SPA (`frontend/`), Node.js JSON API (`b
 
 | Document                                         | Location                                                                                                       |
 | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| Product requirements (source of truth for scope) | [`documents/Salary_Management_Artifacts_Requirement.md`](documents/Salary_Management_Artifacts_Requirement.md) |
+| Product requirements (**source of truth**) | [`documents/Salary Management System Requirements - Incubyte.pdf`](documents/Salary%20Management%20System%20Requirements%20-%20Incubyte.pdf) |
 | Architecture / setup notes                       | [`docs/architecture.md`](docs/architecture.md)                                                                 |
 | Design doc                                       | _not written yet_ — add under `docs/` when UI/API design is specified                                          |
 | Architecture diagram                             | _not written yet_ — add under `docs/`                                                                          |
 | Trade-off document                               | _not written yet_ — add under `docs/`                                                                          |
 | Decision records (ADRs)                          | _not written yet_ — add under `docs/`                                                                          |
 
-**MVP in scope (later):** auth, paginated employee directory, current compensation derived from salary history, salary create/update with history retained, dashboard aggregates, CSV import/export, grounded Q&A, 10k seed.
+**MVP in scope (later), from the Incubyte requirements:** paginated employee directory (search/filter), salary create/view/update with history, salaries stored and shown in **INR**, salary attributes including components (base, bonus, incentives, etc.), CSV import with validation, RBAC (HR Manager and Employee), payslip generation/viewing by role, grounded AI compensation Q&A.
 
-**Explicitly out of scope:** payroll, tax, payslips, recruiting, performance, full audit product, advanced analytics, Next.js, PostgreSQL as the v1 database, multi-repo split.
+**Post-MVP (deferred):** detailed dashboard analytics, full audit trails.
+
+**Explicitly out of scope:** attendance/regularization, recruitment/onboarding, performance management.
 
 ## Prerequisites
 
