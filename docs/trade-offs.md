@@ -69,3 +69,29 @@ The baseline schema in `docs/salary-management-relational-schema.md` is sufficie
 **Decision:** Create and update employee endpoints only accept master-data fields (`employeeCode`, name, email, country, department, designation). Compensation is not set through the directory forms.
 
 **Why:** Salary create/update is part of Salary Management, not Employee Directory CUD.
+
+## Salary Records Management
+
+### Salary history is append-only
+
+**Decision:** Salary changes are modeled as new `salary_records` rows. Existing rows are never updated except to set `effective_to` when superseded.
+
+**Why:** Matches the baseline schema and preserves compensation history for payslips and audit needs.
+
+### One current salary record per employee
+
+**Decision:** Migration `003_salary_records_management.sql` adds a unique partial index on `salary_records(employee_id) WHERE effective_to IS NULL`.
+
+**Why:** Prevents overlapping current salaries at the database layer.
+
+### Closing the previous current record
+
+**Decision:** When a new salary is created, the prior current record's `effective_to` is set to the day before the new `effectiveFrom`.
+
+**Why:** Keeps periods contiguous without overlap and aligns with the schema's non-overlap rule.
+
+### Currency is always INR
+
+**Decision:** Salary API responses include `currency: "INR"` without client-supplied currency fields.
+
+**Why:** MVP scope from requirements; conversion is deferred.

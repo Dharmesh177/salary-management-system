@@ -15,7 +15,13 @@ const result = await seedDevData(db);
 db.close();
 
 if (result.inserted) {
-  console.log(`Dev seed applied: ${result.employeeCount} employees in ${sqlitePath}`);
+  const historicalNote =
+    result.historicalSalaryCount > 0
+      ? `, added ${result.historicalSalaryCount} historical salary records`
+      : '';
+  console.log(
+    `Dev seed applied: added ${result.insertedCount} employees${historicalNote} (${result.employeeCount} total) in ${sqlitePath}`,
+  );
 } else {
-  console.log(`Dev seed skipped: database already has ${result.employeeCount} employees`);
+  console.log(`Dev seed skipped: all seed employees already exist (${result.employeeCount} total)`);
 }
