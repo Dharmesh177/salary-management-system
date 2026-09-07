@@ -282,3 +282,36 @@ button.danger {
   gap: 0.75rem;
   margin-top: 1rem;
 }
+
+.salary-history-section {
+  margin-top: 2rem;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.section-header p {
+  margin: 0.35rem 0 0;
+  color: #627d98;
+}
+
+.salary-history-table td:last-child {
+  white-space: nowrap;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #e0e7ee;
+  color: #334e68;
+}
+
+.status-pill.current {
+  background: #d3f9d8;
+  color: #0b6e4f;
+}
