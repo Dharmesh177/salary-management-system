@@ -1,5 +1,12 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { fetchEmployees, fetchEmployee, fetchLookups } from './employees.js';
+import {
+  createEmployee,
+  deleteEmployee,
+  fetchEmployees,
+  fetchEmployee,
+  fetchLookups,
+  updateEmployee,
+} from './employees.js';
 
 describe('employee API client', () => {
   beforeEach(() => {
@@ -60,5 +67,71 @@ describe('employee API client', () => {
     expect(result.countries[0].name).toBe('India');
     expect(result.departments[0].name).toBe('Engineering');
     expect(result.designations[0].name).toBe('Software Engineer');
+  });
+
+  it('creates an employee', async () => {
+    const payload = {
+      employeeCode: 'EMP010',
+      firstName: 'Tim',
+      lastName: 'Berners-Lee',
+      email: 'tim@acme.example',
+      countryId: 1,
+      departmentId: 1,
+      designationId: 1,
+    };
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: { id: 10, ...payload } }),
+      }),
+    );
+
+    const result = await createEmployee(payload);
+
+    expect(fetch).toHaveBeenCalledWith('/api/v1/employees', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    expect(result.id).toBe(10);
+  });
+
+  it('updates an employee', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: { id: 1, employeeCode: 'EMP001' } }),
+      }),
+    );
+
+    await updateEmployee(1, { employeeCode: 'EMP001' });
+
+    expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ employeeCode: 'EMP001' }),
+    });
+  });
+
+  it('deletes an employee', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 204,
+        json: async () => ({}),
+      }),
+    );
+
+    await deleteEmployee(1);
+
+    expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: undefined,
+    });
   });
 });
