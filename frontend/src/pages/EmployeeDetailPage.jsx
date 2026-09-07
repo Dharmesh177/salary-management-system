@@ -1,4 +1,5 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { deleteEmployee } from '../api/employees.js';
 import CompensationCard from '../features/employees/components/CompensationCard.jsx';
 import EmployeeProfileCard from '../features/employees/components/EmployeeProfileCard.jsx';
 import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
@@ -7,7 +8,22 @@ import { EMPLOYEE_MESSAGES } from '../features/employees/messages.js';
 
 export default function EmployeeDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { employee, loading, error } = useEmployeeDetail(id);
+
+  async function handleDelete() {
+    const confirmed = window.confirm(EMPLOYEE_MESSAGES.confirmDelete);
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteEmployee(id);
+      navigate(EMPLOYEE_ROUTES.directory);
+    } catch (deleteError) {
+      window.alert(deleteError.message ?? EMPLOYEE_MESSAGES.deleteBlocked);
+    }
+  }
 
   if (loading) {
     return <p className="status-message">{EMPLOYEE_MESSAGES.loadingEmployee}</p>;
@@ -28,10 +44,18 @@ export default function EmployeeDetailPage() {
         <Link to={EMPLOYEE_ROUTES.directory}>{EMPLOYEE_MESSAGES.directoryTitle}</Link>
       </nav>
 
-      <header className="page-header">
+      <header className="page-header page-header-actions">
         <div>
           <h1>{employee.firstName} {employee.lastName}</h1>
           <p>{employee.employeeCode} · {employee.email}</p>
+        </div>
+        <div className="page-actions">
+          <Link to={EMPLOYEE_ROUTES.edit(employee.id)} className="button-link">
+            {EMPLOYEE_MESSAGES.editEmployee}
+          </Link>
+          <button type="button" className="danger" onClick={handleDelete}>
+            {EMPLOYEE_MESSAGES.deleteEmployee}
+          </button>
         </div>
       </header>
 

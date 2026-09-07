@@ -55,3 +55,17 @@ This document records product and technical decisions made during incremental fe
 ### Schema assessment
 
 The baseline schema in `docs/salary-management-relational-schema.md` is sufficient for Employee Directory. No mandatory changes were required. The partial index above is an optional performance enhancement, not a model change.
+
+### Employee delete is blocked when salary records exist
+
+**Decision:** `DELETE /api/v1/employees/:id` returns `409 EMPLOYEE_HAS_SALARY_RECORDS` if the employee has any `salary_records` rows.
+
+**Why:** Protects salary history from accidental deletion through the directory UI. Salary lifecycle changes remain a separate concern.
+
+**Trade-off:** HR must remove or reassign salary records (future salary-management flows) before deleting an employee with compensation data.
+
+### Employee CUD does not manage compensation
+
+**Decision:** Create and update employee endpoints only accept master-data fields (`employeeCode`, name, email, country, department, designation). Compensation is not set through the directory forms.
+
+**Why:** Salary create/update is part of Salary Management, not Employee Directory CUD.

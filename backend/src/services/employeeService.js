@@ -1,4 +1,5 @@
 import { EMPLOYEE_ERRORS } from '../constants/employee.js';
+import { parseEmployeeId } from '../utils/parseEmployeeId.js';
 
 function createEmployeeError({ message, status, code }) {
   const error = new Error(message);
@@ -7,15 +8,37 @@ function createEmployeeError({ message, status, code }) {
   return error;
 }
 
-export function createEmployeeService(employeeRepository) {
+export function createEmployeeService(employeeRepository, lookupRepository) {
+  async function assertValidLookups(payload) {
+    const isValid = await lookupRepository.validateEmployeeLookups(payload);
+    if (!isValid) {
+      throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_LOOKUP);
+    }
+  }
+
+  async function assertUniqueEmployeeFields(payload, excludeId = null) {
+    const [existingCodeId, existingEmailId] = await Promise.all([
+      employeeRepository.findEmployeeIdByCode(payload.employeeCode),
+      employeeRepository.findEmployeeIdByEmail(payload.email),
+    ]);
+
+    if (existingCodeId && existingCodeId !== excludeId) {
+      throw createEmployeeError(EMPLOYEE_ERRORS.DUPLICATE);
+    }
+
+    if (existingEmailId && existingEmailId !== excludeId) {
+      throw createEmployeeError(EMPLOYEE_ERRORS.DUPLICATE);
+    }
+  }
+
   return {
     async listEmployees(filters) {
       return employeeRepository.listEmployees(filters);
     },
 
     async getEmployeeById(id) {
-      const employeeId = Number.parseInt(id, 10);
-      if (!Number.isFinite(employeeId) || employeeId <= 0) {
+      const employeeId = parseEmployeeId(id);
+      if (!employeeId) {
         throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
       }
 
@@ -25,6 +48,51 @@ export function createEmployeeService(employeeRepository) {
       }
 
       return employee;
+    },
+
+    async createEmployee(payload) {
+      await assertValidLookups(payload);
+      await assertUniqueEmployeeFields(payload);
+
+      const employeeId = await employeeRepository.createEmployee(payload);
+      return employeeRepository.findEmployeeById(employeeId);
+    },
+
+    async updateEmployee(id, payload) {
+      const employeeId = parseEmployeeId(id);
+      if (!employeeId) {
+        throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
+      }
+
+      const existing = await employeeRepository.findEmployeeById(employeeId);
+      if (!existing) {
+        throw createEmployeeError(EMPLOYEE_ERRORS.NOT_FOUND);
+      }
+
+      await assertValidLookups(payload);
+      await assertUniqueEmployeeFields(payload, employeeId);
+
+      await employeeRepository.updateEmployee(employeeId, payload);
+      return employeeRepository.findEmployeeById(employeeId);
+    },
+
+    async deleteEmployee(id) {
+      const employeeId = parseEmployeeId(id);
+      if (!employeeId) {
+        throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
+      }
+
+      const existing = await employeeRepository.findEmployeeById(employeeId);
+      if (!existing) {
+        throw createEmployeeError(EMPLOYEE_ERRORS.NOT_FOUND);
+      }
+
+      const salaryRecordCount = await employeeRepository.countSalaryRecords(employeeId);
+      if (salaryRecordCount > 0) {
+        throw createEmployeeError(EMPLOYEE_ERRORS.HAS_SALARY_RECORDS);
+      }
+
+      await employeeRepository.deleteEmployee(employeeId);
     },
   };
 }

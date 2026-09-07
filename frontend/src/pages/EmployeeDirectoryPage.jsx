@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
 import EmployeeFilters from '../features/employees/components/EmployeeFilters.jsx';
 import EmployeePagination from '../features/employees/components/EmployeePagination.jsx';
 import EmployeeTable from '../features/employees/components/EmployeeTable.jsx';
+import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
 import { EMPLOYEE_MESSAGES } from '../features/employees/messages.js';
 import { useEmployeeDirectory } from '../features/employees/hooks/useEmployeeDirectory.js';
 
@@ -21,13 +23,17 @@ export default function EmployeeDirectoryPage() {
 
   return (
     <section className="directory-page">
-      <header className="page-header">
+      <header className="page-header page-header-actions">
         <div>
           <h1>{EMPLOYEE_MESSAGES.directoryTitle}</h1>
           <p>{EMPLOYEE_MESSAGES.directorySubtitle}</p>
         </div>
+        <div className="page-actions">
+          <Link to={EMPLOYEE_ROUTES.new} className="button-link primary">
+            {EMPLOYEE_MESSAGES.addEmployee}
+          </Link>
+        </div>
       </header>
-
       <EmployeeFilters
         filters={filters}
         lookups={lookups}

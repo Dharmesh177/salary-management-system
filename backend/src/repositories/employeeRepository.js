@@ -1,12 +1,23 @@
+import { EMPLOYEE_ERRORS } from '../constants/employee.js';
 import { buildPaginationMeta, normalizePagination } from '../utils/pagination.js';
 import { toEmployeeDetail, toEmployeeListItem } from '../mappers/employeeMapper.js';
 import {
   buildEmployeeSearchWhereClause,
   countEmployeesQuery,
+  countSalaryRecordsQuery,
+  createEmployeeQuery,
+  deleteEmployeeQuery,
   findCurrentSalaryQuery,
+  findEmployeeByCodeQuery,
+  findEmployeeByEmailQuery,
   findEmployeeByIdQuery,
   listEmployeesQuery,
+  updateEmployeeQuery,
 } from './queries/employeeQueries.js';
+
+function isUniqueConstraintError(error) {
+  return error?.code === 'ERR_SQLITE_CONSTRAINT' || String(error?.message).includes('UNIQUE');
+}
 
 export function createEmployeeRepository(db) {
   return {
@@ -33,6 +44,75 @@ export function createEmployeeRepository(db) {
 
       const salaryRow = await db.queryOne(findCurrentSalaryQuery(), [id]);
       return toEmployeeDetail(row, salaryRow);
+    },
+
+    async findEmployeeIdByCode(employeeCode) {
+      const row = await db.queryOne(findEmployeeByCodeQuery(), [employeeCode]);
+      return row?.id ?? null;
+    },
+
+    async findEmployeeIdByEmail(email) {
+      const row = await db.queryOne(findEmployeeByEmailQuery(), [email]);
+      return row?.id ?? null;
+    },
+
+    async countSalaryRecords(employeeId) {
+      const row = await db.queryOne(countSalaryRecordsQuery(), [employeeId]);
+      return row?.count ?? 0;
+    },
+
+    async createEmployee(payload) {
+      try {
+        const result = await db.execute(createEmployeeQuery(), [
+          payload.employeeCode,
+          payload.firstName,
+          payload.lastName,
+          payload.email,
+          payload.countryId,
+          payload.departmentId,
+          payload.designationId,
+        ]);
+
+        return result.lastInsertRowid;
+      } catch (error) {
+        if (isUniqueConstraintError(error)) {
+          const duplicateError = new Error(EMPLOYEE_ERRORS.DUPLICATE.message);
+          duplicateError.status = EMPLOYEE_ERRORS.DUPLICATE.status;
+          duplicateError.code = EMPLOYEE_ERRORS.DUPLICATE.code;
+          throw duplicateError;
+        }
+        throw error;
+      }
+    },
+
+    async updateEmployee(id, payload) {
+      try {
+        const result = await db.execute(updateEmployeeQuery(), [
+          payload.employeeCode,
+          payload.firstName,
+          payload.lastName,
+          payload.email,
+          payload.countryId,
+          payload.departmentId,
+          payload.designationId,
+          id,
+        ]);
+
+        return result.changes > 0;
+      } catch (error) {
+        if (isUniqueConstraintError(error)) {
+          const duplicateError = new Error(EMPLOYEE_ERRORS.DUPLICATE.message);
+          duplicateError.status = EMPLOYEE_ERRORS.DUPLICATE.status;
+          duplicateError.code = EMPLOYEE_ERRORS.DUPLICATE.code;
+          throw duplicateError;
+        }
+        throw error;
+      }
+    },
+
+    async deleteEmployee(id) {
+      const result = await db.execute(deleteEmployeeQuery(), [id]);
+      return result.changes > 0;
     },
   };
 }

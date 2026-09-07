@@ -26,6 +26,20 @@ function buildQuery(params) {
   return query ? `?${query}` : '';
 }
 
+async function sendJson(method, path, body) {
+  const response = await fetch(`${baseUrl}${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  return parseJsonResponse(response);
+}
+
 export async function fetchEmployees(params = {}) {
   const response = await fetch(`${baseUrl}/api/v1/employees${buildQuery(params)}`);
   return parseJsonResponse(response);
@@ -35,6 +49,20 @@ export async function fetchEmployee(id) {
   const response = await fetch(`${baseUrl}/api/v1/employees/${id}`);
   const body = await parseJsonResponse(response);
   return body.data;
+}
+
+export async function createEmployee(payload) {
+  const body = await sendJson('POST', '/api/v1/employees', payload);
+  return body.data;
+}
+
+export async function updateEmployee(id, payload) {
+  const body = await sendJson('PUT', `/api/v1/employees/${id}`, payload);
+  return body.data;
+}
+
+export async function deleteEmployee(id) {
+  await sendJson('DELETE', `/api/v1/employees/${id}`);
 }
 
 export async function fetchLookups() {

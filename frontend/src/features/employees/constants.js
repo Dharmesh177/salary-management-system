@@ -2,7 +2,19 @@ export const EMPLOYEE_PAGE_SIZE = 20;
 
 export const EMPLOYEE_ROUTES = {
   directory: '/employees',
+  new: '/employees/new',
   detail: (id) => `/employees/${id}`,
+  edit: (id) => `/employees/${id}/edit`,
+};
+
+export const DEFAULT_EMPLOYEE_FORM = {
+  employeeCode: '',
+  firstName: '',
+  lastName: '',
+  email: '',
+  countryId: '',
+  departmentId: '',
+  designationId: '',
 };
 
 export const DEFAULT_EMPLOYEE_FILTERS = {

@@ -79,3 +79,59 @@ export function findCurrentSalaryQuery() {
           ORDER BY effective_from DESC
           LIMIT 1`;
 }
+
+export const INSERT_EMPLOYEE = `
+  INSERT INTO employees (
+    employee_code, first_name, last_name, email,
+    country_id, department_id, designation_id,
+    created_at, updated_at
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`;
+
+export const UPDATE_EMPLOYEE = `
+  UPDATE employees
+  SET employee_code = ?,
+      first_name = ?,
+      last_name = ?,
+      email = ?,
+      country_id = ?,
+      department_id = ?,
+      designation_id = ?,
+      updated_at = datetime('now')
+  WHERE id = ?`;
+
+export const DELETE_EMPLOYEE = 'DELETE FROM employees WHERE id = ?';
+
+export const COUNT_SALARY_RECORDS = `
+  SELECT COUNT(*) AS count
+  FROM salary_records
+  WHERE employee_id = ?`;
+
+export const FIND_EMPLOYEE_BY_CODE = `
+  SELECT id FROM employees WHERE employee_code = ? COLLATE NOCASE`;
+
+export const FIND_EMPLOYEE_BY_EMAIL = `
+  SELECT id FROM employees WHERE email = ? COLLATE NOCASE`;
+
+export function createEmployeeQuery() {
+  return INSERT_EMPLOYEE;
+}
+
+export function updateEmployeeQuery() {
+  return UPDATE_EMPLOYEE;
+}
+
+export function deleteEmployeeQuery() {
+  return DELETE_EMPLOYEE;
+}
+
+export function countSalaryRecordsQuery() {
+  return COUNT_SALARY_RECORDS;
+}
+
+export function findEmployeeByCodeQuery() {
+  return FIND_EMPLOYEE_BY_CODE;
+}
+
+export function findEmployeeByEmailQuery() {
+  return FIND_EMPLOYEE_BY_EMAIL;
+}
