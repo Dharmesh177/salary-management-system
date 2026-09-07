@@ -8,6 +8,7 @@
     "test": "node --test",
     "test:watch": "node --test --watch",
     "migrate": "node src/db/runMigrate.js",
+    "seed": "node src/db/runSeed.js",
     "lint": "eslint ."
   },
   "dependencies": {

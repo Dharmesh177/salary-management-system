@@ -22,8 +22,13 @@ This note records foundation decisions for the ACME Salary Management System. Do
 - `src/config/` — environment loading
 - `src/routes/` — HTTP routing only
 - `src/controllers/` — request/response mapping
-- `src/services/` — application/business rules (empty until first feature)
-- `src/repositories/` — persistence (empty until first feature)
+- `src/services/` — application/business rules
+- `src/repositories/` — persistence orchestration (SQL execution)
+- `src/repositories/queries/` — SQL strings and query builders per domain
+- `src/mappers/` — DB row → API response shaping
+- `src/validators/` — request query/body parsing
+- `src/utils/` — generic helpers (pagination, etc.)
+- `src/constants/` — shared domain constants and error definitions
 - `src/db/` — SQLite client, migration runner, SQL migration files
 - `src/middleware/` — cross-cutting HTTP concerns
 - `tests/` — Node.js test runner (`node:test`) + Supertest
@@ -31,12 +36,14 @@ This note records foundation decisions for the ACME Salary Management System. Do
 **Frontend**
 
 - `src/api/` — HTTP client for the Node API
-- `src/pages/` — route-level screens (empty until first UI feature)
-- `src/components/` — shared UI pieces
-- `src/hooks/` — shared hooks
+- `src/pages/` — route-level screens (thin shells; wire hooks and components)
+- `src/features/<domain>/` — feature modules (`components/`, `hooks/`, `constants.js`, `messages.js`)
+- `src/components/` — shared UI pieces used across features
+- `src/hooks/` — shared hooks used across features
+- `src/utils/` — generic frontend helpers (formatting, etc.)
 - Colocated `*.test.jsx` files for Vitest + Testing Library
 
-Business logic must not live in Express routes. Controllers stay thin; services own rules; repositories own SQL.
+Business logic must not live in Express routes or React pages. Controllers and pages stay thin; services own backend rules; repositories own SQL; mappers own response shapes; feature hooks own client-side data loading.
 
 ## Major dependencies
 

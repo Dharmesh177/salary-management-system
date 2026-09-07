@@ -2,7 +2,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import EmployeeDirectory from './EmployeeDirectory.jsx';
+import EmployeeDirectoryPage from './EmployeeDirectoryPage.jsx';
 
 vi.mock('../api/employees.js', () => ({
   fetchEmployees: vi.fn(),
@@ -36,12 +36,12 @@ const sampleLookups = {
 function renderDirectory() {
   return render(
     <MemoryRouter>
-      <EmployeeDirectory />
+      <EmployeeDirectoryPage />
     </MemoryRouter>,
   );
 }
 
-describe('EmployeeDirectory', () => {
+describe('EmployeeDirectoryPage', () => {
   afterEach(() => {
     cleanup();
   });

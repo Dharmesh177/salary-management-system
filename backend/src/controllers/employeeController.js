@@ -1,5 +1,6 @@
 import { createEmployeeRepository } from '../repositories/employeeRepository.js';
 import { createEmployeeService } from '../services/employeeService.js';
+import { parseEmployeeListQuery } from '../validators/employeeListQuery.js';
 
 function getEmployeeService(req) {
   const repository = createEmployeeRepository(req.app.locals.db);
@@ -9,15 +10,7 @@ function getEmployeeService(req) {
 export async function listEmployees(req, res, next) {
   try {
     const service = getEmployeeService(req);
-    const result = await service.listEmployees({
-      page: req.query.page,
-      pageSize: req.query.pageSize,
-      search: req.query.search,
-      countryId: req.query.countryId,
-      departmentId: req.query.departmentId,
-      designationId: req.query.designationId,
-    });
-
+    const result = await service.listEmployees(parseEmployeeListQuery(req.query));
     res.json(result);
   } catch (error) {
     next(error);

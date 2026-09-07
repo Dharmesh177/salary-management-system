@@ -1,15 +1,21 @@
+import {
+  LIST_COUNTRIES,
+  LIST_DEPARTMENTS,
+  LIST_DESIGNATIONS,
+} from './queries/lookupQueries.js';
+
 export function createLookupRepository(db) {
   return {
     async listCountries() {
-      return db.query('SELECT id, code, name FROM countries ORDER BY name');
+      return db.query(LIST_COUNTRIES);
     },
 
     async listDepartments() {
-      return db.query('SELECT id, name FROM departments ORDER BY name');
+      return db.query(LIST_DEPARTMENTS);
     },
 
     async listDesignations() {
-      return db.query('SELECT id, name FROM designations ORDER BY name');
+      return db.query(LIST_DESIGNATIONS);
     },
   };
 }

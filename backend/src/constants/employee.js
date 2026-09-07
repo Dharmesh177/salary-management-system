@@ -1,0 +1,14 @@
+export const DEFAULT_CURRENCY = 'INR';
+
+export const EMPLOYEE_ERRORS = {
+  INVALID_ID: {
+    message: 'Invalid employee id',
+    status: 400,
+    code: 'INVALID_EMPLOYEE_ID',
+  },
+  NOT_FOUND: {
+    message: 'Employee not found',
+    status: 404,
+    code: 'EMPLOYEE_NOT_FOUND',
+  },
+};

@@ -53,7 +53,10 @@ Then apply migrations (creates `backend/data/salary.db` if needed):
 
 ```bash
 npm run migrate
+npm run seed
 ```
+
+`npm run seed` loads a small local dev dataset (5 employees). It is safe to run multiple times and skips if employees already exist.
 
 ## Run locally
 

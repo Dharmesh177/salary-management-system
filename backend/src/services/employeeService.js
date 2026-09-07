@@ -1,3 +1,12 @@
+import { EMPLOYEE_ERRORS } from '../constants/employee.js';
+
+function createEmployeeError({ message, status, code }) {
+  const error = new Error(message);
+  error.status = status;
+  error.code = code;
+  return error;
+}
+
 export function createEmployeeService(employeeRepository) {
   return {
     async listEmployees(filters) {
@@ -7,18 +16,12 @@ export function createEmployeeService(employeeRepository) {
     async getEmployeeById(id) {
       const employeeId = Number.parseInt(id, 10);
       if (!Number.isFinite(employeeId) || employeeId <= 0) {
-        const error = new Error('Invalid employee id');
-        error.status = 400;
-        error.code = 'INVALID_EMPLOYEE_ID';
-        throw error;
+        throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
       }
 
       const employee = await employeeRepository.findEmployeeById(employeeId);
       if (!employee) {
-        const error = new Error('Employee not found');
-        error.status = 404;
-        error.code = 'EMPLOYEE_NOT_FOUND';
-        throw error;
+        throw createEmployeeError(EMPLOYEE_ERRORS.NOT_FOUND);
       }
 
       return employee;

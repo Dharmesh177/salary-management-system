@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import EmployeeDetail from './EmployeeDetail.jsx';
+import EmployeeDetailPage from './EmployeeDetailPage.jsx';
 
 vi.mock('../api/employees.js', () => ({
   fetchEmployee: vi.fn(),
@@ -32,13 +32,13 @@ function renderDetail() {
   return render(
     <MemoryRouter initialEntries={['/employees/1']}>
       <Routes>
-        <Route path="/employees/:id" element={<EmployeeDetail />} />
+        <Route path="/employees/:id" element={<EmployeeDetailPage />} />
       </Routes>
     </MemoryRouter>,
   );
 }
 
-describe('EmployeeDetail', () => {
+describe('EmployeeDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     fetchEmployee.mockResolvedValue(sampleEmployee);
