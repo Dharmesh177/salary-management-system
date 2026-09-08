@@ -5,7 +5,12 @@ export async function login({ email, password }) {
   return body.data;
 }
 
-export async function fetchCurrentUser() {
-  const body = await fetchJson('/api/v1/auth/me');
+export async function registerUser(payload) {
+  const body = await sendJson('POST', '/api/v1/auth/register', payload);
+  return body.data;
+}
+
+export async function fetchSession() {
+  const body = await fetchJson('/api/v1/auth/session');
   return body.data;
 }

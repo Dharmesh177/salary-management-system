@@ -1,19 +1,22 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { deleteEmployee } from '../api/employees.js';
-import { useAuth } from '../features/auth/context/AuthContext.jsx';
-import CompensationCard from '../features/employees/components/CompensationCard.jsx';import EmployeeProfileCard from '../features/employees/components/EmployeeProfileCard.jsx';
-import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
-import { useEmployeeDetail } from '../features/employees/hooks/useEmployeeDetail.js';
-import { EMPLOYEE_MESSAGES } from '../features/employees/messages.js';
-import SalaryHistoryTable from '../features/salaryRecords/components/SalaryHistoryTable.jsx';
-import { SALARY_RECORD_ROUTES } from '../features/salaryRecords/constants.js';
-import { useSalaryRecords } from '../features/salaryRecords/hooks/useSalaryRecords.js';
-import { SALARY_RECORD_MESSAGES } from '../features/salaryRecords/messages.js';
+import { deleteEmployee } from '../../api/employees.js';
+import { useAuth } from '../../features/auth/context/AuthContext.jsx';
+import CompensationCard from '../../features/employees/components/CompensationCard.jsx';
+import EmployeeProfileCard from '../../features/employees/components/EmployeeProfileCard.jsx';
+import { EMPLOYEE_ROUTES } from '../../features/employees/constants.js';
+import { useEmployeeDetail } from '../../features/employees/hooks/useEmployeeDetail.js';
+import { EMPLOYEE_MESSAGES } from '../../features/employees/messages.js';
+import SalaryHistoryTable from '../../features/salaryRecords/components/SalaryHistoryTable.jsx';
+import { SALARY_RECORD_ROUTES } from '../../features/salaryRecords/constants.js';
+import { useSalaryRecords } from '../../features/salaryRecords/hooks/useSalaryRecords.js';
+import { SALARY_RECORD_MESSAGES } from '../../features/salaryRecords/messages.js';
+import './EmployeeDetailPage.css';
 
 export default function EmployeeDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isHrManager } = useAuth();  const { employee, loading, error } = useEmployeeDetail(id);
+  const { isHrManager } = useAuth();
+  const { employee, loading, error } = useEmployeeDetail(id);
   const {
     records,
     loading: salaryLoading,
@@ -52,7 +55,8 @@ export default function EmployeeDetailPage() {
       <nav className="breadcrumb">
         <Link to={isHrManager ? EMPLOYEE_ROUTES.directory : `/employees/${id}`}>
           {isHrManager ? EMPLOYEE_MESSAGES.directoryTitle : EMPLOYEE_MESSAGES.backToProfile}
-        </Link>      </nav>
+        </Link>
+      </nav>
 
       <header className="page-header page-header-actions">
         <div>
@@ -71,7 +75,8 @@ export default function EmployeeDetailPage() {
               {EMPLOYEE_MESSAGES.deleteEmployee}
             </button>
           </div>
-        ) : null}      </header>
+        ) : null}
+      </header>
 
       <div className="detail-grid">
         <EmployeeProfileCard employee={employee} />

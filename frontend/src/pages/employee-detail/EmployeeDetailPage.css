@@ -1,0 +1,17 @@
+.salary-history-section {
+  margin-top: 2rem;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.section-header p {
+  margin: 0.35rem 0 0;
+  color: #627d98;
+}
+
+.salary-history-table td:last-child {
+  white-space: nowrap;
+}

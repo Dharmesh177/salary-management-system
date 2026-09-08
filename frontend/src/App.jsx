@@ -4,11 +4,12 @@ import { AuthProvider, useAuth } from './features/auth/context/AuthContext.jsx';
 import { HrRoute, ProtectedRoute } from './features/auth/components/ProtectedRoute.jsx';
 import { AUTH_ROUTES } from './features/auth/constants.js';
 import { EMPLOYEE_ROUTES } from './features/employees/constants.js';
-import EmployeeDetailPage from './pages/EmployeeDetailPage.jsx';
-import EmployeeDirectoryPage from './pages/EmployeeDirectoryPage.jsx';
-import EmployeeFormPage from './pages/EmployeeFormPage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
-import SalaryRecordFormPage from './pages/SalaryRecordFormPage.jsx';
+import EmployeeDetailPage from './pages/employee-detail/EmployeeDetailPage.jsx';
+import EmployeeDirectoryPage from './pages/employee-directory/EmployeeDirectoryPage.jsx';
+import EmployeeFormPage from './pages/employee-form/EmployeeFormPage.jsx';
+import LoginPage from './pages/login/LoginPage.jsx';
+import RegisterPage from './pages/register/RegisterPage.jsx';
+import SalaryRecordFormPage from './pages/salary-record-form/SalaryRecordFormPage.jsx';
 
 function HomeRedirect() {
   const { user, loading, getDefaultRouteForUser } = useAuth();
@@ -33,6 +34,7 @@ export default function App() {
           <main className="app-main">
             <Routes>
               <Route path={AUTH_ROUTES.login} element={<LoginPage />} />
+              <Route path={AUTH_ROUTES.register} element={<RegisterPage />} />
               <Route path="/" element={<HomeRedirect />} />
               <Route
                 path={EMPLOYEE_ROUTES.directory}

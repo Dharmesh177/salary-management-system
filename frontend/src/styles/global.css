@@ -1,0 +1,23 @@
+:root {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #12202b;
+  background: #f4f6f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: #0f5c8c;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

@@ -1,8 +1,9 @@
 import { Link, useParams } from 'react-router-dom';
-import SalaryRecordForm from '../features/salaryRecords/components/SalaryRecordForm.jsx';
-import { useSalaryRecordForm } from '../features/salaryRecords/hooks/useSalaryRecordForm.js';
-import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
-import { SALARY_RECORD_MESSAGES } from '../features/salaryRecords/messages.js';
+import SalaryRecordForm from '../../features/salaryRecords/components/SalaryRecordForm.jsx';
+import { useSalaryRecordForm } from '../../features/salaryRecords/hooks/useSalaryRecordForm.js';
+import { EMPLOYEE_ROUTES } from '../../features/employees/constants.js';
+import { SALARY_RECORD_MESSAGES } from '../../features/salaryRecords/messages.js';
+import './SalaryRecordFormPage.css';
 
 export default function SalaryRecordFormPage() {
   const { id } = useParams();

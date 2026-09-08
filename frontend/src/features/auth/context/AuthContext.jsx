@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { fetchCurrentUser, login as loginRequest } from '../../../api/auth.js';
+import { fetchSession, login as loginRequest } from '../../../api/auth.js';
 import { clearStoredToken, getStoredToken, setStoredToken } from '../../../api/http.js';
 import { getDefaultRouteForUser, isHrManager } from '../utils.js';
 
@@ -18,8 +18,8 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const currentUser = await fetchCurrentUser();
-      setUser(currentUser);
+      const sessionUser = await fetchSession();
+      setUser(sessionUser);
     } catch {
       clearStoredToken();
       setUser(null);

@@ -1,0 +1,29 @@
+.app-header {
+  background: #102a43;
+  color: #fff;
+  padding: 1rem 1.5rem;
+}
+
+.app-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.brand {
+  color: #fff;
+  font-weight: 600;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-summary {
+  font-size: 0.9rem;
+  color: #d9e2ec;
+}

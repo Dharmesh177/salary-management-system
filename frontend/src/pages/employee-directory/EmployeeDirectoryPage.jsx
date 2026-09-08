@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import EmployeeFilters from '../features/employees/components/EmployeeFilters.jsx';
-import EmployeePagination from '../features/employees/components/EmployeePagination.jsx';
-import EmployeeTable from '../features/employees/components/EmployeeTable.jsx';
-import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
-import { EMPLOYEE_MESSAGES } from '../features/employees/messages.js';
-import { useEmployeeDirectory } from '../features/employees/hooks/useEmployeeDirectory.js';
+import EmployeeFilters from '../../features/employees/components/EmployeeFilters.jsx';
+import EmployeePagination from '../../features/employees/components/EmployeePagination.jsx';
+import EmployeeTable from '../../features/employees/components/EmployeeTable.jsx';
+import { EMPLOYEE_ROUTES } from '../../features/employees/constants.js';
+import { EMPLOYEE_MESSAGES } from '../../features/employees/messages.js';
+import { useEmployeeDirectory } from '../../features/employees/hooks/useEmployeeDirectory.js';
+import './EmployeeDirectoryPage.css';
 
 export default function EmployeeDirectoryPage() {
   const {

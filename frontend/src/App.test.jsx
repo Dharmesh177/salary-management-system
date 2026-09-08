@@ -12,17 +12,18 @@ vi.mock('./api/employees.js', () => ({
     departments: [],
     designations: [],
   }),
-  fetchEmployee: vi.fn(),
 }));
 
 vi.mock('./api/auth.js', () => ({
-  fetchCurrentUser: vi.fn().mockResolvedValue({
+  fetchSession: vi.fn().mockResolvedValue({
     id: 1,
     email: 'hr@example.com',
     employeeId: 1,
     roles: ['HR_MANAGER'],
     permissions: ['employee:read'],
   }),
+  login: vi.fn(),
+  registerUser: vi.fn(),
 }));
 
 describe('App', () => {

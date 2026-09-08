@@ -1,8 +1,9 @@
 import { Link, useParams } from 'react-router-dom';
-import EmployeeForm from '../features/employees/components/EmployeeForm.jsx';
-import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
-import { useEmployeeForm } from '../features/employees/hooks/useEmployeeForm.js';
-import { EMPLOYEE_MESSAGES } from '../features/employees/messages.js';
+import EmployeeForm from '../../features/employees/components/EmployeeForm.jsx';
+import { EMPLOYEE_ROUTES } from '../../features/employees/constants.js';
+import { useEmployeeForm } from '../../features/employees/hooks/useEmployeeForm.js';
+import { EMPLOYEE_MESSAGES } from '../../features/employees/messages.js';
+import './EmployeeFormPage.css';
 
 export default function EmployeeFormPage({ mode }) {
   const { id } = useParams();

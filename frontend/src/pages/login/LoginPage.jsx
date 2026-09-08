@@ -1,6 +1,7 @@
-import LoginForm from '../features/auth/components/LoginForm.jsx';
-import { useLoginForm } from '../features/auth/hooks/useLoginForm.js';
-import { AUTH_MESSAGES } from '../features/auth/messages.js';
+import LoginForm from '../../features/auth/components/LoginForm.jsx';
+import { useLoginForm } from '../../features/auth/hooks/useLoginForm.js';
+import { AUTH_MESSAGES } from '../../features/auth/messages.js';
+import './LoginPage.css';
 
 export default function LoginPage() {
   const {

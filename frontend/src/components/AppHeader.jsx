@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
 import { AUTH_MESSAGES } from '../features/auth/messages.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
+import './AppHeader.css';
 
 export default function AppHeader() {
   const { user, isHrManager, logout } = useAuth();
