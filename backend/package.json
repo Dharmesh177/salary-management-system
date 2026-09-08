@@ -8,7 +8,8 @@
     "test": "node --test",
     "test:watch": "node --test --watch",
     "migrate": "node src/db/runMigrate.js",
-    "seed": "node src/db/runSeed.js",
+    "seed": "node src/db/runSeedEmployees.js --count=20 --skip-if-populated",
+    "seed:employees": "node src/db/runSeedEmployees.js",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "supertest": "^7.0.0"
   }
 }

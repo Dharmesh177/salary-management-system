@@ -4,21 +4,24 @@ Greenfield web application that replaces spreadsheet-based compensation tracking
 
 This repository is a **monorepo**: React SPA (`frontend/`), Node.js JSON API (`backend/`), SQLite persistence.
 
-## Requirements and other documents
+## Requirements and documentation
 
-| Document                                         | Location                                                                                                       |
-| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Document | Location |
+| -------- | -------- |
 | Product requirements (**source of truth**) | [`docs/Salary Management System Requirements - Updated.docx`](docs/Salary%20Management%20System%20Requirements%20-%20Updated.docx) |
 | Relational schema (updated) | [`docs/salary-management-relational-schema-updated.md`](docs/salary-management-relational-schema-updated.md) |
-| Architecture / setup notes                       | [`docs/architecture.md`](docs/architecture.md)                                                                 |
-| Design doc                                       | _not written yet_ — add under `docs/` when UI/API design is specified                                          |
-| Architecture diagram                             | _not written yet_ — add under `docs/`                                                                          |
-| Trade-off document                               | _not written yet_ — add under `docs/`                                                                          |
-| Decision records (ADRs)                          | _not written yet_ — add under `docs/`                                                                          |
+| Architecture and setup | [`docs/architecture.md`](docs/architecture.md) |
+| Backend request flow | [`docs/backend-flow.md`](docs/backend-flow.md) |
+| Frontend structure and auth flow | [`docs/frontend-flow.md`](docs/frontend-flow.md) |
+| Trade-offs and design decisions | [`docs/trade-offs.md`](docs/trade-offs.md) |
+| AI usage (tooling and verification) | [`docs/ai-usage.md`](docs/ai-usage.md) |
+| Bulk employee seed (10k dev data) | [`docs/employee-seed.md`](docs/employee-seed.md) |
+| Architecture diagram | _not written yet_ |
+| Decision records (ADRs) | _not written yet_ |
 
-**MVP in scope:** paginated employee directory (search/filter), employee create/update/delete, login with secure registration, current salary snapshot per employee (`employee_salaries`) with explicit currency, exchange rates seeded for future analytics.
+**MVP in scope:** paginated employee directory (search/filter/sort), employee create/update/delete, login with secure registration, current salary snapshot per employee (`employee_salaries`) with explicit currency, seeded exchange rates, dashboard analytics, bulk dev seed (~10k employees).
 
-**Post-MVP (deferred):** salary history, RBAC, payslips, CSV import, dashboard analytics, grounded AI compensation Q&A.
+**Post-MVP (deferred):** salary history, RBAC, payslips, CSV import, grounded AI compensation Q&A.
 
 **Explicitly out of scope:** attendance/regularization, recruitment/onboarding, performance management.
 
@@ -34,9 +37,9 @@ This repository is a **monorepo**: React SPA (`frontend/`), Node.js JSON API (`b
   README.md
   .env.example
   documents/          # requirements and product artifacts
-  docs/               # engineering notes and later design/ADR/trade-off docs
+  docs/               # engineering notes, trade-offs, AI usage, seed guide
   frontend/           # React + Vite SPA
-  backend/            # Express API, SQLite, migrations, seed (later)
+  backend/            # Express API, SQLite, migrations, seeds
 ```
 
 Backend layers: routes → controllers → services → repositories → `db` client. HTTP handlers must not contain business rules.
@@ -57,7 +60,25 @@ npm run migrate
 npm run seed
 ```
 
-`npm run seed` loads a local dev dataset (20 employees across 5 countries and departments). It is safe to run multiple times and only inserts employees that are not already present.
+`npm run seed` loads a small dev dataset (20 Faker-generated employees when the database is empty) and ensures the `mary.jackson@acme.example` login account. It is safe to run multiple times on a populated database — generation is skipped if employees already exist.
+
+For large-scale local testing (~10,000 employees):
+
+```bash
+npm run seed:employees -w backend -- --replace
+```
+
+Options (pass after `--`):
+
+| Flag | Description |
+| ---- | ----------- |
+| `--replace` | Clear existing employees (and linked auth users) before seeding |
+| `--count=10000` | Number of employees to generate (default: `10000`) |
+| `--seed=20240908` | Faker seed for reproducible data (default: `20240908`) |
+| `--skip-if-populated` | Skip generation when employees already exist |
+| `--no-dev-login` | Skip creating the dev login user |
+
+The bulk seed uses weighted country/department distributions, department-aligned designations, and country-specific salary bands. By default it also ensures `mary.jackson@acme.example` is available for login.
 
 After seeding, sign in with this dev account (password: `password123`):
 
@@ -139,4 +160,4 @@ SQLite with checked-in SQL migrations under `backend/src/db/migrations/`. Applic
 
 ## Engineering approach
 
-Implementation of salary-management behavior follows **TDD**: write a failing test, implement the minimum code, refactor. See `docs/architecture.md` for structure, dependency, and database choices.
+Implementation follows **TDD** where practical: write a failing test, implement the minimum code, refactor. See [`docs/architecture.md`](docs/architecture.md) for structure and database choices, [`docs/trade-offs.md`](docs/trade-offs.md) for decision rationale, and [`docs/ai-usage.md`](docs/ai-usage.md) for how AI-assisted development was used and verified.
