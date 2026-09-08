@@ -2,3 +2,4 @@
 @import './styles/shared.css';
 @import './components/AppLayout.css';
 @import './components/charts/BarChart.css';
+@import './components/charts/DonutChart.css';

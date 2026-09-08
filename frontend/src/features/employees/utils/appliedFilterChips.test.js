@@ -22,16 +22,19 @@ describe('buildAppliedFilterChips', () => {
     expect(chips).toEqual([
       {
         key: 'search',
+        typeLabel: 'Search',
         label: 'ada',
         ariaLabel: 'Remove search filter: ada',
       },
       {
         key: 'countryId',
+        typeLabel: 'Country',
         label: 'India',
         ariaLabel: 'Remove country filter: India',
       },
       {
         key: 'designationId',
+        typeLabel: 'Designation',
         label: 'Software Engineer',
         ariaLabel: 'Remove designation filter: Software Engineer',
       },

@@ -105,6 +105,57 @@ describe('GET /api/v1/dashboard/analytics', () => {
     assert.equal(data.kpis.departmentCount, 2);
     assert.equal(data.kpis.totalCompensationUsd, '129800.00');
     assert.equal(data.kpis.averageCompensationUsd, '43266.67');
+    assert.equal(data.kpis.totalEmployeesLabel, 'Total employees');
+    assert.equal(data.kpis.totalCompensationUsdLabel, 'Total compensation (USD)');
+    assert.equal(data.kpis.averageCompensationUsdLabel, 'Average compensation (USD)');
+    assert.equal(data.kpis.countryCountLabel, 'Countries');
+    assert.equal(data.kpis.departmentCountLabel, 'Departments');
+
+    assert.equal(data.chartSections.length, 4);
+    assert.deepEqual(
+      data.chartSections.map((section) => ({
+        id: section.id,
+        title: section.title,
+        chartType: section.chartType,
+        labelKey: section.labelKey,
+        valueKey: section.valueKey,
+        valueFormat: section.valueFormat,
+      })),
+      [
+        {
+          id: 'employeeDistributionByCountry',
+          title: 'Employee distribution by country',
+          chartType: 'donut',
+          labelKey: 'countryName',
+          valueKey: 'employeeCount',
+          valueFormat: 'number',
+        },
+        {
+          id: 'employeeDistributionByDepartment',
+          title: 'Employee distribution by department',
+          chartType: 'donut',
+          labelKey: 'departmentName',
+          valueKey: 'employeeCount',
+          valueFormat: 'number',
+        },
+        {
+          id: 'averageCompensationByCountry',
+          title: 'Average compensation by country (USD)',
+          chartType: 'bar',
+          labelKey: 'countryName',
+          valueKey: 'averageCompensationUsd',
+          valueFormat: 'currency',
+        },
+        {
+          id: 'averageCompensationByDepartment',
+          title: 'Average compensation by department (USD)',
+          chartType: 'bar',
+          labelKey: 'departmentName',
+          valueKey: 'averageCompensationUsd',
+          valueFormat: 'currency',
+        },
+      ],
+    );
 
     assert.deepEqual(
       data.employeeDistributionByCountry.map((item) => ({

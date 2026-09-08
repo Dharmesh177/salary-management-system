@@ -9,6 +9,32 @@
   box-shadow: var(--shadow-card);
 }
 
-.login-form-grid {
+.login-page .form-grid,
+.register-page .form-grid {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  background: transparent;
+}
+
+.login-page .form-actions,
+.register-page .form-actions {
+  margin-top: 1rem;
+}
+
+.login-page .form-actions button,
+.register-page .form-actions button {
+  width: 100%;
+}
+
+.login-form-grid,
+.register-form-grid {
   grid-template-columns: 1fr;
+}
+
+.secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }

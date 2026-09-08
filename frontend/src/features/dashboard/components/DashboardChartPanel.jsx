@@ -1,4 +1,5 @@
 import BarChart from '../../../components/charts/BarChart.jsx';
+import DonutChart from '../../../components/charts/DonutChart.jsx';
 
 function formatUsd(value) {
   const amount = Number(value);
@@ -9,22 +10,36 @@ function formatUsd(value) {
   }).format(Number.isFinite(amount) ? amount : 0);
 }
 
-export default function DashboardChartPanel({
-  title,
-  rows,
-  labelKey,
-  valueKey,
-  formatValue,
-}) {
+function formatChartValue(valueFormat, value) {
+  if (valueFormat === 'currency') {
+    return formatUsd(value);
+  }
+
+  return String(value);
+}
+
+export default function DashboardChartPanel({ section }) {
+  const formatValue = (value) => formatChartValue(section.valueFormat, value);
+
   return (
     <section className="dashboard-panel dashboard-chart-panel">
-      <h2>{title}</h2>
-      <BarChart
-        items={rows}
-        labelKey={labelKey}
-        valueKey={valueKey}
-        formatValue={formatValue}
-      />
+      <h2>{section.title}</h2>
+      {section.chartType === 'donut' ? (
+        <DonutChart
+          items={section.items}
+          labelKey={section.labelKey}
+          valueKey={section.valueKey}
+          formatValue={formatValue}
+        />
+      ) : (
+        <BarChart
+          items={section.items}
+          labelKey={section.labelKey}
+          valueKey={section.valueKey}
+          formatValue={formatValue}
+          minBarPercent={section.valueFormat === 'currency' ? 10 : 8}
+        />
+      )}
     </section>
   );
 }

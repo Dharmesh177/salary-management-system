@@ -14,4 +14,8 @@ export const DASHBOARD_MESSAGES = {
   averageCompensationByDepartment: 'Average compensation by department (USD)',
   employeesLabel: 'Employees',
   averageUsdLabel: 'Average (USD)',
+  fxNoticeTitle: 'Currency conversion notice',
+  fxNoticeMessage:
+    'USD compensation figures use fixed reference exchange rates for consistent reporting. They are not live market prices.',
+  fxNoticeDismissLabel: 'Dismiss currency conversion notice',
 };

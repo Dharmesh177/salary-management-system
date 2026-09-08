@@ -1,4 +1,4 @@
-import { DASHBOARD_MESSAGES } from '../messages.js';
+import DashboardKpiIcon from './DashboardKpiIcon.jsx';
 
 function formatUsd(value) {
   const amount = Number(value);
@@ -11,21 +11,18 @@ function formatUsd(value) {
 
 export default function DashboardKpiCards({ kpis }) {
   const items = [
-    { label: DASHBOARD_MESSAGES.totalEmployees, value: kpis.totalEmployees, featured: true },
-    { label: DASHBOARD_MESSAGES.totalCompensationUsd, value: formatUsd(kpis.totalCompensationUsd) },
-    { label: DASHBOARD_MESSAGES.averageCompensationUsd, value: formatUsd(kpis.averageCompensationUsd) },
-    { label: DASHBOARD_MESSAGES.countryCount, value: kpis.countryCount },
-    { label: DASHBOARD_MESSAGES.departmentCount, value: kpis.departmentCount },
+    { id: 'totalEmployees', icon: 'employees', label: kpis.totalEmployeesLabel, value: kpis.totalEmployees },
+    { id: 'totalCompensationUsd', icon: 'compensation', label: kpis.totalCompensationUsdLabel, value: formatUsd(kpis.totalCompensationUsd) },
+    { id: 'averageCompensationUsd', icon: 'average', label: kpis.averageCompensationUsdLabel, value: formatUsd(kpis.averageCompensationUsd) },
+    { id: 'countryCount', icon: 'countries', label: kpis.countryCountLabel, value: kpis.countryCount },
+    { id: 'departmentCount', icon: 'departments', label: kpis.departmentCountLabel, value: kpis.departmentCount },
   ];
 
   return (
     <div className="dashboard-kpi-grid">
       {items.map((item) => (
-        <article
-          key={item.label}
-          className={`dashboard-kpi-card${item.featured ? ' featured' : ''}`}
-        >
-          <span className="dashboard-kpi-accent" aria-hidden="true" />
+        <article key={item.id} className="dashboard-kpi-card">
+          <DashboardKpiIcon type={item.icon} />
           <p className="dashboard-kpi-label">{item.label}</p>
           <p className="dashboard-kpi-value">{item.value}</p>
         </article>

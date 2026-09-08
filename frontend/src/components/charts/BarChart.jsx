@@ -2,19 +2,26 @@ import './BarChart.css';
 
 const BAR_COLORS = ['#2563eb', '#3b82f6', '#60a5fa', '#1d4ed8', '#93c5fd', '#1e40af'];
 
+function parseValue(value) {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
 export default function BarChart({
   items,
   labelKey,
   valueKey,
   formatValue = (value) => String(value),
+  minBarPercent = 8,
 }) {
-  const maxValue = Math.max(...items.map((item) => Number(item[valueKey]) || 0), 1);
+  const values = items.map((item) => parseValue(item[valueKey]));
+  const maxValue = Math.max(...values, 1);
 
   return (
     <ul className="bar-chart" aria-label="Bar chart">
       {items.map((item, index) => {
-        const value = Number(item[valueKey]) || 0;
-        const width = `${(value / maxValue) * 100}%`;
+        const value = parseValue(item[valueKey]);
+        const widthPercent = value === 0 ? 0 : Math.max((value / maxValue) * 100, minBarPercent);
 
         return (
           <li key={item[labelKey]} className="bar-chart-row">
@@ -26,7 +33,7 @@ export default function BarChart({
               <div
                 className="bar-chart-fill"
                 style={{
-                  width,
+                  width: `${widthPercent}%`,
                   backgroundColor: BAR_COLORS[index % BAR_COLORS.length],
                 }}
               />

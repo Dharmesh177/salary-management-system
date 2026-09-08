@@ -46,6 +46,52 @@ function mapAverageCompensationByDepartment(rows) {
   }));
 }
 
+function buildChartSections({
+  employeeDistributionByCountry,
+  employeeDistributionByDepartment,
+  averageCompensationByCountry,
+  averageCompensationByDepartment,
+}) {
+  return [
+    {
+      id: 'employeeDistributionByCountry',
+      title: 'Employee distribution by country',
+      chartType: 'donut',
+      labelKey: 'countryName',
+      valueKey: 'employeeCount',
+      valueFormat: 'number',
+      items: employeeDistributionByCountry,
+    },
+    {
+      id: 'employeeDistributionByDepartment',
+      title: 'Employee distribution by department',
+      chartType: 'donut',
+      labelKey: 'departmentName',
+      valueKey: 'employeeCount',
+      valueFormat: 'number',
+      items: employeeDistributionByDepartment,
+    },
+    {
+      id: 'averageCompensationByCountry',
+      title: 'Average compensation by country (USD)',
+      chartType: 'bar',
+      labelKey: 'countryName',
+      valueKey: 'averageCompensationUsd',
+      valueFormat: 'currency',
+      items: averageCompensationByCountry,
+    },
+    {
+      id: 'averageCompensationByDepartment',
+      title: 'Average compensation by department (USD)',
+      chartType: 'bar',
+      labelKey: 'departmentName',
+      valueKey: 'averageCompensationUsd',
+      valueFormat: 'currency',
+      items: averageCompensationByDepartment,
+    },
+  ];
+}
+
 export function createDashboardService(dashboardRepository) {
   return {
     async getAnalytics() {
@@ -68,20 +114,34 @@ export function createDashboardService(dashboardRepository) {
         dashboardRepository.getAverageCompensationByDepartment(),
       ]);
 
+      const countryDistribution = mapDistributionByCountry(employeeDistributionByCountry);
+      const departmentDistribution = mapDistributionByDepartment(employeeDistributionByDepartment);
+      const countryCompensation = mapAverageCompensationByCountry(averageCompensationByCountry);
+      const departmentCompensation = mapAverageCompensationByDepartment(averageCompensationByDepartment);
+
       return {
         kpis: {
           totalEmployees: kpisRow.total_employees,
+          totalEmployeesLabel: 'Total employees',
           totalCompensationUsd: formatUsd(kpisRow.total_compensation_usd),
+          totalCompensationUsdLabel: 'Total compensation (USD)',
           averageCompensationUsd: formatUsd(kpisRow.average_compensation_usd),
+          averageCompensationUsdLabel: 'Average compensation (USD)',
           countryCount: kpisRow.country_count,
+          countryCountLabel: 'Countries',
           departmentCount: kpisRow.department_count,
+          departmentCountLabel: 'Departments',
         },
-        employeeDistributionByCountry: mapDistributionByCountry(employeeDistributionByCountry),
-        employeeDistributionByDepartment: mapDistributionByDepartment(employeeDistributionByDepartment),
-        averageCompensationByCountry: mapAverageCompensationByCountry(averageCompensationByCountry),
-        averageCompensationByDepartment: mapAverageCompensationByDepartment(
-          averageCompensationByDepartment,
-        ),
+        employeeDistributionByCountry: countryDistribution,
+        employeeDistributionByDepartment: departmentDistribution,
+        averageCompensationByCountry: countryCompensation,
+        averageCompensationByDepartment: departmentCompensation,
+        chartSections: buildChartSections({
+          employeeDistributionByCountry: countryDistribution,
+          employeeDistributionByDepartment: departmentDistribution,
+          averageCompensationByCountry: countryCompensation,
+          averageCompensationByDepartment: departmentCompensation,
+        }),
       };
     },
   };

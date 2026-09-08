@@ -4,6 +4,7 @@ export function buildAppliedFilterChips(appliedFilters, lookups) {
   if (appliedFilters.search) {
     chips.push({
       key: 'search',
+      typeLabel: 'Search',
       label: appliedFilters.search,
       ariaLabel: `Remove search filter: ${appliedFilters.search}`,
     });
@@ -15,6 +16,7 @@ export function buildAppliedFilterChips(appliedFilters, lookups) {
     );
     chips.push({
       key: 'countryId',
+      typeLabel: 'Country',
       label: country?.name ?? 'Country',
       ariaLabel: `Remove country filter: ${country?.name ?? 'Country'}`,
     });
@@ -26,6 +28,7 @@ export function buildAppliedFilterChips(appliedFilters, lookups) {
     );
     chips.push({
       key: 'departmentId',
+      typeLabel: 'Department',
       label: department?.name ?? 'Department',
       ariaLabel: `Remove department filter: ${department?.name ?? 'Department'}`,
     });
@@ -37,6 +40,7 @@ export function buildAppliedFilterChips(appliedFilters, lookups) {
     );
     chips.push({
       key: 'designationId',
+      typeLabel: 'Designation',
       label: designation?.name ?? 'Designation',
       ariaLabel: `Remove designation filter: ${designation?.name ?? 'Designation'}`,
     });
