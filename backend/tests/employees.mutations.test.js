@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
-import { createSeededTestDb } from './helpers/employeeFixtures.js';
+import { authHeader, createAuthedTestApp } from './helpers/authFixtures.js';
 
 const validPayload = {
   employeeCode: 'EMP010',
@@ -17,10 +16,10 @@ const validPayload = {
 describe('employee CUD API', () => {
   let db;
   let app;
+  let hrToken;
 
   before(async () => {
-    db = await createSeededTestDb();
-    app = createApp({ db, corsOrigin: 'http://localhost:5173' });
+    ({ db, app, hrToken } = await createAuthedTestApp());
   });
 
   after(() => {
@@ -29,7 +28,10 @@ describe('employee CUD API', () => {
 
   describe('POST /api/v1/employees', () => {
     it('creates an employee and returns 201', async () => {
-      const response = await request(app).post('/api/v1/employees').send(validPayload);
+      const response = await request(app)
+        .post('/api/v1/employees')
+        .set(authHeader(hrToken))
+        .send(validPayload);
 
       assert.equal(response.status, 201);
       assert.equal(response.body.data.employeeCode, 'EMP010');
@@ -38,32 +40,41 @@ describe('employee CUD API', () => {
     });
 
     it('returns 400 when required fields are missing', async () => {
-      const response = await request(app).post('/api/v1/employees').send({
-        firstName: 'Missing',
-      });
+      const response = await request(app)
+        .post('/api/v1/employees')
+        .set(authHeader(hrToken))
+        .send({
+          firstName: 'Missing',
+        });
 
       assert.equal(response.status, 400);
       assert.equal(response.body.code, 'EMPLOYEE_VALIDATION_ERROR');
     });
 
     it('returns 409 when employee code already exists', async () => {
-      const response = await request(app).post('/api/v1/employees').send({
-        ...validPayload,
-        employeeCode: 'EMP001',
-        email: 'unique.email@acme.example',
-      });
+      const response = await request(app)
+        .post('/api/v1/employees')
+        .set(authHeader(hrToken))
+        .send({
+          ...validPayload,
+          employeeCode: 'EMP001',
+          email: 'unique.email@acme.example',
+        });
 
       assert.equal(response.status, 409);
       assert.equal(response.body.code, 'EMPLOYEE_DUPLICATE');
     });
 
     it('returns 400 when lookup ids are invalid', async () => {
-      const response = await request(app).post('/api/v1/employees').send({
-        ...validPayload,
-        employeeCode: 'EMP011',
-        email: 'emp011@acme.example',
-        countryId: 999,
-      });
+      const response = await request(app)
+        .post('/api/v1/employees')
+        .set(authHeader(hrToken))
+        .send({
+          ...validPayload,
+          employeeCode: 'EMP011',
+          email: 'emp011@acme.example',
+          countryId: 999,
+        });
 
       assert.equal(response.status, 400);
       assert.equal(response.body.code, 'INVALID_EMPLOYEE_LOOKUP');
@@ -74,6 +85,7 @@ describe('employee CUD API', () => {
     it('updates an employee and returns 200', async () => {
       const response = await request(app)
         .put('/api/v1/employees/2')
+        .set(authHeader(hrToken))
         .send({
           ...validPayload,
           employeeCode: 'EMP002',
@@ -89,7 +101,10 @@ describe('employee CUD API', () => {
     });
 
     it('returns 404 when the employee does not exist', async () => {
-      const response = await request(app).put('/api/v1/employees/999').send(validPayload);
+      const response = await request(app)
+        .put('/api/v1/employees/999')
+        .set(authHeader(hrToken))
+        .send(validPayload);
 
       assert.equal(response.status, 404);
       assert.equal(response.body.code, 'EMPLOYEE_NOT_FOUND');
@@ -98,6 +113,7 @@ describe('employee CUD API', () => {
     it('returns 409 when email belongs to another employee', async () => {
       const response = await request(app)
         .put('/api/v1/employees/2')
+        .set(authHeader(hrToken))
         .send({
           ...validPayload,
           employeeCode: 'EMP002',
@@ -111,30 +127,41 @@ describe('employee CUD API', () => {
 
   describe('DELETE /api/v1/employees/:id', () => {
     it('deletes an employee without salary records', async () => {
-      const createResponse = await request(app).post('/api/v1/employees').send({
-        ...validPayload,
-        employeeCode: 'EMP099',
-        email: 'delete.me@acme.example',
-      });
+      const createResponse = await request(app)
+        .post('/api/v1/employees')
+        .set(authHeader(hrToken))
+        .send({
+          ...validPayload,
+          employeeCode: 'EMP099',
+          email: 'delete.me@acme.example',
+        });
 
       const employeeId = createResponse.body.data.id;
-      const response = await request(app).delete(`/api/v1/employees/${employeeId}`);
+      const response = await request(app)
+        .delete(`/api/v1/employees/${employeeId}`)
+        .set(authHeader(hrToken));
 
       assert.equal(response.status, 204);
 
-      const getResponse = await request(app).get(`/api/v1/employees/${employeeId}`);
+      const getResponse = await request(app)
+        .get(`/api/v1/employees/${employeeId}`)
+        .set(authHeader(hrToken));
       assert.equal(getResponse.status, 404);
     });
 
     it('returns 409 when employee has salary records', async () => {
-      const response = await request(app).delete('/api/v1/employees/1');
+      const response = await request(app)
+        .delete('/api/v1/employees/1')
+        .set(authHeader(hrToken));
 
       assert.equal(response.status, 409);
       assert.equal(response.body.code, 'EMPLOYEE_HAS_SALARY_RECORDS');
     });
 
     it('returns 404 when the employee does not exist', async () => {
-      const response = await request(app).delete('/api/v1/employees/999');
+      const response = await request(app)
+        .delete('/api/v1/employees/999')
+        .set(authHeader(hrToken));
 
       assert.equal(response.status, 404);
       assert.equal(response.body.code, 'EMPLOYEE_NOT_FOUND');

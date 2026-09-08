@@ -1,16 +1,15 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
-import { createSeededTestDb } from './helpers/employeeFixtures.js';
+import { authHeader, createAuthedTestApp } from './helpers/authFixtures.js';
 
 describe('GET /api/v1/employees', () => {
   let db;
   let app;
+  let hrToken;
 
   before(async () => {
-    db = await createSeededTestDb();
-    app = createApp({ db, corsOrigin: 'http://localhost:5173' });
+    ({ db, app, hrToken } = await createAuthedTestApp());
   });
 
   after(() => {
@@ -18,7 +17,9 @@ describe('GET /api/v1/employees', () => {
   });
 
   it('returns a paginated list of employees', async () => {
-    const response = await request(app).get('/api/v1/employees?page=1&pageSize=1');
+    const response = await request(app)
+      .get('/api/v1/employees?page=1&pageSize=1')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.data.length, 1);

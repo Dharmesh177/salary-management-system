@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
-import { createSeededTestDb } from './helpers/employeeFixtures.js';
+import { authHeader, createAuthedTestApp } from './helpers/authFixtures.js';
 
 const validSalaryPayload = {
   baseSalary: 1200000,
@@ -14,9 +13,10 @@ const validSalaryPayload = {
 describe('salary records API', () => {
   let db;
   let app;
+  let hrToken;
 
   before(async () => {
-    db = await createSeededTestDb({
+    ({ db, app, hrToken } = await createAuthedTestApp({
       salaryRecords: [
         {
           employee_id: 1,
@@ -27,8 +27,7 @@ describe('salary records API', () => {
           effective_to: null,
         },
       ],
-    });
-    app = createApp({ db, corsOrigin: 'http://localhost:5173' });
+    }));
   });
 
   after(() => {
@@ -37,7 +36,9 @@ describe('salary records API', () => {
 
   describe('GET /api/v1/employees/:employeeId/salary-records', () => {
     it('returns salary history ordered by effective date descending', async () => {
-      const response = await request(app).get('/api/v1/employees/1/salary-records');
+      const response = await request(app)
+        .get('/api/v1/employees/1/salary-records')
+        .set(authHeader(hrToken));
 
       assert.equal(response.status, 200);
       assert.equal(response.body.data.length, 1);
@@ -47,7 +48,9 @@ describe('salary records API', () => {
     });
 
     it('returns 404 when the employee does not exist', async () => {
-      const response = await request(app).get('/api/v1/employees/999/salary-records');
+      const response = await request(app)
+        .get('/api/v1/employees/999/salary-records')
+        .set(authHeader(hrToken));
 
       assert.equal(response.status, 404);
       assert.equal(response.body.code, 'EMPLOYEE_NOT_FOUND');
@@ -56,7 +59,9 @@ describe('salary records API', () => {
 
   describe('GET /api/v1/employees/:employeeId/salary-records/:salaryRecordId', () => {
     it('returns a single salary record', async () => {
-      const response = await request(app).get('/api/v1/employees/1/salary-records/1');
+      const response = await request(app)
+        .get('/api/v1/employees/1/salary-records/1')
+        .set(authHeader(hrToken));
 
       assert.equal(response.status, 200);
       assert.equal(response.body.data.id, 1);
@@ -65,7 +70,9 @@ describe('salary records API', () => {
     });
 
     it('returns 404 when the salary record does not exist', async () => {
-      const response = await request(app).get('/api/v1/employees/1/salary-records/999');
+      const response = await request(app)
+        .get('/api/v1/employees/1/salary-records/999')
+        .set(authHeader(hrToken));
 
       assert.equal(response.status, 404);
       assert.equal(response.body.code, 'SALARY_RECORD_NOT_FOUND');
@@ -76,6 +83,7 @@ describe('salary records API', () => {
     it('creates the first salary record for an employee without history', async () => {
       const response = await request(app)
         .post('/api/v1/employees/2/salary-records')
+        .set(authHeader(hrToken))
         .send(validSalaryPayload);
 
       assert.equal(response.status, 201);
@@ -88,13 +96,16 @@ describe('salary records API', () => {
     it('creates a new salary record and closes the previous current record', async () => {
       const response = await request(app)
         .post('/api/v1/employees/1/salary-records')
+        .set(authHeader(hrToken))
         .send(validSalaryPayload);
 
       assert.equal(response.status, 201);
       assert.equal(response.body.data.isCurrent, true);
       assert.equal(response.body.data.effectiveFrom, '2024-07-01');
 
-      const historyResponse = await request(app).get('/api/v1/employees/1/salary-records');
+      const historyResponse = await request(app)
+        .get('/api/v1/employees/1/salary-records')
+        .set(authHeader(hrToken));
       assert.equal(historyResponse.body.data.length, 2);
       assert.equal(historyResponse.body.data[0].effectiveFrom, '2024-07-01');
       assert.equal(historyResponse.body.data[1].effectiveTo, '2024-06-30');
@@ -104,6 +115,7 @@ describe('salary records API', () => {
     it('returns 400 when required fields are missing', async () => {
       const response = await request(app)
         .post('/api/v1/employees/2/salary-records')
+        .set(authHeader(hrToken))
         .send({ bonus: 10000 });
 
       assert.equal(response.status, 400);
@@ -113,6 +125,7 @@ describe('salary records API', () => {
     it('returns 400 when effectiveFrom is not after the current record', async () => {
       const response = await request(app)
         .post('/api/v1/employees/1/salary-records')
+        .set(authHeader(hrToken))
         .send({
           ...validSalaryPayload,
           effectiveFrom: '2024-01-01',
@@ -125,6 +138,7 @@ describe('salary records API', () => {
     it('returns 404 when the employee does not exist', async () => {
       const response = await request(app)
         .post('/api/v1/employees/999/salary-records')
+        .set(authHeader(hrToken))
         .send(validSalaryPayload);
 
       assert.equal(response.status, 404);

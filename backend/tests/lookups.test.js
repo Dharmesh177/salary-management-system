@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
-import { createSeededTestDb } from './helpers/employeeFixtures.js';
+import { authHeader, createAuthedTestApp } from './helpers/authFixtures.js';
 
 describe('lookup endpoints', () => {
   let db;
   let app;
+  let hrToken;
 
   before(async () => {
-    db = await createSeededTestDb({
+    ({ db, app, hrToken } = await createAuthedTestApp({
       countries: [
         { id: 1, code: 'IN', name: 'India' },
         { id: 2, code: 'US', name: 'United States' },
@@ -22,8 +22,7 @@ describe('lookup endpoints', () => {
         { id: 1, name: 'Software Engineer' },
         { id: 2, name: 'Accountant' },
       ],
-    });
-    app = createApp({ db, corsOrigin: 'http://localhost:5173' });
+    }));
   });
 
   after(() => {
@@ -31,7 +30,9 @@ describe('lookup endpoints', () => {
   });
 
   it('lists countries for filter dropdowns', async () => {
-    const response = await request(app).get('/api/v1/countries');
+    const response = await request(app)
+      .get('/api/v1/countries')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.data.length, 2);
@@ -39,7 +40,9 @@ describe('lookup endpoints', () => {
   });
 
   it('lists departments for filter dropdowns', async () => {
-    const response = await request(app).get('/api/v1/departments');
+    const response = await request(app)
+      .get('/api/v1/departments')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.data.length, 2);
@@ -47,7 +50,9 @@ describe('lookup endpoints', () => {
   });
 
   it('lists designations for filter dropdowns', async () => {
-    const response = await request(app).get('/api/v1/designations');
+    const response = await request(app)
+      .get('/api/v1/designations')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.data.length, 2);

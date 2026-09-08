@@ -15,10 +15,22 @@ vi.mock('./api/employees.js', () => ({
   fetchEmployee: vi.fn(),
 }));
 
+vi.mock('./api/auth.js', () => ({
+  fetchCurrentUser: vi.fn().mockResolvedValue({
+    id: 1,
+    email: 'hr@example.com',
+    employeeId: 1,
+    roles: ['HR_MANAGER'],
+    permissions: ['employee:read'],
+  }),
+}));
+
 describe('App', () => {
-  it('renders the employee directory by default', async () => {
+  it('renders the employee directory for authenticated HR users', async () => {
+    window.localStorage.setItem('auth_token', 'test-token');
     window.history.pushState({}, '', '/employees');
     render(<App />);
     expect(await screen.findByRole('heading', { name: 'Employee Directory' })).toBeInTheDocument();
+    window.localStorage.clear();
   });
 });

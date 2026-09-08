@@ -12,6 +12,17 @@ vi.mock('../api/salaryRecords.js', () => ({
   fetchSalaryRecords: vi.fn(),
 }));
 
+vi.mock('../api/salaryRecords.js', () => ({
+  fetchSalaryRecords: vi.fn(),
+}));
+
+vi.mock('../features/auth/context/AuthContext.jsx', () => ({
+  useAuth: () => ({
+    isHrManager: true,
+    user: { roles: ['HR_MANAGER'], employeeId: 1 },
+  }),
+}));
+
 import { fetchEmployee } from '../api/employees.js';
 import { fetchSalaryRecords } from '../api/salaryRecords.js';
 

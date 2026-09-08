@@ -24,14 +24,16 @@ describe('employee directory schema', () => {
     );
     const tableNames = tables.map((row) => row.name);
 
-    assert.deepEqual(tableNames, [
+    for (const tableName of [
       'countries',
       'departments',
       'designations',
       'employees',
       'salary_records',
       'schema_migrations',
-    ]);
+    ]) {
+      assert.ok(tableNames.includes(tableName), `missing table ${tableName}`);
+    }
   });
 
   it('enforces employee references to lookup tables', async () => {

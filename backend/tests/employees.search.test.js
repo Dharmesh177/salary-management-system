@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
-import { createSeededTestDb } from './helpers/employeeFixtures.js';
+import { authHeader, createAuthedTestApp } from './helpers/authFixtures.js';
 
 describe('GET /api/v1/employees search and filters', () => {
   let db;
   let app;
+  let hrToken;
 
   before(async () => {
-    db = await createSeededTestDb({
+    ({ db, app, hrToken } = await createAuthedTestApp({
       countries: [
         { id: 1, code: 'IN', name: 'India' },
         { id: 2, code: 'US', name: 'United States' },
@@ -51,8 +51,7 @@ describe('GET /api/v1/employees search and filters', () => {
           designation_id: 2,
         },
       ],
-    });
-    app = createApp({ db, corsOrigin: 'http://localhost:5173' });
+    }));
   });
 
   after(() => {
@@ -60,7 +59,9 @@ describe('GET /api/v1/employees search and filters', () => {
   });
 
   it('searches by employee code', async () => {
-    const response = await request(app).get('/api/v1/employees?search=EMP003');
+    const response = await request(app)
+      .get('/api/v1/employees?search=EMP003')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.data.length, 1);
@@ -68,7 +69,9 @@ describe('GET /api/v1/employees search and filters', () => {
   });
 
   it('searches by employee name', async () => {
-    const response = await request(app).get('/api/v1/employees?search=grace');
+    const response = await request(app)
+      .get('/api/v1/employees?search=grace')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.data.length, 1);
@@ -76,9 +79,9 @@ describe('GET /api/v1/employees search and filters', () => {
   });
 
   it('filters by country, department, and designation', async () => {
-    const response = await request(app).get(
-      '/api/v1/employees?countryId=2&departmentId=2&designationId=2',
-    );
+    const response = await request(app)
+      .get('/api/v1/employees?countryId=2&departmentId=2&designationId=2')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.data.length, 1);

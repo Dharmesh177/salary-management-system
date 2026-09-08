@@ -1,16 +1,15 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
-import { createSeededTestDb } from './helpers/employeeFixtures.js';
+import { authHeader, createAuthedTestApp } from './helpers/authFixtures.js';
 
 describe('GET /api/v1/employees/:id', () => {
   let db;
   let app;
+  let hrToken;
 
   before(async () => {
-    db = await createSeededTestDb();
-    app = createApp({ db, corsOrigin: 'http://localhost:5173' });
+    ({ db, app, hrToken } = await createAuthedTestApp());
   });
 
   after(() => {
@@ -18,7 +17,9 @@ describe('GET /api/v1/employees/:id', () => {
   });
 
   it('returns employee details with current compensation', async () => {
-    const response = await request(app).get('/api/v1/employees/1');
+    const response = await request(app)
+      .get('/api/v1/employees/1')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.data.employeeCode, 'EMP001');
@@ -28,7 +29,9 @@ describe('GET /api/v1/employees/:id', () => {
   });
 
   it('returns 404 when the employee does not exist', async () => {
-    const response = await request(app).get('/api/v1/employees/999');
+    const response = await request(app)
+      .get('/api/v1/employees/999')
+      .set(authHeader(hrToken));
 
     assert.equal(response.status, 404);
     assert.equal(response.body.code, 'EMPLOYEE_NOT_FOUND');
