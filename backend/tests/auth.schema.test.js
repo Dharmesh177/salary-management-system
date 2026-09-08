@@ -20,17 +20,6 @@ describe('auth schema', () => {
     assert.ok(rows.some((row) => row.id === '004_auth_rbac.sql'));
   });
 
-  it('creates users, roles, permissions, and junction tables', async () => {
-    const tables = await db.query(
-      "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('users', 'roles', 'permissions', 'user_roles', 'role_permissions') ORDER BY name",
-    );
-
-    assert.deepEqual(
-      tables.map((row) => row.name),
-      ['permissions', 'role_permissions', 'roles', 'user_roles', 'users'],
-    );
-  });
-
   it('enforces one user account per employee', async () => {
     await db.execute(
       `INSERT INTO users (

@@ -18,6 +18,21 @@ export const authQueries = {
     FROM users u
     WHERE u.id = ?
   `,
+  findUserByEmployeeId: `
+    SELECT id
+    FROM users
+    WHERE employee_id = ?
+  `,
+  findEmployeeById: `
+    SELECT id
+    FROM employees
+    WHERE id = ?
+  `,
+  findRoleByName: `
+    SELECT id
+    FROM roles
+    WHERE name = ?
+  `,
   listRolesForUser: `
     SELECT r.name
     FROM user_roles ur
@@ -32,5 +47,13 @@ export const authQueries = {
     JOIN permissions p ON p.id = rp.permission_id
     WHERE ur.user_id = ?
     ORDER BY p.name
+  `,
+  insertUser: `
+    INSERT INTO users (
+      employee_id, email, password_hash, is_active, created_at, updated_at
+    ) VALUES (?, ?, ?, 1, datetime('now'), datetime('now'))
+  `,
+  insertUserRole: `
+    INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)
   `,
 };

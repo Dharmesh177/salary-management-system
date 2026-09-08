@@ -26,6 +26,15 @@ export function createAuthRepository(db) {
       return mapUser(row);
     },
 
+    async findUserByEmployeeId(employeeId) {
+      return db.queryOne(authQueries.findUserByEmployeeId, [employeeId]);
+    },
+
+    async employeeExists(employeeId) {
+      const row = await db.queryOne(authQueries.findEmployeeById, [employeeId]);
+      return Boolean(row);
+    },
+
     async listRolesForUser(userId) {
       const rows = await db.query(authQueries.listRolesForUser, [userId]);
       return rows.map((row) => row.name);
@@ -34,6 +43,19 @@ export function createAuthRepository(db) {
     async listPermissionsForUser(userId) {
       const rows = await db.query(authQueries.listPermissionsForUser, [userId]);
       return rows.map((row) => row.name);
+    },
+
+    async createUser({ employeeId, email, passwordHash, roleName }) {
+      const result = await db.execute(authQueries.insertUser, [
+        employeeId,
+        email,
+        passwordHash,
+      ]);
+
+      const role = await db.queryOne(authQueries.findRoleByName, [roleName]);
+      await db.execute(authQueries.insertUserRole, [result.lastInsertRowid, role.id]);
+
+      return result.lastInsertRowid;
     },
   };
 }

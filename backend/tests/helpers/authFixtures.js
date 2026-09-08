@@ -6,6 +6,7 @@ import { createApp } from '../../src/app.js';
 
 export const TEST_PASSWORD = 'password123';
 export const TEST_JWT_SECRET = 'test-jwt-secret';
+export const TEST_REGISTRATION_SECRET = 'test-registration-secret';
 
 export const ROLES = {
   HR_MANAGER: 'HR_MANAGER',
@@ -62,6 +63,7 @@ export async function createAuthedTestApp(employeeOverrides = {}, authOverrides 
     db,
     corsOrigin: 'http://localhost:5173',
     jwtSecret: TEST_JWT_SECRET,
+    registrationSecret: TEST_REGISTRATION_SECRET,
   });
 
   const hrLogin = await request(app)

@@ -65,6 +65,8 @@ After seeding, sign in with these dev accounts (password: `password123`):
 | HR Manager | `mary.jackson@acme.example` |
 | Employee | `ada.lovelace@acme.example` |
 
+To register additional users, set `REGISTRATION_SECRET` in `.env` and open `/register` with that secret. Registration is not linked in the UI.
+
 ## Run locally
 
 Start API and UI together:
@@ -125,7 +127,8 @@ Copy `.env.example` to `.env`. Do not commit `.env`.
 | `PORT`              | backend  | API listen port (default `3001`)                                 |
 | `NODE_ENV`          | backend  | `development` / `production`                                     |
 | `SQLITE_PATH`       | backend  | SQLite file path                                                 |
-| `JWT_SECRET`        | backend  | Auth secret (required in production; unused until auth is built) |
+| `JWT_SECRET`        | backend  | Auth secret (required in production) |
+| `REGISTRATION_SECRET` | backend | Secret required to call `POST /api/v1/auth/register` |
 | `CORS_ORIGIN`       | backend  | Allowed browser origin                                           |
 | `LLM_API_KEY`       | backend  | Optional; unused until Q&A                                       |
 | `VITE_API_BASE_URL` | frontend | Leave empty in local dev to use the Vite `/api` proxy            |

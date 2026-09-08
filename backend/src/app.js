@@ -5,11 +5,12 @@ import { apiRouter } from './routes/index.js';
 import { notFound } from './middleware/notFound.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-export function createApp({ db, corsOrigin, jwtSecret }) {
+export function createApp({ db, corsOrigin, jwtSecret, registrationSecret }) {
   const app = express();
 
   app.locals.db = db;
   app.locals.jwtSecret = jwtSecret;
+  app.locals.registrationSecret = registrationSecret;
 
   app.use(helmet());
   app.use(

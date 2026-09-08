@@ -29,6 +29,7 @@ export const config = {
   port: Number(process.env.PORT ?? 3001),
   sqlitePath: resolveSqlitePath(),
   jwtSecret: requiredInProduction('JWT_SECRET', 'dev-only-change-me'),
+  registrationSecret: requiredInProduction('REGISTRATION_SECRET', 'dev-registration-secret'),
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
   llmApiKey: process.env.LLM_API_KEY ?? '',
 };

@@ -100,7 +100,7 @@ The baseline schema in `docs/salary-management-relational-schema.md` is sufficie
 
 ### JWT bearer tokens for API authentication
 
-**Decision:** `POST /api/v1/auth/login` returns a signed JWT. Clients send `Authorization: Bearer <token>` on protected routes.
+**Decision:** `POST /api/v1/auth/login` returns a signed JWT. Clients send `Authorization: Bearer <token>` on protected routes. Current user is loaded via `GET /api/v1/auth/session`.
 
 **Why:** Stateless auth fits the SPA + JSON API model and keeps session storage out of the server for MVP.
 
@@ -123,3 +123,9 @@ The baseline schema in `docs/salary-management-relational-schema.md` is sufficie
 **Decision:** Employee directory list/create/update/delete and salary create endpoints require HR Manager access. Employees can read their own profile and salary history only.
 
 **Why:** Aligns with the Incubyte requirement that employees access their own salary/payslip data while HR manages the organization.
+
+### Registration requires a server-side secret
+
+**Decision:** `POST /api/v1/auth/register` is public but requires `registrationSecret` matching `REGISTRATION_SECRET`. The register page is not linked in navigation.
+
+**Why:** Allows controlled onboarding without open self-signup. Knowing the URL alone is not enough to create accounts.
