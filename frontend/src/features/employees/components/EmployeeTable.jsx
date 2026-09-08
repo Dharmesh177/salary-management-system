@@ -20,6 +20,7 @@ export default function EmployeeTable({ employees }) {
               </td>
               <td>{employee.firstName} {employee.lastName}</td>
               <td>{employee.email}</td>
+              <td>{employee.joiningDate}</td>
               <td>{employee.country.name}</td>
               <td>{employee.department.name}</td>
               <td>{employee.designation.name}</td>

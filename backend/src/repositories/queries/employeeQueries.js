@@ -4,6 +4,7 @@ const EMPLOYEE_SELECT_COLUMNS = `
   e.first_name,
   e.last_name,
   e.email,
+  e.joining_date,
   e.country_id,
   c.code AS country_code,
   c.name AS country_name,
@@ -81,9 +82,9 @@ export function findCurrentSalaryQuery() {
 export const INSERT_EMPLOYEE = `
   INSERT INTO employees (
     employee_code, first_name, last_name, email,
-    country_id, department_id, designation_id,
+    country_id, department_id, designation_id, joining_date,
     created_at, updated_at
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`;
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`;
 
 export const UPDATE_EMPLOYEE = `
   UPDATE employees
@@ -94,6 +95,7 @@ export const UPDATE_EMPLOYEE = `
       country_id = ?,
       department_id = ?,
       designation_id = ?,
+      joining_date = ?,
       updated_at = datetime('now')
   WHERE id = ?`;
 

@@ -64,6 +64,17 @@ export default function EmployeeForm({
         </label>
 
         <label>
+          {EMPLOYEE_MESSAGES.joiningDateLabel}
+          <input
+            type="date"
+            name="joiningDate"
+            value={values.joiningDate}
+            onChange={onChange}
+          />
+          <FieldError message={errors.joiningDate} />
+        </label>
+
+        <label>
           {EMPLOYEE_MESSAGES.countryLabel}
           <select name="countryId" value={values.countryId} onChange={onChange}>
             <option value="">Select country</option>

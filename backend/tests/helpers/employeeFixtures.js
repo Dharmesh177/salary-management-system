@@ -79,9 +79,9 @@ export async function seedEmployeeDirectory(db, overrides = {}) {
     await db.execute(
       `INSERT INTO employees (
         employee_code, first_name, last_name, email,
-        country_id, department_id, designation_id,
+        country_id, department_id, designation_id, joining_date,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
       [
         employee.employee_code,
         employee.first_name,
@@ -90,6 +90,7 @@ export async function seedEmployeeDirectory(db, overrides = {}) {
         employee.country_id,
         employee.department_id,
         employee.designation_id,
+        employee.joining_date ?? '2024-01-01',
       ],
     );
   }

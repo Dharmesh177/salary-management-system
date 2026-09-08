@@ -4,6 +4,15 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function isValidIsoDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
 export function validateEmployeeForm(values) {
   const errors = {};
 
@@ -29,6 +38,11 @@ export function validateEmployeeForm(values) {
   }
   if (!values.designationId) {
     errors.designationId = EMPLOYEE_MESSAGES.validation.designationRequired;
+  }
+  if (!values.joiningDate) {
+    errors.joiningDate = EMPLOYEE_MESSAGES.validation.joiningDateRequired;
+  } else if (!isValidIsoDate(values.joiningDate)) {
+    errors.joiningDate = EMPLOYEE_MESSAGES.validation.joiningDateInvalid;
   }
 
   return errors;

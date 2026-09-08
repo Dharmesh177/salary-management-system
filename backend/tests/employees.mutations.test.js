@@ -11,6 +11,7 @@ const validPayload = {
   countryId: 1,
   departmentId: 1,
   designationId: 1,
+  joiningDate: '2024-09-01',
 };
 
 describe('employee CUD API', () => {

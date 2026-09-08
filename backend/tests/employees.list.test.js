@@ -28,6 +28,7 @@ describe('GET /api/v1/employees', () => {
     assert.equal(response.body.pagination.total, 2);
     assert.equal(response.body.pagination.totalPages, 2);
     assert.equal(response.body.data[0].employeeCode, 'EMP002');
+    assert.equal(response.body.data[0].joiningDate, '2024-01-01');
     assert.equal(response.body.data[0].country.name, 'India');
     assert.equal(response.body.data[0].department.name, 'Engineering');
     assert.equal(response.body.data[0].designation.name, 'Software Engineer');

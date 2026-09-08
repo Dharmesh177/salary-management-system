@@ -28,6 +28,7 @@ export const EMPLOYEE_MESSAGES = {
   countryLabel: 'Country',
   departmentLabel: 'Department',
   designationLabel: 'Designation',
+  joiningDateLabel: 'Joining date',
   applyFilters: 'Apply filters',
   clearFilters: 'Clear',
   previousPage: 'Previous',
@@ -37,6 +38,7 @@ export const EMPLOYEE_MESSAGES = {
   countryField: 'Country',
   departmentField: 'Department',
   designationField: 'Designation',
+  joiningDateField: 'Joining date',
   baseSalaryField: 'Base salary',
   bonusField: 'Bonus',
   incentivesField: 'Incentives',
@@ -51,5 +53,7 @@ export const EMPLOYEE_MESSAGES = {
     countryRequired: 'Country is required',
     departmentRequired: 'Department is required',
     designationRequired: 'Designation is required',
+    joiningDateRequired: 'Joining date is required',
+    joiningDateInvalid: 'Enter a valid joining date',
   },
 };

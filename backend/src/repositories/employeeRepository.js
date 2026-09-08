@@ -65,6 +65,7 @@ export function createEmployeeRepository(db) {
           payload.countryId,
           payload.departmentId,
           payload.designationId,
+          payload.joiningDate,
         ]);
 
         return result.lastInsertRowid;
@@ -89,6 +90,7 @@ export function createEmployeeRepository(db) {
           payload.countryId,
           payload.departmentId,
           payload.designationId,
+          payload.joiningDate,
           id,
         ]);
 

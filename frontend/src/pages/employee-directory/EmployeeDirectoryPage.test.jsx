@@ -19,6 +19,7 @@ const sampleEmployees = {
       firstName: 'Ada',
       lastName: 'Lovelace',
       email: 'ada@example.com',
+      joiningDate: '2024-01-01',
       country: { id: 1, name: 'India' },
       department: { id: 1, name: 'Engineering' },
       designation: { id: 1, name: 'Software Engineer' },

@@ -5,6 +5,7 @@ export function toEmployeeListItem(row) {
     firstName: row.first_name,
     lastName: row.last_name,
     email: row.email,
+    joiningDate: row.joining_date,
     country: {
       id: row.country_id,
       code: row.country_code,

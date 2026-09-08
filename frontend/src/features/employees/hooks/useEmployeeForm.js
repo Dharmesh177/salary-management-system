@@ -19,6 +19,7 @@ function toFormValues(employee) {
     countryId: String(employee.country.id),
     departmentId: String(employee.department.id),
     designationId: String(employee.designation.id),
+    joiningDate: employee.joiningDate,
   };
 }
 
@@ -31,6 +32,7 @@ function toPayload(values) {
     countryId: Number(values.countryId),
     departmentId: Number(values.departmentId),
     designationId: Number(values.designationId),
+    joiningDate: values.joiningDate,
   };
 }
 

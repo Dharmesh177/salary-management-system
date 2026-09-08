@@ -6,6 +6,10 @@ export default function EmployeeProfileCard({ employee }) {
       <h2>{EMPLOYEE_MESSAGES.profileHeading}</h2>
       <dl>
         <div>
+          <dt>{EMPLOYEE_MESSAGES.joiningDateField}</dt>
+          <dd>{employee.joiningDate}</dd>
+        </div>
+        <div>
           <dt>{EMPLOYEE_MESSAGES.countryField}</dt>
           <dd>{employee.country.name}</dd>
         </div>

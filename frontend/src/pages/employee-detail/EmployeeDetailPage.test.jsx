@@ -19,6 +19,7 @@ const sampleEmployee = {
   country: { id: 1, code: 'IN', name: 'India' },
   department: { id: 1, name: 'Engineering' },
   designation: { id: 1, name: 'Software Engineer' },
+  joiningDate: '2024-01-01',
   currentCompensation: {
     currency: 'INR',
     baseSalary: 1000000,

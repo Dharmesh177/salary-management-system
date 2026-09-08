@@ -15,6 +15,7 @@ export const DEFAULT_EMPLOYEE_FORM = {
   countryId: '',
   departmentId: '',
   designationId: '',
+  joiningDate: '',
 };
 
 export const DEFAULT_EMPLOYEE_FILTERS = {
@@ -34,6 +35,7 @@ export const EMPLOYEE_TABLE_COLUMNS = [
   'Employee ID',
   'Name',
   'Email',
+  'Joining date',
   'Country',
   'Department',
   'Designation',

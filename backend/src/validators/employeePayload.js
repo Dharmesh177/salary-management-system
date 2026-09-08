@@ -1,4 +1,5 @@
 import { EMPLOYEE_ERRORS } from '../constants/employee.js';
+import { isValidIsoDate } from '../utils/date.js';
 
 function createValidationError(details) {
   const error = new Error(EMPLOYEE_ERRORS.VALIDATION.message);
@@ -33,6 +34,7 @@ export function parseEmployeePayload(body) {
     countryId: parseLookupId(body.countryId),
     departmentId: parseLookupId(body.departmentId),
     designationId: parseLookupId(body.designationId),
+    joiningDate: normalizeString(body.joiningDate),
   };
 
   const details = [];
@@ -59,6 +61,11 @@ export function parseEmployeePayload(body) {
   }
   if (!payload.designationId) {
     details.push('designationId is required');
+  }
+  if (!payload.joiningDate) {
+    details.push('joiningDate is required');
+  } else if (!isValidIsoDate(payload.joiningDate)) {
+    details.push('joiningDate is invalid');
   }
 
   if (details.length > 0) {
