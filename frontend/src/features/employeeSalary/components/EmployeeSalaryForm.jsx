@@ -1,4 +1,5 @@
-import { SALARY_RECORD_MESSAGES } from '../messages.js';
+import { SUPPORTED_CURRENCIES } from '../constants.js';
+import { EMPLOYEE_SALARY_MESSAGES } from '../messages.js';
 
 function FieldError({ message }) {
   if (!message) {
@@ -8,7 +9,7 @@ function FieldError({ message }) {
   return <span className="field-error">{message}</span>;
 }
 
-export default function SalaryRecordForm({
+export default function EmployeeSalaryForm({
   values,
   errors,
   submitError,
@@ -18,10 +19,10 @@ export default function SalaryRecordForm({
   onCancel,
 }) {
   return (
-    <form className="employee-form salary-record-form" onSubmit={onSubmit} noValidate>
+    <form className="employee-form employee-salary-form" onSubmit={onSubmit} noValidate>
       <div className="form-grid">
         <label>
-          {SALARY_RECORD_MESSAGES.baseSalaryLabel}
+          {EMPLOYEE_SALARY_MESSAGES.baseSalaryLabel}
           <input
             type="number"
             min="0"
@@ -34,7 +35,7 @@ export default function SalaryRecordForm({
         </label>
 
         <label>
-          {SALARY_RECORD_MESSAGES.bonusLabel}
+          {EMPLOYEE_SALARY_MESSAGES.bonusLabel}
           <input
             type="number"
             min="0"
@@ -47,7 +48,7 @@ export default function SalaryRecordForm({
         </label>
 
         <label>
-          {SALARY_RECORD_MESSAGES.incentivesLabel}
+          {EMPLOYEE_SALARY_MESSAGES.incentivesLabel}
           <input
             type="number"
             min="0"
@@ -60,14 +61,13 @@ export default function SalaryRecordForm({
         </label>
 
         <label>
-          {SALARY_RECORD_MESSAGES.effectiveFromLabel}
-          <input
-            type="date"
-            name="effectiveFrom"
-            value={values.effectiveFrom}
-            onChange={onChange}
-          />
-          <FieldError message={errors.effectiveFrom} />
+          {EMPLOYEE_SALARY_MESSAGES.currencyLabel}
+          <select name="currencyCode" value={values.currencyCode} onChange={onChange}>
+            {SUPPORTED_CURRENCIES.map((currency) => (
+              <option key={currency} value={currency}>{currency}</option>
+            ))}
+          </select>
+          <FieldError message={errors.currencyCode} />
         </label>
       </div>
 
@@ -75,9 +75,7 @@ export default function SalaryRecordForm({
 
       <div className="form-actions">
         <button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? SALARY_RECORD_MESSAGES.savingSalaryRecord
-            : SALARY_RECORD_MESSAGES.saveSalaryRecord}
+          {isSubmitting ? EMPLOYEE_SALARY_MESSAGES.savingSalary : EMPLOYEE_SALARY_MESSAGES.saveSalary}
         </button>
         <button type="button" className="secondary" onClick={onCancel} disabled={isSubmitting}>
           Cancel

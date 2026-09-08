@@ -4,7 +4,7 @@
 
 ```
 src/
-  api/              HTTP clients (auth, employees, salaryRecords, http)
+  api/              HTTP clients (auth, employees, employeeSalary, http)
   features/<name>/  domain logic (hooks, components, validation, messages)
   pages/<name>/     route screens (jsx, css, test colocated)
   components/       shared UI (AppHeader)
@@ -25,7 +25,7 @@ Pages are thin: they compose feature hooks/components and import page-specific C
 
 1. User submits `LoginPage` → `useLoginForm` validates → `api/auth.login`.
 2. On success, `AuthContext.login` saves token and sets `user` state.
-3. User is redirected to HR directory or own employee profile.
+3. User is redirected to the employee directory.
 
 ### Session restore
 
@@ -41,8 +41,7 @@ Pages are thin: they compose feature hooks/components and import page-specific C
 
 ### Route guards
 
-- `ProtectedRoute` — requires authentication.
-- `HrRoute` — requires `HR_MANAGER` role; others redirect to own profile.
+- `ProtectedRoute` — requires authentication for all app screens.
 
 ## API client layer
 
@@ -52,7 +51,7 @@ Pages are thin: they compose feature hooks/components and import page-specific C
 - `sendJson(method, path, body)` — POST/PUT/DELETE with auth header
 - `parseJsonResponse` — maps API errors to thrown `Error` with `code` and `status`
 
-Domain clients (`employees.js`, `salaryRecords.js`, `auth.js`) call `http.js`; they do not manage tokens directly.
+Domain clients (`employees.js`, `employeeSalary.js`, `auth.js`) call `http.js`; they do not manage tokens directly.
 
 ## Data flow example (employee directory)
 
@@ -66,12 +65,11 @@ EmployeeDirectoryPage
 
 Hooks own loading/error state. Components receive data via props.
 
-## Role-based UI
+## Salary editing
 
-`useAuth()` exposes `user`, `isHrManager`, `login`, `logout`.
+`EmployeeDetailPage` shows the current compensation snapshot from employee detail.
 
-- HR sees directory link, add/edit/delete actions, salary create.
-- Employee lands on own profile; HR actions hidden in `EmployeeDetailPage`.
+`EmployeeSalaryFormPage` at `/employees/:id/salary/edit` uses `useEmployeeSalaryForm` to load existing salary (if any) and `PUT /api/v1/employees/:id/salary` with explicit `currencyCode`.
 
 ## Styling
 
@@ -87,8 +85,9 @@ Vitest + Testing Library. API modules are mocked in page tests.
 Kept tests focus on core behavior:
 
 - `features/auth/validation.test.js` — login form rules
+- `features/employeeSalary/validation.test.js` — salary form rules
 - `pages/employee-directory/EmployeeDirectoryPage.test.js` — list + filter
-- `pages/employee-detail/EmployeeDetailPage.test.js` — detail render
+- `pages/employee-detail/EmployeeDetailPage.test.jsx` — detail render
 - `App.test.jsx` — authenticated routing to directory
 
 `setupTests.js` mocks `localStorage` for deterministic runs.

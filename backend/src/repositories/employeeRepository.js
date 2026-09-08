@@ -4,7 +4,6 @@ import { toEmployeeDetail, toEmployeeListItem } from '../mappers/employeeMapper.
 import {
   buildEmployeeSearchWhereClause,
   countEmployeesQuery,
-  countSalaryRecordsQuery,
   createEmployeeQuery,
   deleteEmployeeQuery,
   findCurrentSalaryQuery,
@@ -54,11 +53,6 @@ export function createEmployeeRepository(db) {
     async findEmployeeIdByEmail(email) {
       const row = await db.queryOne(findEmployeeByEmailQuery(), [email]);
       return row?.id ?? null;
-    },
-
-    async countSalaryRecords(employeeId) {
-      const row = await db.queryOne(countSalaryRecordsQuery(), [employeeId]);
-      return row?.count ?? 0;
     },
 
     async createEmployee(payload) {

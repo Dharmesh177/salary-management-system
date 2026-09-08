@@ -5,16 +5,12 @@ import { useAuth } from '../features/auth/context/AuthContext.jsx';
 import './AppHeader.css';
 
 export default function AppHeader() {
-  const { user, isHrManager, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <header className="app-header">
       <div className="app-header-content">
-        {isHrManager ? (
-          <Link to={EMPLOYEE_ROUTES.directory} className="brand">ACME Salary Management</Link>
-        ) : (
-          <span className="brand">ACME Salary Management</span>
-        )}
+        <Link to={EMPLOYEE_ROUTES.directory} className="brand">ACME Salary Management</Link>
         {user ? (
           <div className="app-header-actions">
             <span className="user-summary">{user.email}</span>

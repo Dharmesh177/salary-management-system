@@ -6,7 +6,7 @@
 HTTP request
   → routes/          (path + middleware)
   → controllers/     (parse input, map response)
-  → services/        (business rules, authorization)
+  → services/        (business rules)
   → repositories/    (SQL execution)
   → SQLite
 ```
@@ -19,53 +19,51 @@ HTTP request
 |----------|------|---------|
 | `POST /api/v1/auth/login` | Public | Email/password → JWT + user profile |
 | `POST /api/v1/auth/register` | Public, but requires `registrationSecret` | Create user for an existing employee |
-| `GET /api/v1/auth/session` | Bearer token | Return current user, roles, permissions |
+| `GET /api/v1/auth/session` | Bearer token | Return current user profile |
 
 **Login flow**
 
 1. Client sends `{ email, password }`.
 2. `authService.login` loads the user, checks `is_active`, verifies password with bcrypt.
-3. On success, a JWT is signed (`sub` = user id) and returned with roles/permissions.
+3. On success, a JWT is signed (`sub` = user id) and returned with `{ id, employeeId, email }`.
 4. Invalid credentials → `401 INVALID_CREDENTIALS`. Inactive user → `401 USER_INACTIVE`.
 
 **Session flow**
 
 1. Client sends `Authorization: Bearer <token>`.
 2. `authenticate` middleware verifies JWT, reloads user from DB (rejects inactive users).
-3. `req.user` is attached with `{ id, employeeId, email, roles, permissions }`.
+3. `req.user` is attached with `{ id, employeeId, email }`.
 
 **Register flow**
 
-1. Client sends `{ email, password, employeeId, role, registrationSecret }`.
+1. Client sends `{ email, password, employeeId, registrationSecret }`.
 2. `registrationSecret` must match `REGISTRATION_SECRET` env var.
 3. Employee must exist and must not already have a user account.
 4. Wrong secret → `403 REGISTRATION_FORBIDDEN`.
 
-## Authorization (RBAC)
-
-Permissions are stored in `permissions` and assigned to roles via `role_permissions`.
-
-- **HR_MANAGER** — all permissions
-- **EMPLOYEE** — `employee:read`, `salary:read`, `payslip:read`
-
-**Middleware:** `requirePermission('salary:read')` checks `req.user.permissions`.
-
-**Ownership:** services call `assertEmployeeAccess(user, employeeId)` so an employee cannot read another employee's data by changing the URL id. `assertHrManager` blocks directory list and mutations for employees.
-
 ## Employee and salary APIs
 
-All routes under `/api/v1/employees` use `authenticate` first.
+All routes under `/api/v1/employees` use `authenticate` first. Any authenticated user is treated as HR for MVP.
 
-- List/create/update/delete employees — HR Manager only (permission + service checks).
-- Get employee by id — HR any employee; Employee own profile only.
-- Salary history — HR any employee; Employee own records only.
-- Create salary record — HR only.
+| Route | Purpose |
+|-------|---------|
+| `GET /employees` | Paginated directory with search/filter |
+| `POST /employees` | Create employee master data |
+| `GET /employees/:id` | Employee detail with current compensation |
+| `PUT /employees/:id` | Update employee master data |
+| `DELETE /employees/:id` | Delete employee (salary cascades) |
+| `GET /employees/:id/salary` | Current salary snapshot |
+| `PUT /employees/:id/salary` | Create or update current salary snapshot |
 
-Lookups (`/countries`, `/departments`, `/designations`) require `employee:create` (HR forms).
+Lookups (`/countries`, `/departments`, `/designations`) require authentication.
 
 ## Database
 
-Migrations in `backend/src/db/migrations/`. Auth tables: `004_auth_rbac.sql`.
+Migrations in `backend/src/db/migrations/`.
+
+- `002_employee_directory.sql` — lookups and employees
+- `004_auth_rbac.sql` — `users` table (roles/permissions removed in `005`)
+- `005_mvp_scope_update.sql` — `employee_salaries`, `exchange_rates`; drops RBAC and `salary_records`
 
 `app.locals.db` is a singleton per process (set in `createApp`). Tests use in-memory SQLite via `createTestDb()`.
 
@@ -86,4 +84,9 @@ Core auth tests:
 - `auth.schema.test.js` — migration + one-user-per-employee constraint
 - `auth.login.test.js` — login, session, inactive user
 - `auth.register.test.js` — register with/without secret
-- `auth.protection.test.js` — 401, HR vs employee access
+- `auth.protection.test.js` — 401 and authenticated access
+
+Salary tests:
+
+- `employeeSalary.schema.test.js` — one salary row per employee
+- `employeeSalary.api.test.js` — GET/PUT current salary snapshot

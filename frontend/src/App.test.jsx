@@ -19,19 +19,24 @@ vi.mock('./api/auth.js', () => ({
     id: 1,
     email: 'hr@example.com',
     employeeId: 1,
-    roles: ['HR_MANAGER'],
-    permissions: ['employee:read'],
   }),
   login: vi.fn(),
   registerUser: vi.fn(),
 }));
 
 describe('App', () => {
-  it('renders the employee directory for authenticated HR users', async () => {
+  it('renders the employee directory for authenticated users', async () => {
     window.localStorage.setItem('auth_token', 'test-token');
     window.history.pushState({}, '', '/employees');
     render(<App />);
     expect(await screen.findByRole('heading', { name: 'Employee Directory' })).toBeInTheDocument();
     window.localStorage.clear();
+  });
+
+  it('redirects unknown routes to login when unauthenticated', async () => {
+    window.localStorage.clear();
+    window.history.pushState({}, '', '/unknown-route');
+    render(<App />);
+    expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
   });
 });

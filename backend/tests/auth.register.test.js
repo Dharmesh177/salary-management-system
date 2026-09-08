@@ -57,13 +57,12 @@ describe('auth register API', () => {
         email: 'new.hr@example.com',
         password: TEST_PASSWORD,
         employeeId: 1,
-        role: 'HR_MANAGER',
         registrationSecret: TEST_REGISTRATION_SECRET,
       });
 
     assert.equal(response.status, 201);
     assert.equal(response.body.data.email, 'new.hr@example.com');
-    assert.equal(response.body.data.roles.includes('HR_MANAGER'), true);
+    assert.equal(response.body.data.employeeId, 1);
   });
 
   it('returns 403 when registration secret is invalid', async () => {
@@ -73,7 +72,6 @@ describe('auth register API', () => {
         email: 'blocked@example.com',
         password: TEST_PASSWORD,
         employeeId: 2,
-        role: 'EMPLOYEE',
         registrationSecret: 'wrong-secret',
       });
 

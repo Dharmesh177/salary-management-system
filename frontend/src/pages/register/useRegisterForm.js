@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../../api/auth.js';
-import { AUTH_ROUTES, DEFAULT_REGISTER_FORM, ROLES } from '../../features/auth/constants.js';
+import { AUTH_ROUTES, DEFAULT_REGISTER_FORM } from '../../features/auth/constants.js';
 import { AUTH_MESSAGES } from '../../features/auth/messages.js';
 import { hasValidationErrors, validateRegisterForm } from '../../features/auth/validation.js';
 
@@ -46,7 +46,6 @@ export function useRegisterForm() {
     fieldErrors,
     submitError,
     isSubmitting,
-    roleOptions: [ROLES.HR_MANAGER, ROLES.EMPLOYEE],
     handleChange,
     handleSubmit,
   };

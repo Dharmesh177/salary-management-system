@@ -7,7 +7,6 @@ export const AUTH_MESSAGES = {
   passwordLabel: 'Password',
   registrationSecretLabel: 'Registration secret',
   employeeIdLabel: 'Employee ID',
-  roleLabel: 'Role',
   signIn: 'Sign in',
   signingIn: 'Signing in...',
   register: 'Register',
@@ -23,6 +22,5 @@ export const AUTH_MESSAGES = {
     registrationSecretRequired: 'Registration secret is required',
     employeeIdRequired: 'Employee ID is required',
     employeeIdInvalid: 'Employee ID must be a positive number',
-    roleRequired: 'Role is required',
   },
 };

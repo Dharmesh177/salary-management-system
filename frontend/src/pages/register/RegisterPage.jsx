@@ -18,7 +18,6 @@ export default function RegisterPage() {
     fieldErrors,
     submitError,
     isSubmitting,
-    roleOptions,
     handleChange,
     handleSubmit,
   } = useRegisterForm();
@@ -70,17 +69,6 @@ export default function RegisterPage() {
               onChange={handleChange}
             />
             <FieldError message={fieldErrors.employeeId} />
-          </label>
-
-          <label>
-            {AUTH_MESSAGES.roleLabel}
-            <select name="role" value={values.role} onChange={handleChange}>
-              <option value="">Select role</option>
-              {roleOptions.map((role) => (
-                <option key={role} value={role}>{role}</option>
-              ))}
-            </select>
-            <FieldError message={fieldErrors.role} />
           </label>
         </div>
 

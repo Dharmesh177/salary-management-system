@@ -73,11 +73,9 @@ export function findEmployeeByIdQuery() {
 }
 
 export function findCurrentSalaryQuery() {
-  return `SELECT base_salary, bonus, incentives, effective_from
-          FROM salary_records
-          WHERE employee_id = ? AND effective_to IS NULL
-          ORDER BY effective_from DESC
-          LIMIT 1`;
+  return `SELECT base_salary, bonus, incentives, currency_code, updated_at
+          FROM employee_salaries
+          WHERE employee_id = ?`;
 }
 
 export const INSERT_EMPLOYEE = `
@@ -101,11 +99,6 @@ export const UPDATE_EMPLOYEE = `
 
 export const DELETE_EMPLOYEE = 'DELETE FROM employees WHERE id = ?';
 
-export const COUNT_SALARY_RECORDS = `
-  SELECT COUNT(*) AS count
-  FROM salary_records
-  WHERE employee_id = ?`;
-
 export const FIND_EMPLOYEE_BY_CODE = `
   SELECT id FROM employees WHERE employee_code = ? COLLATE NOCASE`;
 
@@ -122,10 +115,6 @@ export function updateEmployeeQuery() {
 
 export function deleteEmployeeQuery() {
   return DELETE_EMPLOYEE;
-}
-
-export function countSalaryRecordsQuery() {
-  return COUNT_SALARY_RECORDS;
 }
 
 export function findEmployeeByCodeQuery() {

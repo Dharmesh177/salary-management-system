@@ -288,32 +288,13 @@ const employees = [
   },
 ];
 
-const historicalSalaryRecords = [
-  {
-    employee_code: 'EMP001',
-    base_salary: 900000,
-    bonus: 80000,
-    incentives: 40000,
-    effective_from: '2023-01-01',
-    effective_to: '2023-12-31',
-  },
-  {
-    employee_code: 'EMP002',
-    base_salary: 1100000,
-    bonus: 90000,
-    incentives: 45000,
-    effective_from: '2023-06-01',
-    effective_to: '2023-12-31',
-  },
-  {
-    employee_code: 'EMP006',
-    base_salary: 2000000,
-    bonus: 220000,
-    incentives: 90000,
-    effective_from: '2023-01-01',
-    effective_to: '2023-08-31',
-  },
-];
+const COUNTRY_CURRENCY = {
+  1: 'INR',
+  2: 'USD',
+  3: 'GBP',
+  4: 'EUR',
+  5: 'USD',
+};
 
 async function seedLookups(db) {
   for (const country of countries) {
@@ -366,53 +347,15 @@ async function insertEmployeeIfMissing(db, employee) {
   );
 
   await db.execute(
-    `INSERT INTO salary_records (
-      employee_id, base_salary, bonus, incentives,
-      effective_from, effective_to, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, NULL, datetime('now'), datetime('now'))`,
+    `INSERT INTO employee_salaries (
+      employee_id, base_salary, bonus, incentives, currency_code, updated_at
+    ) VALUES (?, ?, ?, ?, ?, datetime('now'))`,
     [
       result.lastInsertRowid,
       employee.base_salary,
       employee.bonus,
       employee.incentives,
-      employee.effective_from,
-    ],
-  );
-
-  return true;
-}
-
-async function insertHistoricalSalaryIfMissing(db, record) {
-  const employee = await db.queryOne('SELECT id FROM employees WHERE employee_code = ?', [
-    record.employee_code,
-  ]);
-
-  if (!employee) {
-    return false;
-  }
-
-  const existing = await db.queryOne(
-    `SELECT id FROM salary_records
-     WHERE employee_id = ? AND effective_from = ? AND effective_to = ?`,
-    [employee.id, record.effective_from, record.effective_to],
-  );
-
-  if (existing) {
-    return false;
-  }
-
-  await db.execute(
-    `INSERT INTO salary_records (
-      employee_id, base_salary, bonus, incentives,
-      effective_from, effective_to, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-    [
-      employee.id,
-      record.base_salary,
-      record.bonus,
-      record.incentives,
-      record.effective_from,
-      record.effective_to,
+      COUNTRY_CURRENCY[employee.country_id] ?? 'USD',
     ],
   );
 
@@ -421,38 +364,29 @@ async function insertHistoricalSalaryIfMissing(db, record) {
 
 const DEV_AUTH_PASSWORD = 'password123';
 
-const devAuthUsers = [
-  { email: 'mary.jackson@acme.example', role: 'HR_MANAGER' },
-  { email: 'ada.lovelace@acme.example', role: 'EMPLOYEE' },
-];
+const devAuthUsers = ['mary.jackson@acme.example'];
 
 async function seedAuthUsersIfMissing(db) {
   let insertedCount = 0;
 
-  for (const devUser of devAuthUsers) {
-    const existingUser = await db.queryOne('SELECT id FROM users WHERE email = ?', [devUser.email]);
+  for (const email of devAuthUsers) {
+    const existingUser = await db.queryOne('SELECT id FROM users WHERE email = ?', [email]);
     if (existingUser) {
       continue;
     }
 
-    const employee = await db.queryOne('SELECT id FROM employees WHERE email = ?', [devUser.email]);
+    const employee = await db.queryOne('SELECT id FROM employees WHERE email = ?', [email]);
     if (!employee) {
       continue;
     }
 
     const passwordHash = await bcrypt.hash(DEV_AUTH_PASSWORD, 10);
-    const result = await db.execute(
+    await db.execute(
       `INSERT INTO users (
         employee_id, email, password_hash, is_active, created_at, updated_at
       ) VALUES (?, ?, ?, 1, datetime('now'), datetime('now'))`,
-      [employee.id, devUser.email, passwordHash],
+      [employee.id, email, passwordHash],
     );
-
-    const role = await db.queryOne('SELECT id FROM roles WHERE name = ?', [devUser.role]);
-    await db.execute('INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)', [
-      result.lastInsertRowid,
-      role.id,
-    ]);
 
     insertedCount += 1;
   }
@@ -462,7 +396,6 @@ async function seedAuthUsersIfMissing(db) {
 
 export async function seedDevData(db) {
   let insertedCount = 0;
-  let historicalCount = 0;
   let authUserCount = 0;
 
   await db.transaction(async () => {
@@ -475,22 +408,14 @@ export async function seedDevData(db) {
       }
     }
 
-    for (const record of historicalSalaryRecords) {
-      const inserted = await insertHistoricalSalaryIfMissing(db, record);
-      if (inserted) {
-        historicalCount += 1;
-      }
-    }
-
     authUserCount = await seedAuthUsersIfMissing(db);
   });
 
   const totalRow = await db.queryOne('SELECT COUNT(*) AS count FROM employees');
 
   return {
-    inserted: insertedCount > 0 || historicalCount > 0 || authUserCount > 0,
+    inserted: insertedCount > 0 || authUserCount > 0,
     insertedCount,
-    historicalSalaryCount: historicalCount,
     authUserCount,
     employeeCount: totalRow?.count ?? 0,
   };

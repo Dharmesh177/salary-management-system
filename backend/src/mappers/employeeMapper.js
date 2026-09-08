@@ -1,5 +1,3 @@
-import { DEFAULT_CURRENCY } from '../constants/employee.js';
-
 export function toEmployeeListItem(row) {
   return {
     id: row.id,
@@ -33,12 +31,12 @@ export function toCurrentCompensation(salaryRow) {
   const incentives = Number(salaryRow.incentives);
 
   return {
-    currency: DEFAULT_CURRENCY,
+    currency: salaryRow.currency_code,
     baseSalary,
     bonus,
     incentives,
     totalAmount: baseSalary + bonus + incentives,
-    effectiveFrom: salaryRow.effective_from,
+    updatedAt: salaryRow.updated_at,
   };
 }
 

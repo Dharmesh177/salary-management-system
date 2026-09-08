@@ -126,7 +126,7 @@ describe('employee CUD API', () => {
   });
 
   describe('DELETE /api/v1/employees/:id', () => {
-    it('deletes an employee without salary records', async () => {
+    it('deletes an employee and cascades salary data', async () => {
       const createResponse = await request(app)
         .post('/api/v1/employees')
         .set(authHeader(hrToken))
@@ -137,6 +137,16 @@ describe('employee CUD API', () => {
         });
 
       const employeeId = createResponse.body.data.id;
+      await request(app)
+        .put(`/api/v1/employees/${employeeId}/salary`)
+        .set(authHeader(hrToken))
+        .send({
+          baseSalary: 1000000,
+          bonus: 0,
+          incentives: 0,
+          currencyCode: 'INR',
+        });
+
       const response = await request(app)
         .delete(`/api/v1/employees/${employeeId}`)
         .set(authHeader(hrToken));
@@ -149,13 +159,22 @@ describe('employee CUD API', () => {
       assert.equal(getResponse.status, 404);
     });
 
-    it('returns 409 when employee has salary records', async () => {
+    it('deletes an employee with an existing salary snapshot', async () => {
+      await request(app)
+        .put('/api/v1/employees/2/salary')
+        .set(authHeader(hrToken))
+        .send({
+          baseSalary: 900000,
+          bonus: 50000,
+          incentives: 25000,
+          currencyCode: 'INR',
+        });
+
       const response = await request(app)
-        .delete('/api/v1/employees/1')
+        .delete('/api/v1/employees/2')
         .set(authHeader(hrToken));
 
-      assert.equal(response.status, 409);
-      assert.equal(response.body.code, 'EMPLOYEE_HAS_SALARY_RECORDS');
+      assert.equal(response.status, 204);
     });
 
     it('returns 404 when the employee does not exist', async () => {

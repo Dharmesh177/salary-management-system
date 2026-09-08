@@ -8,19 +8,7 @@ vi.mock('../../api/employees.js', () => ({
   deleteEmployee: vi.fn(),
 }));
 
-vi.mock('../../api/salaryRecords.js', () => ({
-  fetchSalaryRecords: vi.fn(),
-}));
-
-vi.mock('../../features/auth/context/AuthContext.jsx', () => ({
-  useAuth: () => ({
-    isHrManager: true,
-    user: { roles: ['HR_MANAGER'], employeeId: 1 },
-  }),
-}));
-
 import { fetchEmployee } from '../../api/employees.js';
-import { fetchSalaryRecords } from '../../api/salaryRecords.js';
 
 const sampleEmployee = {
   id: 1,
@@ -37,7 +25,7 @@ const sampleEmployee = {
     bonus: 100000,
     incentives: 50000,
     totalAmount: 1150000,
-    effectiveFrom: '2024-01-01',
+    updatedAt: '2024-01-01T00:00:00.000Z',
   },
 };
 
@@ -45,7 +33,6 @@ describe('EmployeeDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     fetchEmployee.mockResolvedValue(sampleEmployee);
-    fetchSalaryRecords.mockResolvedValue([]);
   });
 
   it('renders employee profile and compensation', async () => {

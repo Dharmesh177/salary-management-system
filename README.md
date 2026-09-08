@@ -1,23 +1,24 @@
 # ACME Salary Management System
 
-Greenfield web application that replaces spreadsheet-based compensation tracking for ACME (~10,000 employees). An authenticated HR user will search the directory, maintain salary history, view high-level pay patterns, import/export CSV, and ask grounded salary questions.
+Greenfield web application that replaces spreadsheet-based compensation tracking for ACME (~10,000 employees). An authenticated HR user searches the employee directory, maintains employee master data, and manages each employee's current salary snapshot.
 
-This repository is a **monorepo**: React SPA (`frontend/`), Node.js JSON API (`backend/`), SQLite persistence. Product features are not implemented yet; this tree is the runnable foundation for TDD.
+This repository is a **monorepo**: React SPA (`frontend/`), Node.js JSON API (`backend/`), SQLite persistence.
 
 ## Requirements and other documents
 
 | Document                                         | Location                                                                                                       |
 | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| Product requirements (**source of truth**) | [`documents/Salary Management System Requirements - Incubyte.pdf`](documents/Salary%20Management%20System%20Requirements%20-%20Incubyte.pdf) |
+| Product requirements (**source of truth**) | [`docs/Salary Management System Requirements - Updated.docx`](docs/Salary%20Management%20System%20Requirements%20-%20Updated.docx) |
+| Relational schema (updated) | [`docs/salary-management-relational-schema-updated.md`](docs/salary-management-relational-schema-updated.md) |
 | Architecture / setup notes                       | [`docs/architecture.md`](docs/architecture.md)                                                                 |
 | Design doc                                       | _not written yet_ — add under `docs/` when UI/API design is specified                                          |
 | Architecture diagram                             | _not written yet_ — add under `docs/`                                                                          |
 | Trade-off document                               | _not written yet_ — add under `docs/`                                                                          |
 | Decision records (ADRs)                          | _not written yet_ — add under `docs/`                                                                          |
 
-**MVP in scope (later), from the Incubyte requirements:** paginated employee directory (search/filter), salary create/view/update with history, salaries stored and shown in **INR**, salary attributes including components (base, bonus, incentives, etc.), CSV import with validation, RBAC (HR Manager and Employee), payslip generation/viewing by role, grounded AI compensation Q&A.
+**MVP in scope:** paginated employee directory (search/filter), employee create/update/delete, login with secure registration, current salary snapshot per employee (`employee_salaries`) with explicit currency, exchange rates seeded for future analytics.
 
-**Post-MVP (deferred):** detailed dashboard analytics, full audit trails.
+**Post-MVP (deferred):** salary history, RBAC, payslips, CSV import, dashboard analytics, grounded AI compensation Q&A.
 
 **Explicitly out of scope:** attendance/regularization, recruitment/onboarding, performance management.
 
@@ -58,12 +59,11 @@ npm run seed
 
 `npm run seed` loads a local dev dataset (20 employees across 5 countries and departments). It is safe to run multiple times and only inserts employees that are not already present.
 
-After seeding, sign in with these dev accounts (password: `password123`):
+After seeding, sign in with this dev account (password: `password123`):
 
-| Role | Email |
-| ---- | ----- |
-| HR Manager | `mary.jackson@acme.example` |
-| Employee | `ada.lovelace@acme.example` |
+| Email |
+| ----- |
+| `mary.jackson@acme.example` |
 
 To register additional users, set `REGISTRATION_SECRET` in `.env` and open `/register` with that secret. Registration is not linked in the UI.
 

@@ -35,25 +35,12 @@ export function createAuthRepository(db) {
       return Boolean(row);
     },
 
-    async listRolesForUser(userId) {
-      const rows = await db.query(authQueries.listRolesForUser, [userId]);
-      return rows.map((row) => row.name);
-    },
-
-    async listPermissionsForUser(userId) {
-      const rows = await db.query(authQueries.listPermissionsForUser, [userId]);
-      return rows.map((row) => row.name);
-    },
-
-    async createUser({ employeeId, email, passwordHash, roleName }) {
+    async createUser({ employeeId, email, passwordHash }) {
       const result = await db.execute(authQueries.insertUser, [
         employeeId,
         email,
         passwordHash,
       ]);
-
-      const role = await db.queryOne(authQueries.findRoleByName, [roleName]);
-      await db.execute(authQueries.insertUserRole, [result.lastInsertRowid, role.id]);
 
       return result.lastInsertRowid;
     },

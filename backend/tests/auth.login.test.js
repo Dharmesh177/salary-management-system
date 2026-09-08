@@ -52,21 +52,18 @@ describe('auth login API', () => {
             employee_id: 1,
             email: 'hr@example.com',
             password: TEST_PASSWORD,
-            role: 'HR_MANAGER',
             is_active: 1,
           },
           {
             employee_id: 2,
             email: 'employee@example.com',
             password: TEST_PASSWORD,
-            role: 'EMPLOYEE',
             is_active: 1,
           },
           {
             employee_id: 3,
             email: 'inactive@example.com',
             password: TEST_PASSWORD,
-            role: 'EMPLOYEE',
             is_active: 0,
           },
         ],
@@ -91,7 +88,7 @@ describe('auth login API', () => {
 
     assert.equal(response.status, 200);
     assert.ok(response.body.data.token);
-    assert.equal(response.body.data.user.roles.includes('HR_MANAGER'), true);
+    assert.equal(response.body.data.user.email, 'hr@example.com');
   });
 
   it('returns 401 for invalid credentials', async () => {

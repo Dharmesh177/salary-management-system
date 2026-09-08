@@ -9,13 +9,11 @@ function createAuthError(definition) {
   return error;
 }
 
-function mapAuthUser(user, roles, permissions) {
+function mapAuthUser(user) {
   return {
     id: user.id,
     employeeId: user.employeeId,
     email: user.email,
-    roles,
-    permissions,
   };
 }
 
@@ -26,12 +24,7 @@ export function createAuthService(authRepository, jwtSecret, registrationSecret)
       throw createAuthError(AUTH_ERRORS.UNAUTHORIZED);
     }
 
-    const [roles, permissions] = await Promise.all([
-      authRepository.listRolesForUser(userId),
-      authRepository.listPermissionsForUser(userId),
-    ]);
-
-    return mapAuthUser(user, roles, permissions);
+    return mapAuthUser(user);
   }
 
   return {
@@ -51,18 +44,13 @@ export function createAuthService(authRepository, jwtSecret, registrationSecret)
         throw createAuthError(AUTH_ERRORS.INVALID_CREDENTIALS);
       }
 
-      const [roles, permissions] = await Promise.all([
-        authRepository.listRolesForUser(user.id),
-        authRepository.listPermissionsForUser(user.id),
-      ]);
-
-      const authUser = mapAuthUser(user, roles, permissions);
+      const authUser = mapAuthUser(user);
       const token = signAccessToken({ sub: user.id }, jwtSecret);
 
       return { token, user: authUser };
     },
 
-    async register({ email, password, employeeId, role, registrationSecret: providedSecret }) {
+    async register({ email, password, employeeId, registrationSecret: providedSecret }) {
       if (providedSecret !== registrationSecret) {
         throw createAuthError(AUTH_ERRORS.REGISTRATION_FORBIDDEN);
       }
@@ -86,7 +74,6 @@ export function createAuthService(authRepository, jwtSecret, registrationSecret)
         employeeId,
         email,
         passwordHash,
-        roleName: role,
       });
 
       return loadUserContext(userId);

@@ -29,7 +29,8 @@ describe('employee directory schema', () => {
       'departments',
       'designations',
       'employees',
-      'salary_records',
+      'employee_salaries',
+      'exchange_rates',
       'schema_migrations',
     ]) {
       assert.ok(tableNames.includes(tableName), `missing table ${tableName}`);

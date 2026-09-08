@@ -26,9 +26,4 @@ export const EMPLOYEE_ERRORS = {
     status: 400,
     code: 'INVALID_EMPLOYEE_LOOKUP',
   },
-  HAS_SALARY_RECORDS: {
-    message: 'Cannot delete employee with salary records',
-    status: 409,
-    code: 'EMPLOYEE_HAS_SALARY_RECORDS',
-  },
 };

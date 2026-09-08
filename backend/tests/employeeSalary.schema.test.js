@@ -3,7 +3,7 @@ import { after, before, describe, it } from 'node:test';
 import { createTestDb } from './helpers/testDb.js';
 import { seedEmployeeDirectory } from './helpers/employeeFixtures.js';
 
-describe('auth schema', () => {
+describe('employee salary schema', () => {
   let db;
 
   before(async () => {
@@ -15,23 +15,23 @@ describe('auth schema', () => {
     db.close();
   });
 
-  it('applies the auth migration', async () => {
+  it('applies the MVP scope update migration', async () => {
     const rows = await db.query('SELECT id FROM schema_migrations ORDER BY id');
-    assert.ok(rows.some((row) => row.id === '004_auth_rbac.sql'));
+    assert.ok(rows.some((row) => row.id === '005_mvp_scope_update.sql'));
   });
 
-  it('enforces one user account per employee', async () => {
+  it('allows only one salary row per employee', async () => {
     await db.execute(
-      `INSERT INTO users (
-        employee_id, email, password_hash, is_active, created_at, updated_at
-      ) VALUES (1, 'hr@example.com', 'hash', 1, datetime('now'), datetime('now'))`,
+      `INSERT INTO employee_salaries (
+        employee_id, base_salary, bonus, incentives, currency_code, updated_at
+      ) VALUES (1, 1000000, 0, 0, 'INR', datetime('now'))`,
     );
 
     await assert.rejects(async () => {
       await db.execute(
-        `INSERT INTO users (
-          employee_id, email, password_hash, is_active, created_at, updated_at
-        ) VALUES (1, 'duplicate@example.com', 'hash', 1, datetime('now'), datetime('now'))`,
+        `INSERT INTO employee_salaries (
+          employee_id, base_salary, bonus, incentives, currency_code, updated_at
+        ) VALUES (1, 1200000, 0, 0, 'INR', datetime('now'))`,
       );
     });
   });

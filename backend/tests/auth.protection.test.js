@@ -12,30 +12,10 @@ import {
 describe('auth protection', () => {
   let db;
   let app;
-  let hrToken;
-  let employeeToken;
+  let authToken;
 
   before(async () => {
-    db = await createAuthenticatedTestDb({
-      salaryRecords: [
-        {
-          employee_id: 1,
-          base_salary: 1000000,
-          bonus: 100000,
-          incentives: 50000,
-          effective_from: '2024-01-01',
-          effective_to: null,
-        },
-        {
-          employee_id: 2,
-          base_salary: 900000,
-          bonus: 50000,
-          incentives: 25000,
-          effective_from: '2024-01-01',
-          effective_to: null,
-        },
-      ],
-    });
+    db = await createAuthenticatedTestDb();
     app = createApp({
       db,
       corsOrigin: 'http://localhost:5173',
@@ -43,15 +23,10 @@ describe('auth protection', () => {
       registrationSecret: TEST_REGISTRATION_SECRET,
     });
 
-    const hrLogin = await request(app)
+    const login = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: 'hr@example.com', password: TEST_PASSWORD });
-    hrToken = hrLogin.body.data.token;
-
-    const employeeLogin = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'employee@example.com', password: TEST_PASSWORD });
-    employeeToken = employeeLogin.body.data.token;
+    authToken = login.body.data.token;
   });
 
   after(() => {
@@ -63,31 +38,17 @@ describe('auth protection', () => {
     assert.equal(response.status, 401);
   });
 
-  it('allows HR managers to list employees', async () => {
+  it('allows authenticated users to list employees', async () => {
     const response = await request(app)
       .get('/api/v1/employees')
-      .set(authHeader(hrToken));
+      .set(authHeader(authToken));
     assert.equal(response.status, 200);
   });
 
-  it('forbids employees from listing the directory', async () => {
-    const response = await request(app)
-      .get('/api/v1/employees')
-      .set(authHeader(employeeToken));
-    assert.equal(response.status, 403);
-  });
-
-  it('forbids employees from accessing another employee profile', async () => {
+  it('allows authenticated users to access employee profiles', async () => {
     const response = await request(app)
       .get('/api/v1/employees/1')
-      .set(authHeader(employeeToken));
-    assert.equal(response.status, 403);
-  });
-
-  it('allows employees to access their own salary history', async () => {
-    const response = await request(app)
-      .get('/api/v1/employees/2/salary-records')
-      .set(authHeader(employeeToken));
+      .set(authHeader(authToken));
     assert.equal(response.status, 200);
   });
 });

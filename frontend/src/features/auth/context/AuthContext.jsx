@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { fetchSession, login as loginRequest } from '../../../api/auth.js';
 import { clearStoredToken, getStoredToken, setStoredToken } from '../../../api/http.js';
-import { getDefaultRouteForUser, isHrManager } from '../utils.js';
 
 const AuthContext = createContext(null);
 
@@ -49,10 +48,8 @@ export function AuthProvider({ children }) {
       user,
       loading,
       isAuthenticated: Boolean(user),
-      isHrManager: isHrManager(user),
       login,
       logout,
-      getDefaultRouteForUser: () => getDefaultRouteForUser(user),
     }),
     [user, loading, login, logout],
   );

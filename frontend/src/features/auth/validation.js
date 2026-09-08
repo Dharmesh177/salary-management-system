@@ -1,4 +1,3 @@
-import { ROLES } from './constants.js';
 import { AUTH_MESSAGES } from './messages.js';
 
 export function validateLoginForm(values) {
@@ -26,7 +25,6 @@ export function validateRegisterForm(values) {
   const email = String(values.email ?? '').trim();
   const password = String(values.password ?? '');
   const registrationSecret = String(values.registrationSecret ?? '').trim();
-  const role = String(values.role ?? '').trim();
   const employeeId = Number(values.employeeId);
 
   if (!registrationSecret) {
@@ -47,10 +45,6 @@ export function validateRegisterForm(values) {
     errors.employeeId = AUTH_MESSAGES.validation.employeeIdInvalid;
   }
 
-  if (!role || ![ROLES.HR_MANAGER, ROLES.EMPLOYEE].includes(role)) {
-    errors.role = AUTH_MESSAGES.validation.roleRequired;
-  }
-
   if (Object.keys(errors).length > 0) {
     return { errors, payload: null };
   }
@@ -62,7 +56,6 @@ export function validateRegisterForm(values) {
       password,
       registrationSecret,
       employeeId,
-      role,
     },
   };
 }

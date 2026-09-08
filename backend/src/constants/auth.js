@@ -46,9 +46,4 @@ export const AUTH_ERRORS = {
   },
 };
 
-export const ROLES = {
-  HR_MANAGER: 'HR_MANAGER',
-  EMPLOYEE: 'EMPLOYEE',
-};
-
 export const TOKEN_EXPIRY = '8h';

@@ -26,8 +26,8 @@ export default function CompensationCard({ compensation }) {
             </dd>
           </div>
           <div>
-            <dt>{EMPLOYEE_MESSAGES.effectiveFromField}</dt>
-            <dd>{compensation.effectiveFrom}</dd>
+            <dt>{EMPLOYEE_MESSAGES.updatedAtField}</dt>
+            <dd>{compensation.updatedAt}</dd>
           </div>
         </dl>
       ) : (

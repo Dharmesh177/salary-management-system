@@ -1,5 +1,14 @@
 import { createTestDb } from './testDb.js';
 
+const DEFAULT_EXCHANGE_RATES = [
+  { currency_code: 'USD', rate_to_usd: 1.0, effective_date: '2024-01-01' },
+  { currency_code: 'INR', rate_to_usd: 0.012, effective_date: '2024-01-01' },
+  { currency_code: 'EUR', rate_to_usd: 1.08, effective_date: '2024-01-01' },
+  { currency_code: 'GBP', rate_to_usd: 1.27, effective_date: '2024-01-01' },
+  { currency_code: 'AUD', rate_to_usd: 0.66, effective_date: '2024-01-01' },
+  { currency_code: 'JPY', rate_to_usd: 0.0067, effective_date: '2024-01-01' },
+];
+
 export async function seedEmployeeDirectory(db, overrides = {}) {
   const {
     countries = [{ id: 1, code: 'IN', name: 'India' }],
@@ -25,17 +34,24 @@ export async function seedEmployeeDirectory(db, overrides = {}) {
         designation_id: 1,
       },
     ],
-    salaryRecords = [
+    employeeSalaries = [
       {
         employee_id: 1,
         base_salary: 1000000,
         bonus: 100000,
         incentives: 50000,
-        effective_from: '2024-01-01',
-        effective_to: null,
+        currency_code: 'INR',
       },
     ],
+    exchangeRates = DEFAULT_EXCHANGE_RATES,
   } = overrides;
+
+  for (const rate of exchangeRates) {
+    await db.execute(
+      'INSERT OR IGNORE INTO exchange_rates (currency_code, rate_to_usd, effective_date) VALUES (?, ?, ?)',
+      [rate.currency_code, rate.rate_to_usd, rate.effective_date],
+    );
+  }
 
   for (const country of countries) {
     await db.execute('INSERT INTO countries (id, code, name) VALUES (?, ?, ?)', [
@@ -78,19 +94,17 @@ export async function seedEmployeeDirectory(db, overrides = {}) {
     );
   }
 
-  for (const record of salaryRecords) {
+  for (const salary of employeeSalaries) {
     await db.execute(
-      `INSERT INTO salary_records (
-        employee_id, base_salary, bonus, incentives,
-        effective_from, effective_to, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      `INSERT INTO employee_salaries (
+        employee_id, base_salary, bonus, incentives, currency_code, updated_at
+      ) VALUES (?, ?, ?, ?, ?, datetime('now'))`,
       [
-        record.employee_id,
-        record.base_salary,
-        record.bonus ?? 0,
-        record.incentives ?? 0,
-        record.effective_from,
-        record.effective_to ?? null,
+        salary.employee_id,
+        salary.base_salary,
+        salary.bonus ?? 0,
+        salary.incentives ?? 0,
+        salary.currency_code,
       ],
     );
   }
