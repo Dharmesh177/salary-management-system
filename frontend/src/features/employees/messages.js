@@ -23,6 +23,7 @@ export const EMPLOYEE_MESSAGES = {
   emptyEmployees: 'No employees found.',
   noCompensation: 'No current compensation record.',
   backToDirectory: 'Back to directory',
+  backToProfile: 'My profile',
   searchLabel: 'Search',
   searchPlaceholder: 'Name or employee ID',
   countryLabel: 'Country',

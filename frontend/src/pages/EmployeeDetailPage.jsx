@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { deleteEmployee } from '../api/employees.js';
-import CompensationCard from '../features/employees/components/CompensationCard.jsx';
-import EmployeeProfileCard from '../features/employees/components/EmployeeProfileCard.jsx';
+import { useAuth } from '../features/auth/context/AuthContext.jsx';
+import CompensationCard from '../features/employees/components/CompensationCard.jsx';import EmployeeProfileCard from '../features/employees/components/EmployeeProfileCard.jsx';
 import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
 import { useEmployeeDetail } from '../features/employees/hooks/useEmployeeDetail.js';
 import { EMPLOYEE_MESSAGES } from '../features/employees/messages.js';
@@ -13,7 +13,7 @@ import { SALARY_RECORD_MESSAGES } from '../features/salaryRecords/messages.js';
 export default function EmployeeDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { employee, loading, error } = useEmployeeDetail(id);
+  const { isHrManager } = useAuth();  const { employee, loading, error } = useEmployeeDetail(id);
   const {
     records,
     loading: salaryLoading,
@@ -50,26 +50,28 @@ export default function EmployeeDetailPage() {
   return (
     <section className="detail-page">
       <nav className="breadcrumb">
-        <Link to={EMPLOYEE_ROUTES.directory}>{EMPLOYEE_MESSAGES.directoryTitle}</Link>
-      </nav>
+        <Link to={isHrManager ? EMPLOYEE_ROUTES.directory : `/employees/${id}`}>
+          {isHrManager ? EMPLOYEE_MESSAGES.directoryTitle : EMPLOYEE_MESSAGES.backToProfile}
+        </Link>      </nav>
 
       <header className="page-header page-header-actions">
         <div>
           <h1>{employee.firstName} {employee.lastName}</h1>
           <p>{employee.employeeCode} · {employee.email}</p>
         </div>
-        <div className="page-actions">
-          <Link to={SALARY_RECORD_ROUTES.new(employee.id)} className="button-link primary">
-            {SALARY_RECORD_MESSAGES.addSalaryRecord}
-          </Link>
-          <Link to={EMPLOYEE_ROUTES.edit(employee.id)} className="button-link">
-            {EMPLOYEE_MESSAGES.editEmployee}
-          </Link>
-          <button type="button" className="danger" onClick={handleDelete}>
-            {EMPLOYEE_MESSAGES.deleteEmployee}
-          </button>
-        </div>
-      </header>
+        {isHrManager ? (
+          <div className="page-actions">
+            <Link to={SALARY_RECORD_ROUTES.new(employee.id)} className="button-link primary">
+              {SALARY_RECORD_MESSAGES.addSalaryRecord}
+            </Link>
+            <Link to={EMPLOYEE_ROUTES.edit(employee.id)} className="button-link">
+              {EMPLOYEE_MESSAGES.editEmployee}
+            </Link>
+            <button type="button" className="danger" onClick={handleDelete}>
+              {EMPLOYEE_MESSAGES.deleteEmployee}
+            </button>
+          </div>
+        ) : null}      </header>
 
       <div className="detail-grid">
         <EmployeeProfileCard employee={employee} />

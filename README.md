@@ -56,7 +56,14 @@ npm run migrate
 npm run seed
 ```
 
-`npm run seed` loads a small local dev dataset (5 employees). It is safe to run multiple times and skips if employees already exist.
+`npm run seed` loads a local dev dataset (20 employees across 5 countries and departments). It is safe to run multiple times and only inserts employees that are not already present.
+
+After seeding, sign in with these dev accounts (password: `password123`):
+
+| Role | Email |
+| ---- | ----- |
+| HR Manager | `mary.jackson@acme.example` |
+| Employee | `ada.lovelace@acme.example` |
 
 ## Run locally
 

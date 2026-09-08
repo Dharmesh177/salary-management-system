@@ -95,3 +95,31 @@ The baseline schema in `docs/salary-management-relational-schema.md` is sufficie
 **Decision:** Salary API responses include `currency: "INR"` without client-supplied currency fields.
 
 **Why:** MVP scope from requirements; conversion is deferred.
+
+## Login and RBAC
+
+### JWT bearer tokens for API authentication
+
+**Decision:** `POST /api/v1/auth/login` returns a signed JWT. Clients send `Authorization: Bearer <token>` on protected routes.
+
+**Why:** Stateless auth fits the SPA + JSON API model and keeps session storage out of the server for MVP.
+
+**Trade-off:** Tokens are not revoked server-side until expiry; inactive users are rejected on each authenticated request when the user record is reloaded.
+
+### Explicit roles and permissions tables
+
+**Decision:** Migration `004_auth_rbac.sql` adds `users`, `roles`, `permissions`, `user_roles`, and `role_permissions` per the baseline schema. `HR_MANAGER` receives all permissions; `EMPLOYEE` receives `employee:read`, `salary:read`, and `payslip:read`.
+
+**Why:** Matches the documented RBAC design and keeps authorization extensible without hard-coding role checks everywhere.
+
+### Backend-enforced access control
+
+**Decision:** Middleware authenticates requests and checks permissions. Services additionally enforce employee ownership so an `EMPLOYEE` cannot access another employee's profile or salary history by changing an ID in the URL.
+
+**Why:** Frontend route guards improve UX but must not be the only authorization layer.
+
+### HR-only directory and mutation endpoints
+
+**Decision:** Employee directory list/create/update/delete and salary create endpoints require HR Manager access. Employees can read their own profile and salary history only.
+
+**Why:** Aligns with the Incubyte requirement that employees access their own salary/payslip data while HR manages the organization.

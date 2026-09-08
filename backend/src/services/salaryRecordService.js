@@ -1,6 +1,7 @@
 import { EMPLOYEE_ERRORS, SALARY_RECORD_ERRORS } from '../constants/salaryRecord.js';
 import { parseEmployeeId } from '../utils/parseEmployeeId.js';
 import { dayBefore } from '../utils/date.js';
+import { assertEmployeeAccess, assertHrManager } from '../utils/accessControl.js';
 
 function createError({ message, status, code }) {
   const error = new Error(message);
@@ -18,18 +19,19 @@ export function createSalaryRecordService(salaryRecordRepository) {
   }
 
   return {
-    async listSalaryRecords(employeeIdParam) {
+    async listSalaryRecords(employeeIdParam, authUser) {
       const employeeId = parseEmployeeId(employeeIdParam);
       if (!employeeId) {
         throw createError(EMPLOYEE_ERRORS.INVALID_ID);
       }
 
+      assertEmployeeAccess(authUser, employeeId);
       await assertEmployeeExists(employeeId);
       const data = await salaryRecordRepository.listByEmployeeId(employeeId);
       return { data };
     },
 
-    async getSalaryRecord(employeeIdParam, salaryRecordIdParam) {
+    async getSalaryRecord(employeeIdParam, salaryRecordIdParam, authUser) {
       const employeeId = parseEmployeeId(employeeIdParam);
       const salaryRecordId = parseEmployeeId(salaryRecordIdParam);
 
@@ -39,6 +41,7 @@ export function createSalaryRecordService(salaryRecordRepository) {
         );
       }
 
+      assertEmployeeAccess(authUser, employeeId);
       await assertEmployeeExists(employeeId);
 
       const record = await salaryRecordRepository.findById(employeeId, salaryRecordId);
@@ -49,7 +52,9 @@ export function createSalaryRecordService(salaryRecordRepository) {
       return record;
     },
 
-    async createSalaryRecord(employeeIdParam, payload) {
+    async createSalaryRecord(employeeIdParam, payload, authUser) {
+      assertHrManager(authUser);
+
       const employeeId = parseEmployeeId(employeeIdParam);
       if (!employeeId) {
         throw createError(EMPLOYEE_ERRORS.INVALID_ID);

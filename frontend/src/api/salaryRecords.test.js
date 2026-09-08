@@ -21,7 +21,7 @@ describe('salary records API client', () => {
 
     const result = await fetchSalaryRecords(1);
 
-    expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1/salary-records');
+    expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1/salary-records', { headers: {} });
     expect(result).toEqual(mockRecords);
   });
 

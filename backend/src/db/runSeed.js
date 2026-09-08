@@ -19,8 +19,10 @@ if (result.inserted) {
     result.historicalSalaryCount > 0
       ? `, added ${result.historicalSalaryCount} historical salary records`
       : '';
+  const authNote =
+    result.authUserCount > 0 ? `, added ${result.authUserCount} auth users` : '';
   console.log(
-    `Dev seed applied: added ${result.insertedCount} employees${historicalNote} (${result.employeeCount} total) in ${sqlitePath}`,
+    `Dev seed applied: added ${result.insertedCount} employees${historicalNote}${authNote} (${result.employeeCount} total) in ${sqlitePath}`,
   );
 } else {
   console.log(`Dev seed skipped: all seed employees already exist (${result.employeeCount} total)`);

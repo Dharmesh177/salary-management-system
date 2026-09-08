@@ -1,6 +1,6 @@
 import { EMPLOYEE_ERRORS } from '../constants/employee.js';
 import { parseEmployeeId } from '../utils/parseEmployeeId.js';
-
+import { assertEmployeeAccess, assertHrManager } from '../utils/accessControl.js';
 function createEmployeeError({ message, status, code }) {
   const error = new Error(message);
   error.status = status;
@@ -32,15 +32,18 @@ export function createEmployeeService(employeeRepository, lookupRepository) {
   }
 
   return {
-    async listEmployees(filters) {
+    async listEmployees(filters, authUser) {
+      assertHrManager(authUser);
       return employeeRepository.listEmployees(filters);
     },
 
-    async getEmployeeById(id) {
+    async getEmployeeById(id, authUser) {
       const employeeId = parseEmployeeId(id);
       if (!employeeId) {
         throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
       }
+
+      assertEmployeeAccess(authUser, employeeId);
 
       const employee = await employeeRepository.findEmployeeById(employeeId);
       if (!employee) {
@@ -50,16 +53,16 @@ export function createEmployeeService(employeeRepository, lookupRepository) {
       return employee;
     },
 
-    async createEmployee(payload) {
-      await assertValidLookups(payload);
+    async createEmployee(payload, authUser) {
+      assertHrManager(authUser);      await assertValidLookups(payload);
       await assertUniqueEmployeeFields(payload);
 
       const employeeId = await employeeRepository.createEmployee(payload);
       return employeeRepository.findEmployeeById(employeeId);
     },
 
-    async updateEmployee(id, payload) {
-      const employeeId = parseEmployeeId(id);
+    async updateEmployee(id, payload, authUser) {
+      assertHrManager(authUser);      const employeeId = parseEmployeeId(id);
       if (!employeeId) {
         throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
       }
@@ -76,8 +79,8 @@ export function createEmployeeService(employeeRepository, lookupRepository) {
       return employeeRepository.findEmployeeById(employeeId);
     },
 
-    async deleteEmployee(id) {
-      const employeeId = parseEmployeeId(id);
+    async deleteEmployee(id, authUser) {
+      assertHrManager(authUser);      const employeeId = parseEmployeeId(id);
       if (!employeeId) {
         throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
       }

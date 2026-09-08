@@ -29,7 +29,7 @@ describe('employee API client', () => {
 
     const result = await fetchEmployees({ page: 1, search: 'ada' });
 
-    expect(fetch).toHaveBeenCalledWith('/api/v1/employees?page=1&search=ada');
+    expect(fetch).toHaveBeenCalledWith('/api/v1/employees?page=1&search=ada', { headers: {} });
     expect(result).toEqual(mockResponse);
   });
 
@@ -46,7 +46,7 @@ describe('employee API client', () => {
 
     const result = await fetchEmployee(1);
 
-    expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1');
+    expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1', { headers: {} });
     expect(result).toEqual(mockResponse.data);
   });
 

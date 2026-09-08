@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 const countries = [
   { id: 1, code: 'IN', name: 'India' },
   { id: 2, code: 'US', name: 'United States' },
@@ -417,9 +419,51 @@ async function insertHistoricalSalaryIfMissing(db, record) {
   return true;
 }
 
+const DEV_AUTH_PASSWORD = 'password123';
+
+const devAuthUsers = [
+  { email: 'mary.jackson@acme.example', role: 'HR_MANAGER' },
+  { email: 'ada.lovelace@acme.example', role: 'EMPLOYEE' },
+];
+
+async function seedAuthUsersIfMissing(db) {
+  let insertedCount = 0;
+
+  for (const devUser of devAuthUsers) {
+    const existingUser = await db.queryOne('SELECT id FROM users WHERE email = ?', [devUser.email]);
+    if (existingUser) {
+      continue;
+    }
+
+    const employee = await db.queryOne('SELECT id FROM employees WHERE email = ?', [devUser.email]);
+    if (!employee) {
+      continue;
+    }
+
+    const passwordHash = await bcrypt.hash(DEV_AUTH_PASSWORD, 10);
+    const result = await db.execute(
+      `INSERT INTO users (
+        employee_id, email, password_hash, is_active, created_at, updated_at
+      ) VALUES (?, ?, ?, 1, datetime('now'), datetime('now'))`,
+      [employee.id, devUser.email, passwordHash],
+    );
+
+    const role = await db.queryOne('SELECT id FROM roles WHERE name = ?', [devUser.role]);
+    await db.execute('INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)', [
+      result.lastInsertRowid,
+      role.id,
+    ]);
+
+    insertedCount += 1;
+  }
+
+  return insertedCount;
+}
+
 export async function seedDevData(db) {
   let insertedCount = 0;
   let historicalCount = 0;
+  let authUserCount = 0;
 
   await db.transaction(async () => {
     await seedLookups(db);
@@ -437,14 +481,17 @@ export async function seedDevData(db) {
         historicalCount += 1;
       }
     }
+
+    authUserCount = await seedAuthUsersIfMissing(db);
   });
 
   const totalRow = await db.queryOne('SELECT COUNT(*) AS count FROM employees');
 
   return {
-    inserted: insertedCount > 0 || historicalCount > 0,
+    inserted: insertedCount > 0 || historicalCount > 0 || authUserCount > 0,
     insertedCount,
     historicalSalaryCount: historicalCount,
+    authUserCount,
     employeeCount: totalRow?.count ?? 0,
   };
 }

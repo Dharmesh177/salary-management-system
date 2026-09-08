@@ -4,9 +4,10 @@ import {
   getSalaryRecord,
   listSalaryRecords,
 } from '../controllers/salaryRecordController.js';
+import { requirePermission } from '../middleware/requirePermission.js';
 
 export const salaryRecordsRouter = Router({ mergeParams: true });
 
-salaryRecordsRouter.get('/', listSalaryRecords);
-salaryRecordsRouter.post('/', createSalaryRecord);
-salaryRecordsRouter.get('/:salaryRecordId', getSalaryRecord);
+salaryRecordsRouter.get('/', requirePermission('salary:read'), listSalaryRecords);
+salaryRecordsRouter.post('/', requirePermission('salary:create'), createSalaryRecord);
+salaryRecordsRouter.get('/:salaryRecordId', requirePermission('salary:read'), getSalaryRecord);

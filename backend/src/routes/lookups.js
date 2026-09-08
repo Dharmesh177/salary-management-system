@@ -4,12 +4,14 @@ import {
   listDepartments,
   listDesignations,
 } from '../controllers/lookupController.js';
+import { authenticate } from '../middleware/authenticate.js';
+import { requirePermission } from '../middleware/requirePermission.js';
 
 export const countriesRouter = Router();
-countriesRouter.get('/', listCountries);
+countriesRouter.get('/', authenticate, requirePermission('employee:create'), listCountries);
 
 export const departmentsRouter = Router();
-departmentsRouter.get('/', listDepartments);
+departmentsRouter.get('/', authenticate, requirePermission('employee:create'), listDepartments);
 
 export const designationsRouter = Router();
-designationsRouter.get('/', listDesignations);
+designationsRouter.get('/', authenticate, requirePermission('employee:create'), listDesignations);

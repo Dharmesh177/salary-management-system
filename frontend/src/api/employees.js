@@ -1,17 +1,6 @@
+import { fetchJson, parseJsonResponse, sendJson } from './http.js';
+
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
-
-async function parseJsonResponse(response) {
-  const body = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const error = new Error(body.message ?? 'Request failed');
-    error.code = body.code;
-    error.status = response.status;
-    throw error;
-  }
-
-  return body;
-}
 
 function buildQuery(params) {
   const searchParams = new URLSearchParams();
@@ -26,28 +15,12 @@ function buildQuery(params) {
   return query ? `?${query}` : '';
 }
 
-async function sendJson(method, path, body) {
-  const response = await fetch(`${baseUrl}${path}`, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  if (response.status === 204) {
-    return null;
-  }
-
-  return parseJsonResponse(response);
-}
-
 export async function fetchEmployees(params = {}) {
-  const response = await fetch(`${baseUrl}/api/v1/employees${buildQuery(params)}`);
-  return parseJsonResponse(response);
+  return fetchJson(`/api/v1/employees${buildQuery(params)}`);
 }
 
 export async function fetchEmployee(id) {
-  const response = await fetch(`${baseUrl}/api/v1/employees/${id}`);
-  const body = await parseJsonResponse(response);
+  const body = await fetchJson(`/api/v1/employees/${id}`);
   return body.data;
 }
 
@@ -67,9 +40,9 @@ export async function deleteEmployee(id) {
 
 export async function fetchLookups() {
   const [countries, departments, designations] = await Promise.all([
-    fetch(`${baseUrl}/api/v1/countries`).then(parseJsonResponse),
-    fetch(`${baseUrl}/api/v1/departments`).then(parseJsonResponse),
-    fetch(`${baseUrl}/api/v1/designations`).then(parseJsonResponse),
+    fetchJson('/api/v1/countries'),
+    fetchJson('/api/v1/departments'),
+    fetchJson('/api/v1/designations'),
   ]);
 
   return {
@@ -78,3 +51,5 @@ export async function fetchLookups() {
     designations: designations.data,
   };
 }
+
+export { parseJsonResponse };
