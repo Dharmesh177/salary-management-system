@@ -1,7 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import AppHeader from './components/AppHeader.jsx';
+import ProtectedLayout from './components/ProtectedLayout.jsx';
 import { AuthProvider, useAuth } from './features/auth/context/AuthContext.jsx';
-import { ProtectedRoute } from './features/auth/components/ProtectedRoute.jsx';
 import { AUTH_ROUTES } from './features/auth/constants.js';
 import { DASHBOARD_ROUTES } from './features/dashboard/constants.js';
 import { EMPLOYEE_ROUTES } from './features/employees/constants.js';
@@ -55,83 +54,54 @@ function PublicOnlyRoute({ children }) {
   return children;
 }
 
+function AuthShell({ children }) {
+  return (
+    <div className="auth-shell">
+      <div className="auth-brand">
+        <span className="auth-brand-mark">A</span>
+        ACME Salary Management
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="app-shell">
-          <AppHeader />
-          <main className="app-main">
-            <Routes>
-              <Route
-                path={AUTH_ROUTES.login}
-                element={
-                  <PublicOnlyRoute>
-                    <LoginPage />
-                  </PublicOnlyRoute>
-                }
-              />
-              <Route
-                path={AUTH_ROUTES.register}
-                element={
-                  <PublicOnlyRoute>
-                    <RegisterPage />
-                  </PublicOnlyRoute>
-                }
-              />
-              <Route path="/" element={<HomeRedirect />} />
-              <Route
-                path={DASHBOARD_ROUTES.dashboard}
-                element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={EMPLOYEE_ROUTES.directory}
-                element={
-                  <ProtectedRoute>
-                    <EmployeeDirectoryPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={EMPLOYEE_ROUTES.new}
-                element={
-                  <ProtectedRoute>
-                    <EmployeeFormPage mode="create" />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/employees/:id/edit"
-                element={
-                  <ProtectedRoute>
-                    <EmployeeFormPage mode="edit" />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/employees/:id/salary/edit"
-                element={
-                  <ProtectedRoute>
-                    <EmployeeSalaryFormPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/employees/:id"
-                element={
-                  <ProtectedRoute>
-                    <EmployeeDetailPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<FallbackRedirect />} />
-            </Routes>
-          </main>
-        </div>
+        <Routes>
+          <Route
+            path={AUTH_ROUTES.login}
+            element={
+              <PublicOnlyRoute>
+                <AuthShell>
+                  <LoginPage />
+                </AuthShell>
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path={AUTH_ROUTES.register}
+            element={
+              <PublicOnlyRoute>
+                <AuthShell>
+                  <RegisterPage />
+                </AuthShell>
+              </PublicOnlyRoute>
+            }
+          />
+          <Route path="/" element={<HomeRedirect />} />
+          <Route element={<ProtectedLayout />}>
+            <Route path={DASHBOARD_ROUTES.dashboard} element={<DashboardPage />} />
+            <Route path={EMPLOYEE_ROUTES.directory} element={<EmployeeDirectoryPage />} />
+            <Route path={EMPLOYEE_ROUTES.new} element={<EmployeeFormPage mode="create" />} />
+            <Route path="/employees/:id/edit" element={<EmployeeFormPage mode="edit" />} />
+            <Route path="/employees/:id/salary/edit" element={<EmployeeSalaryFormPage />} />
+            <Route path="/employees/:id" element={<EmployeeDetailPage />} />
+          </Route>
+          <Route path="*" element={<FallbackRedirect />} />
+        </Routes>
       </AuthProvider>
     </BrowserRouter>
   );
