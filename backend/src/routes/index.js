@@ -2,12 +2,14 @@ import { Router } from 'express';
 import { healthRouter } from './health.js';
 import { authRouter } from './auth.js';
 import { employeesRouter } from './employees.js';
+import { dashboardRouter } from './dashboard.js';
 import { countriesRouter, departmentsRouter, designationsRouter } from './lookups.js';
 
 export const apiRouter = Router();
 
 apiRouter.use('/health', healthRouter);
 apiRouter.use('/auth', authRouter);
+apiRouter.use('/dashboard', dashboardRouter);
 apiRouter.use('/employees', employeesRouter);
 apiRouter.use('/countries', countriesRouter);
 apiRouter.use('/departments', departmentsRouter);
