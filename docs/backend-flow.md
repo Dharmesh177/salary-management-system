@@ -57,6 +57,14 @@ All routes under `/api/v1/employees` use `authenticate` first. Any authenticated
 
 Lookups (`/countries`, `/departments`, `/designations`) require authentication.
 
+## Dashboard
+
+| Route | Purpose |
+|-------|---------|
+| `GET /dashboard/analytics` | KPIs, chart sections, USD-normalized compensation aggregations |
+
+Returns `422` if any salary references a currency missing from `exchange_rates`.
+
 ## Database
 
 Migrations in `backend/src/db/migrations/`.
@@ -64,6 +72,7 @@ Migrations in `backend/src/db/migrations/`.
 - `002_employee_directory.sql` — lookups and employees
 - `004_auth_rbac.sql` — `users` table (roles/permissions removed in `005`)
 - `005_mvp_scope_update.sql` — `employee_salaries`, `exchange_rates`; drops RBAC and `salary_records`
+- `006_add_joining_date.sql` — `employees.joining_date`
 
 `app.locals.db` is a singleton per process (set in `createApp`). Tests use in-memory SQLite via `createTestDb()`.
 

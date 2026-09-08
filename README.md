@@ -14,7 +14,7 @@ This repository is a **monorepo**: React SPA (`frontend/`), Node.js JSON API (`b
 | Backend request flow | [`docs/backend-flow.md`](docs/backend-flow.md) |
 | Frontend structure and auth flow | [`docs/frontend-flow.md`](docs/frontend-flow.md) |
 | Trade-offs and design decisions | [`docs/trade-offs.md`](docs/trade-offs.md) |
-| AI usage (tooling and verification) | [`docs/ai-usage.md`](docs/ai-usage.md) |
+| AI usage (tooling, prompts, human-led decisions) | [`docs/ai-usage.md`](docs/ai-usage.md) |
 | Bulk employee seed (10k dev data) | [`docs/employee-seed.md`](docs/employee-seed.md) |
 | Architecture diagram | _not written yet_ |
 | Decision records (ADRs) | _not written yet_ |

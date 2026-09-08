@@ -1,16 +1,16 @@
 # Architecture and setup notes
 
-This note records foundation decisions for the ACME Salary Management System. Domain schema, auth, and product features are intentionally not implemented yet; they will be driven by TDD.
+This document records foundation and layering decisions for the ACME Salary Management System. For feature-level trade-offs, see [`trade-offs.md`](./trade-offs.md). For what was human-led vs AI-assisted, see [`ai-usage.md`](./ai-usage.md).
 
-**Source of truth for product scope:** [`documents/Salary Management System Requirements - Incubyte.pdf`](../documents/Salary%20Management%20System%20Requirements%20-%20Incubyte.pdf). Other briefs are not authoritative if they conflict with that PDF.
+**Source of truth for product scope:** [`docs/Salary Management System Requirements - Updated.docx`](./Salary%20Management%20System%20Requirements%20-%20Updated.docx) and [`salary-management-relational-schema-updated.md`](./salary-management-relational-schema-updated.md).
 
 ## Project structure
 
 ```
 /
   README.md                 # operator entry point
-  documents/                # requirements and other product artifacts
-  docs/                     # engineering notes (this file; later: design, ADRs, trade-offs)
+  documents/                # original product artifacts
+  docs/                     # engineering notes, trade-offs, AI usage, flows
   frontend/                 # React SPA (Vite)
   backend/                  # Node.js HTTP API (Express) + SQLite
 ```
@@ -24,65 +24,120 @@ This note records foundation decisions for the ACME Salary Management System. Do
 - `src/controllers/` — request/response mapping
 - `src/services/` — application/business rules
 - `src/repositories/` — persistence orchestration (SQL execution)
-- `src/repositories/queries/` — SQL strings and query builders per domain
+- `src/repositories/queries/` — SQL strings per domain
 - `src/mappers/` — DB row → API response shaping
 - `src/validators/` — request query/body parsing
-- `src/utils/` — generic helpers (pagination, etc.)
+- `src/utils/` — generic helpers (pagination, date, ID parsing)
 - `src/constants/` — shared domain constants and error definitions
-- `src/db/` — SQLite client, migration runner, SQL migration files
+- `src/db/` — SQLite client, migrations, seed scripts
 - `src/middleware/` — cross-cutting HTTP concerns
 - `tests/` — Node.js test runner (`node:test`) + Supertest
 
 **Frontend**
 
-- `src/api/` — HTTP client for the Node API
-- `src/pages/` — route-level screens (thin shells; wire hooks and components)
-- `src/features/<domain>/` — feature modules (`components/`, `hooks/`, `constants.js`, `messages.js`)
-- `src/components/` — shared UI pieces used across features
-- `src/hooks/` — shared hooks used across features
-- `src/utils/` — generic frontend helpers (formatting, etc.)
-- Colocated `*.test.jsx` files for Vitest + Testing Library
+- `src/api/` — HTTP clients for the Node API
+- `src/pages/<name>/` — route screens (thin; colocated `.jsx`, `.css`, `.test.jsx`)
+- `src/features/<domain>/` — hooks, components, validation, `messages.js`, `constants.js`
+- `src/components/` — shared UI (`AppLayout`, charts, `Loader`, `EmptyState`)
+- `src/styles/` — `global.css`, `shared.css` design tokens and shared patterns
 
 Business logic must not live in Express routes or React pages. Controllers and pages stay thin; services own backend rules; repositories own SQL; mappers own response shapes; feature hooks own client-side data loading.
 
+## Request and data flow
+
+```
+Browser → Vite dev proxy (/api) → Express routes → controllers → services → repositories → SQLite
+```
+
+- API prefix: `/api/v1/`
+- Health: `GET /api/v1/health` (unauthenticated liveness)
+- Auth: JWT bearer token; session via `GET /api/v1/auth/session`
+- Dashboard: `GET /api/v1/dashboard/analytics` (SQL aggregations, USD via `exchange_rates`)
+
+See [`backend-flow.md`](./backend-flow.md) and [`frontend-flow.md`](./frontend-flow.md) for endpoint and auth detail.
+
 ## Major dependencies
 
-| Package                       | Why                                                                                    |
-| ----------------------------- | -------------------------------------------------------------------------------------- |
-| Express                       | Small, conventional HTTP layer for a REST JSON API                                     |
-| `node:sqlite`                 | Built-in SQLite (no native addon / node-gyp). Enough for ~10k rows and in-memory tests |
-| cors, helmet                  | Dev CORS to the Vite origin; baseline HTTP hardening                                   |
-| dotenv                        | Env files without committing secrets                                                   |
-| Vite + React                  | Standard SPA toolchain; no Next.js (out of scope)                                      |
-| Vitest + Testing Library      | Fast frontend unit tests without a browser                                             |
-| node:test + Supertest         | Backend tests with no extra runner; HTTP contract tests later                          |
-| concurrently / npm workspaces | One install and one `npm test` / `npm run dev` from the repo root                      |
+| Package | Why |
+| ------- | --- |
+| Express | Small REST JSON API layer |
+| `node:sqlite` | Built-in SQLite — no native addon; sufficient for ~10k rows and in-memory tests |
+| bcryptjs, jsonwebtoken | Password hashing and JWT auth |
+| cors, helmet | Dev CORS and baseline HTTP hardening |
+| dotenv | Env files without committing secrets |
+| Vite + React | SPA toolchain |
+| Vitest + Testing Library | Fast frontend tests |
+| node:test + Supertest | Backend tests without extra runner |
+| concurrently / npm workspaces | One install, one `npm test` / `npm run dev` from root |
+| @faker-js/faker (dev) | Bulk employee seed only — not a runtime dependency |
 
-A component library (e.g. MUI) is **not** added yet. It should be chosen when the first UI screens are built.
+No UI component library (MUI, etc.) — custom CSS with shared tokens.
 
 ## Testing approach
 
-- Default suites are fast and isolated: backend uses SQLite `:memory:`; frontend tests mock the network when they need API data.
-- `npm test` at the root runs both workspaces. `npm run test:backend` and `npm run test:frontend` run one suite.
-- Seed of 10,000 employees will be a script, not part of the default test run.
-- No live LLM calls in unit tests (Q&A guards will mock the model).
-- Implementation of domain rules will follow red → green → refactor. The health and DB smoke tests only prove the harness works.
+- Backend: in-memory SQLite (`createTestDb()`); Supertest against `createApp()`
+- Frontend: Vitest + Testing Library; API mocked in page tests
+- **Meaningful tests only** — core paths, deterministic, no live LLM calls
+- **10k seed** is a CLI script, not part of `npm test`
+- TDD: red → green → refactor per feature where practical
 
 ## Database approach
 
-- SQLite file path is configurable (`SQLITE_PATH`). The file is gitignored; migrations are checked in.
-- WAL and foreign keys are enabled on connect.
-- Access goes through `createDb()` (`node:sqlite` `DatabaseSync` today): `query`, `queryOne`, `execute`, `exec`, `transaction`, `ping`. Methods are async so a PostgreSQL adapter can replace SQLite later without rewriting services.
-- Domain tables (`users`, `employees`, `salary_events`, indexes) will be added in later migrations as tests specify them. Current salary will be **derived** from history, not stored as an overwritable column.
+- SQLite file path via `SQLITE_PATH` (gitignored); migrations checked in under `backend/src/db/migrations/`
+- WAL and foreign keys enabled on connect
+- Access through async `createDb()` adapter (`query`, `queryOne`, `execute`, `exec`, `transaction`, `ping`) so PostgreSQL could replace SQLite later without rewriting services
+- **Singleton** DB handle on `app.locals.db` per server process
 
-## Other setup decisions
+### Current schema (MVP)
 
-- **Auth:** JWT secret is in env only. Session vs JWT cookie will be decided with the first auth tests. The Incubyte spec names **HR Manager** and **Employee** (own salary + own payslips). Simple predefined RBAC is the planned approach, pending confirmation in the spec.
-- **Currency:** MVP stores and displays salaries in **INR** (conversion / other defaults are an open question in the spec).
-- **Salary model:** history is retained on change; attributes include amount **components** (base, bonus, incentives, etc.), effective date, and last updated date. Exact component schema will be locked in TDD.
-- **Payslips:** in MVP (HR can generate/view for employees; employees can generate/view their own). Not payroll processing (gross-to-net, bank files).
-- **Dashboard:** detailed analytics are **post-MVP**. Do not treat a full dashboard as a v1 requirement unless the spec is updated.
-- **CORS:** Vite proxies `/api` to the backend in development; Express also allows `CORS_ORIGIN`. Production can sit behind a same-origin reverse proxy.
-- **API prefix:** `/api/v1/`.
-- **Health:** `GET /api/v1/health` is unauthenticated liveness (process + SQLite reachable). It is infrastructure, not a salary feature.
-- **JavaScript, not TypeScript:** matches the stated React.js / Node.js stack and keeps the TDD loop small. Can be revisited if the team wants types.
+| Migration | Purpose |
+| --------- | ------- |
+| `002_employee_directory.sql` | `countries`, `departments`, `designations`, `employees` |
+| `004_auth_rbac.sql` | `users` (RBAC tables later removed) |
+| `005_mvp_scope_update.sql` | `employee_salaries`, `exchange_rates`; drops history + RBAC |
+| `006_add_joining_date.sql` | `employees.joining_date` |
+
+Salaries are stored in **native currency**; USD analytics are **derived** via `exchange_rates` at query time.
+
+## Design decisions (human-led)
+
+Decisions below were made by the developer against updated requirements. AI helped implement them as migrations and code.
+
+| Area | Decision |
+| ---- | -------- |
+| Salary model | One current row per employee (`employee_salaries`), not salary history |
+| Auth | Login required; **no RBAC** in MVP — single HR persona |
+| Multi-currency | Explicit `currency_code` on salary; FX table for USD normalization |
+| Analytics | Query-time SQL aggregation — no dashboard snapshot tables |
+| Pagination | SQL `LIMIT`/`OFFSET` with default page size **10** |
+| Registration | Secret-gated `POST /register`; not exposed in main nav |
+| Frontend routing | Unauthenticated / invalid routes → login; home → dashboard when authed |
+| Layout | `AppLayout` sidebar + sticky topbar; mobile overlay drawer |
+| Charts | Custom SVG (donut + bar); labels/metadata from dashboard API |
+| Seed | Faker bulk generator + `ensureDevLoginUser()`; see [`employee-seed.md`](./employee-seed.md) |
+
+## Environment and local dev
+
+| Variable | Purpose |
+| -------- | ------- |
+| `PORT` | API listen port (default `3001`) |
+| `SQLITE_PATH` | Database file |
+| `JWT_SECRET` | Token signing (required in production) |
+| `REGISTRATION_SECRET` | Gate for register endpoint |
+| `CORS_ORIGIN` | Allowed browser origin |
+| `VITE_API_BASE_URL` | Empty in dev — Vite proxies `/api` |
+
+```bash
+npm run migrate
+npm run seed              # 20 employees if DB empty + dev login
+npm run dev
+```
+
+## Other conventions
+
+- **JavaScript (ESM), not TypeScript** — faster MVP iteration; tests carry contracts
+- **CORS:** Vite proxies `/api` in development; production can use same-origin reverse proxy
+- **Errors:** Structured API errors with `code` + `message`; services throw with `status`
+- **Incremental schema** — only migrate what each feature needs; history visible in git
+
+For deferred items (payslips, CSV import, live FX, AI Q&A), see the deferred table in [`trade-offs.md`](./trade-offs.md).

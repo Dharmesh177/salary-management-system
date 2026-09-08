@@ -1,6 +1,24 @@
 # Trade-offs and Design Decisions
 
-This document records product and technical decisions made during incremental feature delivery. It complements the relational schema note and architecture overview; it is not a substitute for requirements.
+This document records **product and technical trade-offs** made during delivery. Decisions were driven by the updated requirements document and developer review; AI helped implement them but did not set scope. See [`ai-usage.md`](./ai-usage.md) for tooling, prompts, and human-led vs AI-assisted work.
+
+Complements [`architecture.md`](./architecture.md) and [`salary-management-relational-schema-updated.md`](./salary-management-relational-schema-updated.md); not a substitute for requirements.
+
+## Scope pivot (human-led)
+
+**Decision:** Remove RBAC and salary **history** from MVP; keep authentication and a **single current salary** per employee.
+
+**Why:** Updated requirements document — single HR Manager persona, simpler compensation model.
+
+**Impact:** Migration `005_mvp_scope_update.sql` drops `roles`/`permissions`/`salary_records`; adds `employee_salaries` and `exchange_rates`.
+
+## Frontend structure (human-led refactor)
+
+**Decision:** `pages/<name>/` for route shells (jsx, css, test colocated); `features/<domain>/` for hooks, components, validation, and `messages.js`.
+
+**Why:** Code review — avoid monolithic page files and a single global CSS file.
+
+**Trade-off:** More folders; clearer ownership per domain.
 
 ## Employee Directory
 

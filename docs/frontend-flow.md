@@ -4,14 +4,14 @@
 
 ```
 src/
-  api/              HTTP clients (auth, employees, employeeSalary, http)
+  api/              HTTP clients (auth, employees, employeeSalary, dashboard, http)
   features/<name>/  domain logic (hooks, components, validation, messages)
   pages/<name>/     route screens (jsx, css, test colocated)
-  components/       shared UI (AppHeader)
+  components/       shared UI (AppLayout, Loader, EmptyState, charts)
   styles/           global.css + shared.css
 ```
 
-Pages are thin: they compose feature hooks/components and import page-specific CSS.
+Pages are thin: they compose feature hooks/components and import page-specific CSS. Authenticated routes render inside `AppLayout` (sidebar + topbar).
 
 ## Authentication flow
 

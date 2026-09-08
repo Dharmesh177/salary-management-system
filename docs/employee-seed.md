@@ -240,3 +240,7 @@ The generated dataset is intended to stress:
 - **Database path:** Resolved from `SQLITE_PATH` env var or defaults to `backend/data/salary.db` (see `backend/src/config/env.js`).
 - **Not for production:** Faker and bulk seed are dev/test tooling only; do not run `--replace` against production data.
 - **Schema:** No migrations or API changes are required or introduced by this seed.
+
+---
+
+See also: [`architecture.md`](./architecture.md), [`trade-offs.md`](./trade-offs.md#bulk-employee-seed-development), [`ai-usage.md`](./ai-usage.md).
