@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { upsertEmployeeSalary } from '../../../api/employeeSalary.js';
 import {
   createEmployee,
   fetchEmployee,
@@ -8,7 +9,11 @@ import {
 } from '../../../api/employees.js';
 import { DEFAULT_EMPLOYEE_FORM, EMPLOYEE_ROUTES } from '../constants.js';
 import { EMPLOYEE_MESSAGES } from '../messages.js';
-import { hasValidationErrors, validateEmployeeForm } from '../validation.js';
+import {
+  buildSalaryPayload,
+  hasValidationErrors,
+  validateEmployeeForm,
+} from '../validation.js';
 
 function toFormValues(employee) {
   return {
@@ -20,6 +25,10 @@ function toFormValues(employee) {
     departmentId: String(employee.department.id),
     designationId: String(employee.designation.id),
     joiningDate: employee.joiningDate,
+    baseSalary: '',
+    bonus: '0',
+    incentives: '0',
+    currencyCode: 'INR',
   };
 }
 
@@ -82,7 +91,7 @@ export function useEmployeeForm({ mode, employeeId }) {
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
 
-    const validationErrors = validateEmployeeForm(values);
+    const validationErrors = validateEmployeeForm(values, { includeCompensation: !isEdit });
     if (hasValidationErrors(validationErrors)) {
       setFieldErrors(validationErrors);
       return;
@@ -96,6 +105,10 @@ export function useEmployeeForm({ mode, employeeId }) {
       const employee = isEdit
         ? await updateEmployee(employeeId, payload)
         : await createEmployee(payload);
+
+      if (!isEdit) {
+        await upsertEmployeeSalary(employee.id, buildSalaryPayload(values));
+      }
 
       navigate(EMPLOYEE_ROUTES.detail(employee.id));
     } catch (error) {
@@ -120,6 +133,7 @@ export function useEmployeeForm({ mode, employeeId }) {
     submitError,
     loading,
     isSubmitting,
+    showCompensation: !isEdit,
     handleChange,
     handleSubmit,
     handleCancel,

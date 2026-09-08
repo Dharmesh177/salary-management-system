@@ -30,6 +30,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: end;
+  flex-wrap: wrap;
 }
 
 .pagination-bar {
@@ -38,4 +39,17 @@
   align-items: center;
   gap: 1rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .filter-actions,
+  .pagination-actions {
+    width: 100%;
+  }
+
+  .filter-actions button,
+  .pagination-actions button {
+    flex: 1 1 auto;
+  }
 }

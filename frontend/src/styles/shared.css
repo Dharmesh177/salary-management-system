@@ -8,6 +8,15 @@
   padding: 2rem 1.5rem 3rem;
 }
 
+.form-section {
+  margin-top: 1.5rem;
+}
+
+.form-section h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
 .page-header h1,
 .detail-page h1 {
   margin: 0 0 0.25rem;
@@ -23,6 +32,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .page-actions {
@@ -175,6 +185,56 @@ button:disabled {
 
 .sort-indicator.active {
   color: #0f5c8c;
+}
+
+@media (max-width: 900px) {
+  .employee-table thead {
+    display: none;
+  }
+
+  .employee-table,
+  .employee-table tbody,
+  .employee-table tr,
+  .employee-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .employee-table tr {
+    padding: 1rem;
+    border-bottom: 1px solid #e0e7ee;
+  }
+
+  .employee-table td {
+    padding: 0.35rem 0;
+    border: none;
+  }
+
+  .employee-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #627d98;
+    margin-bottom: 0.15rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-main {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button,
+  .form-actions .button-link {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .detail-grid {

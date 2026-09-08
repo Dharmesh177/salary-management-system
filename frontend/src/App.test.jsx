@@ -5,7 +5,7 @@ import App from './App.jsx';
 vi.mock('./api/employees.js', () => ({
   fetchEmployees: vi.fn().mockResolvedValue({
     data: [],
-    pagination: { page: 1, pageSize: 20, total: 0, totalPages: 0 },
+    pagination: { page: 1, pageSize: 10, total: 0, totalPages: 0 },
   }),
   fetchLookups: vi.fn().mockResolvedValue({
     countries: [],

@@ -1,4 +1,4 @@
-export const EMPLOYEE_PAGE_SIZE = 20;
+export const EMPLOYEE_PAGE_SIZE = 10;
 
 export const EMPLOYEE_ROUTES = {
   directory: '/employees',
@@ -16,6 +16,10 @@ export const DEFAULT_EMPLOYEE_FORM = {
   departmentId: '',
   designationId: '',
   joiningDate: '',
+  baseSalary: '',
+  bonus: '0',
+  incentives: '0',
+  currencyCode: 'INR',
 };
 
 export const DEFAULT_EMPLOYEE_FILTERS = {

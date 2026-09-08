@@ -34,6 +34,15 @@ describe('GET /api/v1/employees', () => {
     assert.equal(response.body.data[0].designation.name, 'Software Engineer');
   });
 
+  it('defaults to 10 rows per page', async () => {
+    const response = await request(app)
+      .get('/api/v1/employees')
+      .set(authHeader(hrToken));
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.pagination.pageSize, 10);
+  });
+
   it('sorts employees by employee code descending', async () => {
     const response = await request(app)
       .get('/api/v1/employees?sortBy=employeeCode&sortOrder=desc')

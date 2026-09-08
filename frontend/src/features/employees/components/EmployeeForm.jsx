@@ -1,3 +1,4 @@
+import { SUPPORTED_CURRENCIES } from '../../employeeSalary/constants.js';
 import { EMPLOYEE_MESSAGES } from '../messages.js';
 
 function FieldError({ message }) {
@@ -15,6 +16,7 @@ export default function EmployeeForm({
   submitError,
   isSubmitting,
   submitLabel,
+  showCompensation = false,
   onChange,
   onSubmit,
   onCancel,
@@ -113,6 +115,62 @@ export default function EmployeeForm({
           <FieldError message={errors.designationId} />
         </label>
       </div>
+
+      {showCompensation ? (
+        <section className="form-section">
+          <h2>{EMPLOYEE_MESSAGES.compensationSectionTitle}</h2>
+          <div className="form-grid">
+            <label>
+              {EMPLOYEE_MESSAGES.baseSalaryLabel}
+              <input
+                type="number"
+                min="0"
+                step="1"
+                name="baseSalary"
+                value={values.baseSalary}
+                onChange={onChange}
+              />
+              <FieldError message={errors.baseSalary} />
+            </label>
+
+            <label>
+              {EMPLOYEE_MESSAGES.bonusLabel}
+              <input
+                type="number"
+                min="0"
+                step="1"
+                name="bonus"
+                value={values.bonus}
+                onChange={onChange}
+              />
+              <FieldError message={errors.bonus} />
+            </label>
+
+            <label>
+              {EMPLOYEE_MESSAGES.incentivesLabel}
+              <input
+                type="number"
+                min="0"
+                step="1"
+                name="incentives"
+                value={values.incentives}
+                onChange={onChange}
+              />
+              <FieldError message={errors.incentives} />
+            </label>
+
+            <label>
+              {EMPLOYEE_MESSAGES.currencyLabel}
+              <select name="currencyCode" value={values.currencyCode} onChange={onChange}>
+                {SUPPORTED_CURRENCIES.map((currency) => (
+                  <option key={currency} value={currency}>{currency}</option>
+                ))}
+              </select>
+              <FieldError message={errors.currencyCode} />
+            </label>
+          </div>
+        </section>
+      ) : null}
 
       {submitError ? <p className="status-message error">{submitError}</p> : null}
 

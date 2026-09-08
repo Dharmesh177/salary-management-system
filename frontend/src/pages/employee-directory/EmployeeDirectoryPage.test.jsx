@@ -25,7 +25,7 @@ const sampleEmployees = {
       designation: { id: 1, name: 'Software Engineer' },
     },
   ],
-  pagination: { page: 1, pageSize: 20, total: 1, totalPages: 1 },
+  pagination: { page: 1, pageSize: 10, total: 1, totalPages: 1 },
 };
 
 const sampleLookups = {
@@ -74,7 +74,7 @@ describe('EmployeeDirectoryPage', () => {
 
     expect(fetchEmployees).toHaveBeenLastCalledWith({
       page: 1,
-      pageSize: 20,
+      pageSize: 10,
       search: 'ada',
       countryId: '',
       departmentId: '',

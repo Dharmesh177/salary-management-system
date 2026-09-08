@@ -1,17 +1,25 @@
-.salary-history-section {
-  margin-top: 2rem;
+.detail-page .page-header-actions {
+  flex-wrap: wrap;
 }
 
-.section-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
+.detail-page .page-actions {
+  width: 100%;
 }
 
-.section-header p {
-  margin: 0.35rem 0 0;
-  color: #627d98;
+.detail-page .page-actions .button-link,
+.detail-page .page-actions button {
+  flex: 1 1 12rem;
+  justify-content: center;
 }
 
-.salary-history-table td:last-child {
-  white-space: nowrap;
+@media (max-width: 640px) {
+  .detail-page .page-actions {
+    flex-direction: column;
+  }
+
+  .detail-page .page-actions .button-link,
+  .detail-page .page-actions button {
+    width: 100%;
+    text-align: center;
+  }
 }

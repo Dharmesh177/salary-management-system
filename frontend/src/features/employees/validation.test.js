@@ -11,6 +11,10 @@ const validEmployee = {
   departmentId: '1',
   designationId: '1',
   joiningDate: '2024-09-01',
+  baseSalary: '1000000',
+  bonus: '0',
+  incentives: '0',
+  currencyCode: 'INR',
 };
 
 describe('validateEmployeeForm', () => {
@@ -28,6 +32,15 @@ describe('validateEmployeeForm', () => {
     const errors = validateEmployeeForm(validEmployee);
 
     expect(hasValidationErrors(errors)).toBe(false);
+  });
+
+  it('validates compensation fields on create', () => {
+    const errors = validateEmployeeForm(
+      { ...validEmployee, baseSalary: '' },
+      { includeCompensation: true },
+    );
+
+    expect(errors.baseSalary).toBeTruthy();
   });
 
   it('rejects an invalid email address', () => {

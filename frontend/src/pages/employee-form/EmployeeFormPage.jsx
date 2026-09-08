@@ -16,6 +16,7 @@ export default function EmployeeFormPage({ mode }) {
     submitError,
     loading,
     isSubmitting,
+    showCompensation,
     handleChange,
     handleSubmit,
     handleCancel,
@@ -44,6 +45,7 @@ export default function EmployeeFormPage({ mode }) {
         submitError={submitError}
         isSubmitting={isSubmitting}
         submitLabel={EMPLOYEE_MESSAGES.saveEmployee}
+        showCompensation={showCompensation}
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
