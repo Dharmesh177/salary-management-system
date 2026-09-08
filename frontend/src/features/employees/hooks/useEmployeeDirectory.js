@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchEmployees, fetchLookups } from '../../../api/employees.js';
-import { DEFAULT_EMPLOYEE_FILTERS, EMPLOYEE_PAGE_SIZE } from '../constants.js';
+import {
+  DEFAULT_EMPLOYEE_FILTERS,
+  DEFAULT_EMPLOYEE_SORT,
+  EMPLOYEE_PAGE_SIZE,
+} from '../constants.js';
 import { EMPLOYEE_MESSAGES } from '../messages.js';
 
 export function useEmployeeDirectory() {
@@ -14,6 +18,7 @@ export function useEmployeeDirectory() {
   const [lookups, setLookups] = useState({ countries: [], departments: [], designations: [] });
   const [filters, setFilters] = useState(DEFAULT_EMPLOYEE_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState(DEFAULT_EMPLOYEE_FILTERS);
+  const [sort, setSort] = useState(DEFAULT_EMPLOYEE_SORT);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,6 +40,8 @@ export function useEmployeeDirectory() {
         countryId: appliedFilters.countryId,
         departmentId: appliedFilters.departmentId,
         designationId: appliedFilters.designationId,
+        sortBy: sort.sortBy,
+        sortOrder: sort.sortOrder,
       });
 
       setEmployees(result.data);
@@ -45,7 +52,7 @@ export function useEmployeeDirectory() {
     } finally {
       setLoading(false);
     }
-  }, [appliedFilters, page]);
+  }, [appliedFilters, page, sort]);
 
   useEffect(() => {
     loadLookups().catch(() => {
@@ -74,16 +81,23 @@ export function useEmployeeDirectory() {
     setPage(1);
   }
 
+  function handleSort(nextSort) {
+    setPage(1);
+    setSort(nextSort);
+  }
+
   return {
     employees,
     pagination,
     lookups,
     filters,
+    sort,
     loading,
     error,
     handleFilterChange,
     handleApplyFilters,
     handleClearFilters,
+    handleSort,
     goToPreviousPage: () => setPage((current) => current - 1),
     goToNextPage: () => setPage((current) => current + 1),
   };

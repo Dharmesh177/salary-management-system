@@ -2,6 +2,7 @@ import { EMPLOYEE_ERRORS } from '../constants/employee.js';
 import { buildPaginationMeta, normalizePagination } from '../utils/pagination.js';
 import { toEmployeeDetail, toEmployeeListItem } from '../mappers/employeeMapper.js';
 import {
+  buildEmployeeOrderBy,
   buildEmployeeSearchWhereClause,
   countEmployeesQuery,
   createEmployeeQuery,
@@ -27,7 +28,10 @@ export function createEmployeeRepository(db) {
       const countRow = await db.queryOne(countEmployeesQuery(whereSql), params);
       const total = countRow?.total ?? 0;
 
-      const rows = await db.query(listEmployeesQuery(whereSql), [...params, pageSize, offset]);
+      const rows = await db.query(
+        listEmployeesQuery(whereSql, buildEmployeeOrderBy(filters)),
+        [...params, pageSize, offset],
+      );
 
       return {
         data: rows.map(toEmployeeListItem),

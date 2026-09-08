@@ -25,6 +25,11 @@ export const DEFAULT_EMPLOYEE_FILTERS = {
   designationId: '',
 };
 
+export const DEFAULT_EMPLOYEE_SORT = {
+  sortBy: 'lastName',
+  sortOrder: 'asc',
+};
+
 export const FILTER_OPTION_LABELS = {
   country: 'All countries',
   department: 'All departments',
@@ -32,11 +37,11 @@ export const FILTER_OPTION_LABELS = {
 };
 
 export const EMPLOYEE_TABLE_COLUMNS = [
-  'Employee ID',
-  'Name',
-  'Email',
-  'Joining date',
-  'Country',
-  'Department',
-  'Designation',
+  { label: 'Employee ID', sortKey: 'employeeCode' },
+  { label: 'Name', sortKey: 'lastName' },
+  { label: 'Email', sortKey: 'email' },
+  { label: 'Joining date', sortKey: 'joiningDate' },
+  { label: 'Country', sortKey: 'country' },
+  { label: 'Department', sortKey: 'department' },
+  { label: 'Designation', sortKey: 'designation' },
 ];

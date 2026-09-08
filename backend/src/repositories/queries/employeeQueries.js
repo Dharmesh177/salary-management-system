@@ -1,3 +1,5 @@
+import { DEFAULT_EMPLOYEE_SORT, EMPLOYEE_SORT_FIELDS } from '../../constants/employeeList.js';
+
 const EMPLOYEE_SELECT_COLUMNS = `
   e.id,
   e.employee_code,
@@ -19,8 +21,16 @@ const EMPLOYEE_BASE_JOINS = `
   INNER JOIN departments d ON d.id = e.department_id
   INNER JOIN designations g ON g.id = e.designation_id`;
 
-const EMPLOYEE_ORDER_BY = `
-  ORDER BY e.last_name COLLATE NOCASE, e.first_name COLLATE NOCASE, e.employee_code`;
+export function buildEmployeeOrderBy({ sortBy, sortOrder } = DEFAULT_EMPLOYEE_SORT) {
+  const direction = sortOrder === 'desc' ? 'DESC' : 'ASC';
+  const field = EMPLOYEE_SORT_FIELDS[sortBy] ?? EMPLOYEE_SORT_FIELDS.lastName;
+
+  if (sortBy === 'lastName') {
+    return `ORDER BY e.last_name COLLATE NOCASE ${direction}, e.first_name COLLATE NOCASE ${direction}, e.employee_code ${direction}`;
+  }
+
+  return `ORDER BY ${field} COLLATE NOCASE ${direction}`;
+}
 
 export function buildEmployeeSearchWhereClause({ search, countryId, departmentId, designationId }) {
   const conditions = [];
@@ -59,11 +69,11 @@ export function countEmployeesQuery(whereSql) {
           ${whereSql}`;
 }
 
-export function listEmployeesQuery(whereSql) {
+export function listEmployeesQuery(whereSql, orderBySql) {
   return `SELECT ${EMPLOYEE_SELECT_COLUMNS}
           ${EMPLOYEE_BASE_JOINS}
           ${whereSql}
-          ${EMPLOYEE_ORDER_BY}
+          ${orderBySql}
           LIMIT ? OFFSET ?`;
 }
 

@@ -13,11 +13,13 @@ export default function EmployeeDirectoryPage() {
     pagination,
     lookups,
     filters,
+    sort,
     loading,
     error,
     handleFilterChange,
     handleApplyFilters,
     handleClearFilters,
+    handleSort,
     goToPreviousPage,
     goToNextPage,
   } = useEmployeeDirectory();
@@ -51,7 +53,7 @@ export default function EmployeeDirectoryPage() {
 
       {!loading && !error && employees.length > 0 ? (
         <>
-          <EmployeeTable employees={employees} />
+          <EmployeeTable employees={employees} sort={sort} onSort={handleSort} />
           <EmployeePagination
             pagination={pagination}
             onPrevious={goToPreviousPage}

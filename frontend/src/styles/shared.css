@@ -152,6 +152,29 @@ button:disabled {
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: #486581;
+  white-space: nowrap;
+}
+
+.sortable-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sort-indicator {
+  color: #9fb3c8;
+  font-size: 0.75rem;
+}
+
+.sort-indicator.active {
+  color: #0f5c8c;
 }
 
 .detail-grid {

@@ -33,4 +33,14 @@ describe('GET /api/v1/employees', () => {
     assert.equal(response.body.data[0].department.name, 'Engineering');
     assert.equal(response.body.data[0].designation.name, 'Software Engineer');
   });
+
+  it('sorts employees by employee code descending', async () => {
+    const response = await request(app)
+      .get('/api/v1/employees?sortBy=employeeCode&sortOrder=desc')
+      .set(authHeader(hrToken));
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.data[0].employeeCode, 'EMP002');
+    assert.equal(response.body.data[1].employeeCode, 'EMP001');
+  });
 });

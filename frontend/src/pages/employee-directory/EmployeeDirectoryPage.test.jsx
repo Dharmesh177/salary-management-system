@@ -79,6 +79,8 @@ describe('EmployeeDirectoryPage', () => {
       countryId: '',
       departmentId: '',
       designationId: '',
+      sortBy: 'lastName',
+      sortOrder: 'asc',
     });
   });
 });
