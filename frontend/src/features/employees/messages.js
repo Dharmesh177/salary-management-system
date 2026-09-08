@@ -20,7 +20,7 @@ export const EMPLOYEE_MESSAGES = {
   loadEmployeesError: 'Unable to load employees',
   loadEmployeeError: 'Unable to load employee',
   loadFiltersError: 'Unable to load filter options',
-  emptyEmployees: 'No employees found.',
+  emptyEmployees: 'No employees match your search and filters.',
   noCompensation: 'No current compensation record.',
   backToDirectory: 'Back to directory',
   searchLabel: 'Search',

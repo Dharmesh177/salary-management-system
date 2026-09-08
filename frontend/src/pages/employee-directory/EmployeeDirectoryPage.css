@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   gap: 1rem;
-  margin: 1.5rem 0;
+  margin: 1.5rem 0 0;
   padding: 1rem;
   background: #fff;
   border: 1px solid #d9e2ec;
@@ -19,10 +19,31 @@
 
 .filter-panel input,
 .filter-panel select {
+  width: 100%;
   padding: 0.55rem 0.65rem;
   border: 1px solid #bcccdc;
   border-radius: 0.5rem;
   background: #fff;
+  font: inherit;
+  color: #243b53;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.filter-panel select {
+  padding-right: 2rem;
+  cursor: pointer;
+}
+
+.filter-panel input:hover,
+.filter-panel select:hover {
+  border-color: #829ab1;
+}
+
+.filter-panel input:focus,
+.filter-panel select:focus {
+  border-color: #0f5c8c;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 92, 140, 0.15);
 }
 
 .filter-actions,
@@ -40,6 +61,68 @@
   gap: 1rem;
   margin-top: 1rem;
   flex-wrap: wrap;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  padding: 0.35rem 0.4rem 0.35rem 0.75rem;
+  background: #e0e7ee;
+  border: 1px solid #cbd2d9;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  color: #243b53;
+}
+
+.filter-chip-label {
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filter-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #486581;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.filter-chip-remove:hover {
+  background: #cbd2d9;
+  color: #243b53;
+}
+
+.filter-chip-remove:focus-visible {
+  outline: 2px solid #0f5c8c;
+  outline-offset: 1px;
+}
+
+.directory-results {
+  margin-top: 1.5rem;
 }
 
 @media (max-width: 640px) {

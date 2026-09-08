@@ -24,6 +24,13 @@
 .brand:hover {
   color: #ffffff;
   text-decoration: none;
+  opacity: 0.9;
+}
+
+.brand:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+  border-radius: 0.25rem;
 }
 
 .app-header-actions {
@@ -46,6 +53,15 @@
   background: #ffffff;
   color: #0b2545;
   font-weight: 600;
+}
+
+.app-header .secondary:hover:not(:disabled) {
+  background: #e0e7ee;
+}
+
+.app-header .secondary:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 
 @media (max-width: 640px) {

@@ -63,6 +63,7 @@
   color: #243b53;
   text-decoration: none;
   font-weight: 600;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .button-link.primary {
@@ -72,7 +73,18 @@
 
 .button-link:hover {
   text-decoration: none;
-  opacity: 0.92;
+  background: #cbd2d9;
+  color: #243b53;
+}
+
+.button-link.primary:hover {
+  background: #0d4f77;
+  color: #fff;
+}
+
+.button-link:focus-visible {
+  outline: 2px solid #0f5c8c;
+  outline-offset: 2px;
 }
 
 button {
@@ -83,6 +95,16 @@ button {
   color: #fff;
   cursor: pointer;
   font: inherit;
+  transition: background-color 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  background: #0d4f77;
+}
+
+button:focus-visible {
+  outline: 2px solid #0f5c8c;
+  outline-offset: 2px;
 }
 
 button.secondary {
@@ -90,8 +112,16 @@ button.secondary {
   color: #243b53;
 }
 
+button.secondary:hover:not(:disabled) {
+  background: #cbd2d9;
+}
+
 button.danger {
   background: #9b1c1c;
+}
+
+button.danger:hover:not(:disabled) {
+  background: #841616;
 }
 
 button:disabled {
@@ -124,6 +154,19 @@ button:disabled {
   border-radius: 0.5rem;
   background: #fff;
   font: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-grid input:hover,
+.form-grid select:hover {
+  border-color: #829ab1;
+}
+
+.form-grid input:focus,
+.form-grid select:focus {
+  border-color: #0f5c8c;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 92, 140, 0.15);
 }
 
 .field-error {
@@ -139,6 +182,7 @@ button:disabled {
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   background: #fff;
   border: 1px solid #d9e2ec;
   border-radius: 0.75rem;
@@ -146,6 +190,7 @@ button:disabled {
 
 .employee-table {
   width: 100%;
+  min-width: 44rem;
   border-collapse: collapse;
 }
 
@@ -169,13 +214,26 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0;
+  padding: 0.15rem 0.25rem;
+  margin: -0.15rem -0.25rem;
   border: none;
+  border-radius: 0.25rem;
   background: transparent;
   color: inherit;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.sortable-header:hover {
+  color: #0f5c8c;
+  background: rgba(15, 92, 140, 0.06);
+}
+
+.sortable-header:focus-visible {
+  outline: 2px solid #0f5c8c;
+  outline-offset: 1px;
 }
 
 .sort-indicator {
@@ -187,43 +245,19 @@ button:disabled {
   color: #0f5c8c;
 }
 
-@media (max-width: 900px) {
-  .employee-table thead {
-    display: none;
-  }
-
-  .employee-table,
-  .employee-table tbody,
-  .employee-table tr,
-  .employee-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .employee-table tr {
-    padding: 1rem;
-    border-bottom: 1px solid #e0e7ee;
-  }
-
-  .employee-table td {
-    padding: 0.35rem 0;
-    border: none;
-  }
-
-  .employee-table td::before {
-    content: attr(data-label);
-    display: block;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: #627d98;
-    margin-bottom: 0.15rem;
-  }
-}
-
 @media (max-width: 640px) {
   .app-main {
     padding: 1.25rem 1rem 2rem;
+  }
+
+  .table-wrap {
+    border-radius: 0.5rem;
+  }
+
+  .employee-table th,
+  .employee-table td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.875rem;
   }
 
   .form-actions {

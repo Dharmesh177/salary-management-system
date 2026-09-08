@@ -81,6 +81,13 @@ export function useEmployeeDirectory() {
     setPage(1);
   }
 
+  function handleRemoveFilter(filterKey) {
+    const nextFilters = { ...appliedFilters, [filterKey]: '' };
+    setFilters(nextFilters);
+    setAppliedFilters(nextFilters);
+    setPage(1);
+  }
+
   function handleSort(nextSort) {
     setPage(1);
     setSort(nextSort);
@@ -91,12 +98,14 @@ export function useEmployeeDirectory() {
     pagination,
     lookups,
     filters,
+    appliedFilters,
     sort,
     loading,
     error,
     handleFilterChange,
     handleApplyFilters,
     handleClearFilters,
+    handleRemoveFilter,
     handleSort,
     goToPreviousPage: () => setPage((current) => current - 1),
     goToNextPage: () => setPage((current) => current + 1),

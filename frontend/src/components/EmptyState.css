@@ -1,0 +1,25 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.75rem;
+}
+
+.empty-state-icon {
+  width: 4rem;
+  height: 4rem;
+  color: #9fb3c8;
+}
+
+.empty-state-message {
+  margin: 0;
+  max-width: 20rem;
+  color: #52606d;
+  font-size: 1rem;
+}

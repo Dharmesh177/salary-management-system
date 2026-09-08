@@ -1,4 +1,7 @@
 import { Link } from 'react-router-dom';
+import EmptyState from '../../components/EmptyState.jsx';
+import Loader from '../../components/Loader.jsx';
+import EmployeeFilterChips from '../../features/employees/components/EmployeeFilterChips.jsx';
 import EmployeeFilters from '../../features/employees/components/EmployeeFilters.jsx';
 import EmployeePagination from '../../features/employees/components/EmployeePagination.jsx';
 import EmployeeTable from '../../features/employees/components/EmployeeTable.jsx';
@@ -13,12 +16,14 @@ export default function EmployeeDirectoryPage() {
     pagination,
     lookups,
     filters,
+    appliedFilters,
     sort,
     loading,
     error,
     handleFilterChange,
     handleApplyFilters,
     handleClearFilters,
+    handleRemoveFilter,
     handleSort,
     goToPreviousPage,
     goToNextPage,
@@ -45,22 +50,30 @@ export default function EmployeeDirectoryPage() {
         onClearFilters={handleClearFilters}
       />
 
-      {loading ? <p className="status-message">{EMPLOYEE_MESSAGES.loadingEmployees}</p> : null}
-      {!loading && error ? <p className="status-message error">{error}</p> : null}
-      {!loading && !error && employees.length === 0 ? (
-        <p className="status-message">{EMPLOYEE_MESSAGES.emptyEmployees}</p>
-      ) : null}
+      <EmployeeFilterChips
+        appliedFilters={appliedFilters}
+        lookups={lookups}
+        onRemove={handleRemoveFilter}
+      />
 
-      {!loading && !error && employees.length > 0 ? (
-        <>
-          <EmployeeTable employees={employees} sort={sort} onSort={handleSort} />
-          <EmployeePagination
-            pagination={pagination}
-            onPrevious={goToPreviousPage}
-            onNext={goToNextPage}
-          />
-        </>
-      ) : null}
+      <div className="directory-results">
+        {loading ? <Loader message={EMPLOYEE_MESSAGES.loadingEmployees} /> : null}
+        {!loading && error ? <p className="status-message error">{error}</p> : null}
+        {!loading && !error && employees.length === 0 ? (
+          <EmptyState message={EMPLOYEE_MESSAGES.emptyEmployees} />
+        ) : null}
+
+        {!loading && !error && employees.length > 0 ? (
+          <>
+            <EmployeeTable employees={employees} sort={sort} onSort={handleSort} />
+            <EmployeePagination
+              pagination={pagination}
+              onPrevious={goToPreviousPage}
+              onNext={goToNextPage}
+            />
+          </>
+        ) : null}
+      </div>
     </section>
   );
 }

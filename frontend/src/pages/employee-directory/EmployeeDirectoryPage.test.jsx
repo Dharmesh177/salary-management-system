@@ -82,5 +82,69 @@ describe('EmployeeDirectoryPage', () => {
       sortBy: 'lastName',
       sortOrder: 'asc',
     });
+
+    expect(screen.getByRole('button', { name: /remove search filter: ada/i })).toBeInTheDocument();
+  });
+
+  it('shows a loader while employees are loading', () => {
+    fetchEmployees.mockImplementation(() => new Promise(() => {}));
+
+    render(
+      <MemoryRouter>
+        <EmployeeDirectoryPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent(/loading employees/i);
+  });
+
+  it('shows an empty state when no employees match', async () => {
+    fetchEmployees.mockResolvedValue({
+      data: [],
+      pagination: { page: 1, pageSize: 10, total: 0, totalPages: 0 },
+    });
+
+    render(
+      <MemoryRouter>
+        <EmployeeDirectoryPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/no employees match your search and filters/i)).toBeInTheDocument();
+    });
+  });
+
+  it('removes an applied filter chip', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <EmployeeDirectoryPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'EMP001' })).toBeInTheDocument();
+    });
+
+    await user.selectOptions(screen.getByLabelText(/country/i), '1');
+    await user.click(screen.getByRole('button', { name: /apply filters/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /remove country filter: india/i })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /remove country filter: india/i }));
+
+    expect(fetchEmployees).toHaveBeenLastCalledWith({
+      page: 1,
+      pageSize: 10,
+      search: '',
+      countryId: '',
+      departmentId: '',
+      designationId: '',
+      sortBy: 'lastName',
+      sortOrder: 'asc',
+    });
   });
 });

@@ -48,15 +48,15 @@ export default function EmployeeTable({ employees, sort, onSort }) {
         <tbody>
           {employees.map((employee) => (
             <tr key={employee.id}>
-              <td data-label="Employee ID">
+              <td>
                 <Link to={EMPLOYEE_ROUTES.detail(employee.id)}>{employee.employeeCode}</Link>
               </td>
-              <td data-label="Name">{employee.firstName} {employee.lastName}</td>
-              <td data-label="Email">{employee.email}</td>
-              <td data-label="Joining date">{employee.joiningDate}</td>
-              <td data-label="Country">{employee.country.name}</td>
-              <td data-label="Department">{employee.department.name}</td>
-              <td data-label="Designation">{employee.designation.name}</td>
+              <td>{employee.firstName} {employee.lastName}</td>
+              <td>{employee.email}</td>
+              <td>{employee.joiningDate}</td>
+              <td>{employee.country.name}</td>
+              <td>{employee.department.name}</td>
+              <td>{employee.designation.name}</td>
             </tr>
           ))}
         </tbody>
