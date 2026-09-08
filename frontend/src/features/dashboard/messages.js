@@ -1,0 +1,17 @@
+export const DASHBOARD_MESSAGES = {
+  title: 'Dashboard',
+  subtitle: 'Workforce and compensation insights at a glance.',
+  loading: 'Loading dashboard analytics...',
+  loadError: 'Unable to load dashboard analytics',
+  totalEmployees: 'Total employees',
+  totalCompensationUsd: 'Total compensation (USD)',
+  averageCompensationUsd: 'Average compensation (USD)',
+  countryCount: 'Countries',
+  departmentCount: 'Departments',
+  employeeDistributionByCountry: 'Employee distribution by country',
+  employeeDistributionByDepartment: 'Employee distribution by department',
+  averageCompensationByCountry: 'Average compensation by country (USD)',
+  averageCompensationByDepartment: 'Average compensation by department (USD)',
+  employeesLabel: 'Employees',
+  averageUsdLabel: 'Average (USD)',
+};
