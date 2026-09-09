@@ -9,8 +9,11 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, repoRoot, '');
   const apiPort = env.PORT || '3001';
 
-  if (mode === 'production' && !env.VITE_API_BASE_URL) {
-    throw new Error('VITE_API_BASE_URL must be set for production builds');
+  // Empty = relative /api paths (Netlify proxy). Set full URL only for direct cross-origin API.
+  if (mode === 'production' && env.VITE_API_BASE_URL === undefined) {
+    throw new Error(
+      'Set VITE_API_BASE_URL for production builds (use empty string for same-origin Netlify proxy)',
+    );
   }
 
   return {

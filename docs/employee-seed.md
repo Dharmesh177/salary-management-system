@@ -59,9 +59,7 @@ With `--replace`, all auth users and employees are cleared, then new rows are in
 
 | File | Role |
 | ---- | ---- |
-| `backend/src/core/db/runSeedEmployees.js` | CLI entry (migrate → seed → dev login) |
-| `backend/src/core/db/seedEmployees.js` | Generator and database insert logic |
-| `backend/src/core/db/seed/employeeSeedConfig.js` | Lookup weights and salary bands |
-| `backend/src/core/db/seed/ensureDevLogin.js` | Ensures `mary.jackson@acme.example` |
+| `backend/src/core/db/runSeedEmployees.js` | CLI entry, dev login, migrate → seed |
+| `backend/src/core/db/seedEmployees.js` | Faker generator, lookup/salary config, inserts |
 
 See also: [backend-flow.md](./backend-flow.md), [trade-offs.md](./trade-offs.md).
