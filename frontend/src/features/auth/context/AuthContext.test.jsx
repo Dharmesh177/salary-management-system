@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { clearAccessToken } from '../../../api/authToken.js';
 import * as http from '../../../api/http.js';
 import { AuthProvider, useAuth } from './AuthContext.jsx';
 
@@ -27,6 +28,7 @@ describe('AuthContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     http.setUnauthorizedHandler(null);
+    clearAccessToken();
   });
 
   it('restores an authenticated session on mount', async () => {

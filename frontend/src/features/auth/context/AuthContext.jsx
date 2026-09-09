@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { clearAccessToken, setAccessToken } from '../../../api/authToken.js';
 import { fetchSession, login as loginRequest, logout as logoutRequest } from '../../../api/auth.js';
 import { setUnauthorizedHandler } from '../../../api/http.js';
 
@@ -9,6 +10,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const clearSession = useCallback(() => {
+    clearAccessToken();
     setUser(null);
   }, []);
 
@@ -39,6 +41,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (credentials) => {
     const result = await loginRequest(credentials);
+    setAccessToken(result.token);
     setUser(result.user);
     return result.user;
   }, []);

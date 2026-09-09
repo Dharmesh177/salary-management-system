@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { clearAccessToken, setAccessToken } from './authToken.js';
 import {
   fetchJson,
   getAuthHeaders,
@@ -11,10 +12,16 @@ describe('http client', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     setUnauthorizedHandler(null);
+    clearAccessToken();
   });
 
-  it('returns empty auth headers for cookie-based auth', () => {
+  it('returns empty auth headers when no token is stored', () => {
     expect(getAuthHeaders()).toEqual({});
+  });
+
+  it('returns bearer auth headers when a token is stored', () => {
+    setAccessToken('test-token');
+    expect(getAuthHeaders()).toEqual({ Authorization: 'Bearer test-token' });
   });
 
   it('includes credentials on requests', async () => {

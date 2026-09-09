@@ -1,3 +1,5 @@
+import { getAccessToken } from './authToken.js';
+
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 
 let unauthorizedHandler = null;
@@ -7,7 +9,22 @@ export function setUnauthorizedHandler(handler) {
 }
 
 export function getAuthHeaders() {
-  return {};
+  const token = getAccessToken();
+  if (!token) {
+    return {};
+  }
+
+  return { Authorization: `Bearer ${token}` };
+}
+
+function buildHeaders(body) {
+  const headers = { ...getAuthHeaders() };
+
+  if (body) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  return Object.keys(headers).length > 0 ? headers : undefined;
 }
 
 export async function parseJsonResponse(response) {
@@ -31,7 +48,7 @@ async function request(method, path, body) {
   const response = await fetch(`${baseUrl}${path}`, {
     method,
     credentials: 'include',
-    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    headers: buildHeaders(body),
     body: body ? JSON.stringify(body) : undefined,
   });
 
