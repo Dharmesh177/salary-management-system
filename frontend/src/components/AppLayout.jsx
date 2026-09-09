@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { DASHBOARD_ROUTES } from '../features/dashboard/constants.js';
 import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
 import { AUTH_MESSAGES } from '../features/auth/messages.js';
@@ -12,10 +12,15 @@ function NavIcon({ children }) {
 
 export default function AppLayout() {
   const { user, logout } = useAuth();
+  const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuButtonRef = useRef(null);
   const sidebarRef = useRef(null);
   const userInitial = user?.email?.charAt(0).toUpperCase() ?? '?';
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     document.body.classList.toggle('mobile-nav-open', mobileNavOpen);
