@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { upsertEmployeeSalary } from '../../../api/employeeSalary.js';
-import {
-  createEmployee,
-  fetchEmployee,
-  fetchLookups,
-  updateEmployee,
-} from '../../../api/employees.js';
+import { createEmployee, fetchEmployee, updateEmployee } from '../../../api/employees.js';
+import { useLookups } from '../context/LookupsContext.jsx';
 import { DEFAULT_EMPLOYEE_FORM, EMPLOYEE_ROUTES } from '../constants.js';
 import { EMPLOYEE_MESSAGES } from '../messages.js';
 import {
@@ -48,20 +44,18 @@ function toPayload(values) {
 export function useEmployeeForm({ mode, employeeId }) {
   const navigate = useNavigate();
   const isEdit = mode === 'edit';
+  const { lookups, error: lookupsError } = useLookups();
   const [values, setValues] = useState(DEFAULT_EMPLOYEE_FORM);
-  const [lookups, setLookups] = useState({ countries: [], departments: [], designations: [] });
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitError, setSubmitError] = useState(null);
   const [loading, setLoading] = useState(isEdit);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchLookups()
-      .then(setLookups)
-      .catch(() => {
-        setSubmitError(EMPLOYEE_MESSAGES.loadFiltersError);
-      });
-  }, []);
+    if (lookupsError) {
+      setSubmitError(lookupsError);
+    }
+  }, [lookupsError]);
 
   useEffect(() => {
     if (!isEdit) {

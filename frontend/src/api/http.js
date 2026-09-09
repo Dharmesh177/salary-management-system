@@ -1,26 +1,21 @@
-const TOKEN_STORAGE_KEY = 'auth_token';
+const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 
-export function getStoredToken() {
-  return localStorage.getItem(TOKEN_STORAGE_KEY);
-}
+let unauthorizedHandler = null;
 
-export function setStoredToken(token) {
-  localStorage.setItem(TOKEN_STORAGE_KEY, token);
-}
-
-export function clearStoredToken() {
-  localStorage.removeItem(TOKEN_STORAGE_KEY);
+export function setUnauthorizedHandler(handler) {
+  unauthorizedHandler = handler;
 }
 
 export function getAuthHeaders() {
-  const token = getStoredToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return {};
 }
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
 
 export async function parseJsonResponse(response) {
   const body = await response.json().catch(() => ({}));
+
+  if (response.status === 401 && unauthorizedHandler) {
+    unauthorizedHandler();
+  }
 
   if (!response.ok) {
     const error = new Error(body.message ?? 'Request failed');
@@ -32,15 +27,17 @@ export async function parseJsonResponse(response) {
   return body;
 }
 
-export async function sendJson(method, path, body) {
+async function request(method, path, body) {
   const response = await fetch(`${baseUrl}${path}`, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeaders(),
-    },
+    credentials: 'include',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
     body: body ? JSON.stringify(body) : undefined,
   });
+
+  if (response.status === 401 && unauthorizedHandler) {
+    unauthorizedHandler();
+  }
 
   if (response.status === 204) {
     return null;
@@ -49,10 +46,10 @@ export async function sendJson(method, path, body) {
   return parseJsonResponse(response);
 }
 
-export async function fetchJson(path) {
-  const response = await fetch(`${baseUrl}${path}`, {
-    headers: getAuthHeaders(),
-  });
+export async function sendJson(method, path, body) {
+  return request(method, path, body);
+}
 
-  return parseJsonResponse(response);
+export async function fetchJson(path) {
+  return request('GET', path);
 }

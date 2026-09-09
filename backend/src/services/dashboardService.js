@@ -1,11 +1,5 @@
 import { DASHBOARD_ERRORS } from '../constants/dashboard.js';
-
-function createDashboardError(errorDefinition) {
-  const error = new Error(errorDefinition.message);
-  error.status = errorDefinition.status;
-  error.code = errorDefinition.code;
-  return error;
-}
+import { createAppError } from '../utils/createAppError.js';
 
 function formatUsd(value) {
   const amount = Number(value ?? 0);
@@ -97,7 +91,7 @@ export function createDashboardService(dashboardRepository) {
     async getAnalytics() {
       const missingExchangeRates = await dashboardRepository.countSalariesWithMissingExchangeRate();
       if (missingExchangeRates > 0) {
-        throw createDashboardError(DASHBOARD_ERRORS.MISSING_EXCHANGE_RATE);
+        throw createAppError(DASHBOARD_ERRORS.MISSING_EXCHANGE_RATE);
       }
 
       const [

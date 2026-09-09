@@ -3,8 +3,6 @@ export const AUTH_ROUTES = {
   register: '/register',
 };
 
-export const AUTH_STORAGE_KEY = 'auth_token';
-
 export const DEFAULT_LOGIN_FORM = {
   email: '',
   password: '',

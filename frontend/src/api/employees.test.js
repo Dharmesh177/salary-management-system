@@ -29,7 +29,12 @@ describe('employee API client', () => {
 
     const result = await fetchEmployees({ page: 1, search: 'ada' });
 
-    expect(fetch).toHaveBeenCalledWith('/api/v1/employees?page=1&search=ada', { headers: {} });
+    expect(fetch).toHaveBeenCalledWith('/api/v1/employees?page=1&search=ada', {
+      method: 'GET',
+      credentials: 'include',
+      headers: undefined,
+      body: undefined,
+    });
     expect(result).toEqual(mockResponse);
   });
 
@@ -46,7 +51,12 @@ describe('employee API client', () => {
 
     const result = await fetchEmployee(1);
 
-    expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1', { headers: {} });
+    expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1', {
+      method: 'GET',
+      credentials: 'include',
+      headers: undefined,
+      body: undefined,
+    });
     expect(result).toEqual(mockResponse.data);
   });
 
@@ -92,6 +102,7 @@ describe('employee API client', () => {
 
     expect(fetch).toHaveBeenCalledWith('/api/v1/employees', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
@@ -111,6 +122,7 @@ describe('employee API client', () => {
 
     expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1', {
       method: 'PUT',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ employeeCode: 'EMP001' }),
     });
@@ -130,7 +142,8 @@ describe('employee API client', () => {
 
     expect(fetch).toHaveBeenCalledWith('/api/v1/employees/1', {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      headers: undefined,
       body: undefined,
     });
   });

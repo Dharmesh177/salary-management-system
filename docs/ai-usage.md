@@ -4,26 +4,31 @@ This document records how AI-assisted tooling was used on the ACME Salary Manage
 
 **Related docs**
 
-| Topic | Document |
-| ----- | -------- |
-| Layering, dependencies, DB adapter | [`architecture.md`](./architecture.md) |
-| Feature-level trade-offs | [`trade-offs.md`](./trade-offs.md) |
-| Bulk seed implementation | [`employee-seed.md`](./employee-seed.md) |
-| API and auth flows | [`backend-flow.md`](./backend-flow.md), [`frontend-flow.md`](./frontend-flow.md) |
+
+| Topic                              | Document                                                                         |
+| ---------------------------------- | -------------------------------------------------------------------------------- |
+| Layering, dependencies, DB adapter | `[backend-flow.md](./backend-flow.md)`, `[frontend-flow.md](./frontend-flow.md)` |
+| Feature-level trade-offs           | `[trade-offs.md](./trade-offs.md)`                                               |
+| Bulk seed implementation           | `[employee-seed.md](./employee-seed.md)`                                         |
+| API and auth flows                 | `[backend-flow.md](./backend-flow.md)`, `[frontend-flow.md](./frontend-flow.md)` |
+
 
 No production runtime depends on an LLM. The API does not call OpenAI or similar services in the shipped MVP (`LLM_API_KEY` is reserved for a possible future Q&A feature).
 
 ---
 
+
+
 ## AI tools used
 
-| Tool | How it was used |
-| ---- | --------------- |
-| **Cursor Agent (chat)** | End-to-end implementation: failing tests, backend layers, React pages, CSS, refactors, seed script, documentation drafts |
-| **Cursor inline / edits** | Small targeted fixes (import paths, proxy port, syntax errors) |
-| **Screenshots in chat** | UI polish iterations — mobile layout, filter chips, KPI cards, dropdown alignment, hover states |
 
-The developer remained responsible for requirements interpretation, scope changes, commit boundaries, manual UI review, and final approval.
+| Tool                      | How it was used                                                                                                          |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Cursor Agent (chat)**   | End-to-end implementation: failing tests, backend layers, React pages, CSS, refactors, seed script, documentation drafts |
+| **Cursor inline / edits** | Small targeted fixes (import paths, proxy port, syntax errors)                                                           |
+
+
+The developer remained responsible for requirements interpretation, scope changes, designing architecture, database schema design, commit boundaries, manual UI & Code review, and final approval.
 
 ---
 
@@ -33,8 +38,7 @@ These were set by the developer and requirements documents. AI implemented withi
 
 ### Product and scope
 
-- **Source of truth:** [`docs/Salary Management System Requirements - Updated.docx`](./Salary%20Management%20System%20Requirements%20-%20Updated.docx) and [`salary-management-relational-schema-updated.md`](./salary-management-relational-schema-updated.md).
-- **MVP scope pivot:** Remove RBAC and salary **history**; keep login and a **single current salary** row per employee (`employee_salaries`).
+- **Source of truth:** `[salary-management-relational-schema-updated.md](./salary-management-relational-schema-updated.md)`.
 - **Single HR persona:** Any authenticated user can access all MVP screens (no role checks).
 - **Registration gate:** `POST /register` requires `REGISTRATION_SECRET`; register page not linked in nav.
 - **Dashboard in MVP:** KPIs and distributions added after updated requirements (not deferred).
@@ -45,26 +49,28 @@ These were set by the developer and requirements documents. AI implemented withi
 
 - **Monorepo:** `frontend` + `backend` npm workspaces; `npm test` at root runs both.
 - **Backend layers:** `routes → controllers → services → repositories → queries` — no business logic in routes.
-- **Frontend structure:** Thin `pages/`, logic in `features/<domain>/` (hooks, components, `messages.js`, validation).
+- **Frontend structure:** Domain modules in `features/<domain>/` (hooks, components, `pages/`, `messages.js`, validation).
 - **TDD workflow:** Failing test commit → implementation commit(s); avoid unnecessary tests; meaningful deterministic cases only.
 - **Commit discipline:** ~3–6 commits per feature area; separate commits for UI polish vs seed script.
 - **DB connection:** Singleton `app.locals.db` per process (not per request).
 - **Incremental migrations:** One migration per schema evolution; visible in git history.
 - **No TypeScript:** Plain ESM JavaScript for speed of iteration.
-- **`node:sqlite`:** Built-in SQLite instead of native addons.
+- `node:sqlite`**:** Built-in SQLite instead of native addons.
 
 ### Database design (human-led, AI implemented migrations)
 
-| Decision | Rationale |
-| -------- | --------- |
-| `employee_salaries` with `UNIQUE(employee_id)` | Current snapshot only — no history table in MVP |
-| `exchange_rates` + `currency_code` on salary | Multi-currency storage; USD derived at query time |
-| Drop `roles`, `permissions`, `user_roles`, `role_permissions` | RBAC out of MVP |
-| `users.employee_id` one-to-one with employees | Login identity separate from employee master data |
-| `joining_date` on `employees` | Added when directory UX required it |
-| Foreign keys + WAL enabled | Integrity and local dev reliability |
 
-See [`architecture.md`](./architecture.md#design-decisions-human-led) and [`trade-offs.md`](./trade-offs.md) for more detail.
+| Decision                                                      | Rationale                                         |
+| ------------------------------------------------------------- | ------------------------------------------------- |
+| `employee_salaries` with `UNIQUE(employee_id)`                | Current snapshot only — no history table in MVP   |
+| `exchange_rates` + `currency_code` on salary                  | Multi-currency storage; USD derived at query time |
+| Drop `roles`, `permissions`, `user_roles`, `role_permissions` | RBAC out of MVP                                   |
+| `users.employee_id` one-to-one with employees                 | Login identity separate from employee master data |
+| `joining_date` on `employees`                                 | Added when directory UX required it               |
+| Foreign keys + WAL enabled                                    | Integrity and local dev reliability               |
+
+
+See `[trade-offs.md](./trade-offs.md)` and the flow docs for more detail.
 
 ### UI / UX (developer feedback, AI implemented)
 
@@ -77,7 +83,7 @@ See [`architecture.md`](./architecture.md#design-decisions-human-led) and [`trad
 - **Consistent KPI cards** (no “featured” first card).
 - **Mixed charts:** donut for headcount distribution, bars for compensation.
 - **Chart/KPI labels from backend** for consistency.
-- **Icon-button hover fix:** scope `button.*` selectors so global primary button styles do not override chip/notice close buttons.
+- **Icon-button hover fix:** scope `button.`* selectors so global primary button styles do not override chip/notice close buttons.
 
 ---
 
@@ -95,11 +101,11 @@ Feedback given during the project that shaped the codebase:
 
 ### Frontend
 
-- Restructure **`pages/`** — page-specific folders with `.jsx`, `.css`, `.test.jsx` colocated.
-- Introduce **`features/<domain>/`** for hooks, components, `messages.js`, `constants.js`.
+- Restructure `features/<domain>/pages/` — route screens with `.jsx`, `.css`, `.test.jsx` colocated per domain.
+- Introduce `features/<domain>/` for hooks, components, `messages.js`, `constants.js`.
 - Stop putting all CSS in one file — **component and page CSS** colocated.
 - Extract **magic strings and labels** to `messages.js` / `constants.js`.
-- Rename `/me` to **`/auth/session`** with clearer naming.
+- Rename `/me` to `/auth/session` with clearer naming.
 - **Fallback to login** for unauthenticated and invalid routes.
 - **Component-based** structure instead of monolithic page files.
 
@@ -149,20 +155,10 @@ Backend:
 
 Frontend:
 - features/<domain>/ for hooks and components
-- pages/<name>/ with colocated jsx, css, test
+- features/<domain>/pages/ with colocated jsx, css, test
 - messages.js and constants.js for user-facing strings
 
 Do not change behavior. Run full test suite after.
-```
-
-### MVP scope change
-
-```
-Requirements document was updated. [Describe change].
-
-Revert [X] completely. Keep [Y].
-Use the updated requirements doc as single source of truth.
-Ask before assuming anything unclear.
 ```
 
 ### UI polish from screenshots
@@ -190,6 +186,8 @@ Backend aggregations in SQL; frontend follows existing patterns.
 Separate commits: backend tests+API, frontend, UI polish if needed.
 ```
 
+
+
 ### Bulk seed
 
 ```
@@ -204,16 +202,6 @@ Implement a database seed script for ~10,000 realistic employees:
 - Do not change schema or application runtime behavior
 ```
 
-### Commit instructions
-
-```
-Create [N] commits:
-1. [scope]
-2. [scope]
-
-Use my git author only. Do not push unless asked.
-```
-
 ---
 
 ## Where AI was used effectively
@@ -225,16 +213,20 @@ Use my git author only. Do not push unless asked.
 - **Faker seed generator** with weighted config and CLI flags
 - **Documentation drafts** (then edited to match actual decisions)
 
+
+
 ## Where AI needed correction or guardrails
 
-| Issue | What happened | Mitigation |
-| ----- | ------------- | ---------- |
-| Over-scoping | Suggested RBAC, history tables, extra endpoints | Requirements + trade-offs docs; explicit “out of scope” |
-| Wrong mobile pattern | Card layout for directory table | Developer feedback → horizontal scroll table |
-| Global CSS leaks | `button:hover` broke chip close buttons | Higher-specificity selectors for icon buttons |
-| Too many commits | Many tiny commits early on | Developer rule: batch into 3–6 per feature |
-| Backend FX notice | Over-detailed API `fxNotice` with rates | Developer asked for static dismissible banner only |
-| Test noise | Duplicate text queries when charts added | More specific test selectors; `cleanup()` between tests |
+
+| Issue                | What happened                                   | Mitigation                                              |
+| -------------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| Over-scoping         | Suggested RBAC, history tables, extra endpoints | Requirements + trade-offs docs; explicit “out of scope” |
+| Wrong mobile pattern | Card layout for directory table                 | Developer feedback → horizontal scroll table            |
+| Global CSS leaks     | `button:hover` broke chip close buttons         | Higher-specificity selectors for icon buttons           |
+| Too many commits     | Many tiny commits early on                      | Developer rule: batch into 3–6 per feature              |
+| Backend FX notice    | Over-detailed API `fxNotice` with rates         | Developer asked for static dismissible banner only      |
+| Test noise           | Duplicate text queries when charts added        | More specific test selectors; `cleanup()` between tests |
+
 
 ---
 
@@ -253,10 +245,10 @@ AI-generated changes were treated as **untrusted until verified**:
 
 ## Guidelines for future AI-assisted work
 
-1. **Read first** — requirements doc, `architecture.md`, neighboring files.
+1. **Read first** — requirements doc, flow docs, neighboring files.
 2. **Test first** for behavior and API contract changes.
 3. **Minimal diff** — do not refactor unrelated code in the same pass.
-4. **Document human decisions** in `trade-offs.md` or `architecture.md`, not only in chat.
+4. **Document human decisions** in `trade-offs.md` or the flow docs, not only in chat.
 5. **Update this file** when tooling, verification, or prompt patterns change.
 6. **No live LLM calls in unit tests** for any future Q&A feature.
 

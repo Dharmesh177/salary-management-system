@@ -12,6 +12,7 @@ export function parseEmployeeListQuery(query) {
   return {
     page: query.page,
     pageSize: query.pageSize,
+    cursor: query.cursor ? String(query.cursor) : null,
     search: query.search,
     countryId: parsePositiveInt(query.countryId),
     departmentId: parsePositiveInt(query.departmentId),

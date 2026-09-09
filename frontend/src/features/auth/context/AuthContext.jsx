@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { fetchSession, login as loginRequest } from '../../../api/auth.js';
-import { clearStoredToken, getStoredToken, setStoredToken } from '../../../api/http.js';
+import { fetchSession, login as loginRequest, logout as logoutRequest } from '../../../api/auth.js';
+import { setUnauthorizedHandler } from '../../../api/http.js';
 
 const AuthContext = createContext(null);
 
@@ -8,40 +8,50 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const clearSession = useCallback(() => {
+    setUser(null);
+  }, []);
+
   const loadSession = useCallback(async () => {
-    const token = getStoredToken();
-    if (!token) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
 
     try {
       const sessionUser = await fetchSession();
       setUser(sessionUser);
     } catch {
-      clearStoredToken();
-      setUser(null);
+      clearSession();
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [clearSession]);
 
   useEffect(() => {
     loadSession();
   }, [loadSession]);
 
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      clearSession();
+    });
+
+    return () => setUnauthorizedHandler(null);
+  }, [clearSession]);
+
   const login = useCallback(async (credentials) => {
     const result = await loginRequest(credentials);
-    setStoredToken(result.token);
     setUser(result.user);
     return result.user;
   }, []);
 
-  const logout = useCallback(() => {
-    clearStoredToken();
-    setUser(null);
-  }, []);
+  const logout = useCallback(async () => {
+    try {
+      await logoutRequest();
+    } catch {
+      // Clear local session even if the logout request fails.
+    } finally {
+      clearSession();
+    }
+  }, [clearSession]);
 
   const value = useMemo(
     () => ({

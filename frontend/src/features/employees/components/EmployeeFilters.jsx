@@ -10,9 +10,10 @@ export default function EmployeeFilters({
 }) {
   return (
     <form className="filter-panel" onSubmit={onApplyFilters}>
-      <label>
+      <label htmlFor="employee-filter-search">
         {EMPLOYEE_MESSAGES.searchLabel}
         <input
+          id="employee-filter-search"
           type="search"
           name="search"
           value={filters.search}
@@ -21,9 +22,14 @@ export default function EmployeeFilters({
         />
       </label>
 
-      <label>
+      <label htmlFor="employee-filter-country">
         {EMPLOYEE_MESSAGES.countryLabel}
-        <select name="countryId" value={filters.countryId} onChange={onFilterChange}>
+        <select
+          id="employee-filter-country"
+          name="countryId"
+          value={filters.countryId}
+          onChange={onFilterChange}
+        >
           <option value="">{FILTER_OPTION_LABELS.country}</option>
           {lookups.countries.map((country) => (
             <option key={country.id} value={country.id}>
@@ -33,9 +39,14 @@ export default function EmployeeFilters({
         </select>
       </label>
 
-      <label>
+      <label htmlFor="employee-filter-department">
         {EMPLOYEE_MESSAGES.departmentLabel}
-        <select name="departmentId" value={filters.departmentId} onChange={onFilterChange}>
+        <select
+          id="employee-filter-department"
+          name="departmentId"
+          value={filters.departmentId}
+          onChange={onFilterChange}
+        >
           <option value="">{FILTER_OPTION_LABELS.department}</option>
           {lookups.departments.map((department) => (
             <option key={department.id} value={department.id}>
@@ -45,9 +56,14 @@ export default function EmployeeFilters({
         </select>
       </label>
 
-      <label>
+      <label htmlFor="employee-filter-designation">
         {EMPLOYEE_MESSAGES.designationLabel}
-        <select name="designationId" value={filters.designationId} onChange={onFilterChange}>
+        <select
+          id="employee-filter-designation"
+          name="designationId"
+          value={filters.designationId}
+          onChange={onFilterChange}
+        >
           <option value="">{FILTER_OPTION_LABELS.designation}</option>
           {lookups.designations.map((designation) => (
             <option key={designation.id} value={designation.id}>

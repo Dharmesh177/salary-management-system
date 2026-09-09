@@ -57,6 +57,15 @@ function parseArgs(argv) {
 }
 
 const options = parseArgs(process.argv.slice(2));
+
+if (config.isProduction && options.replace) {
+  throw new Error('Refusing to run employee seed with --replace in production');
+}
+
+if (config.isProduction) {
+  options.withDevLogin = false;
+}
+
 const sqlitePath = path.resolve(config.sqlitePath);
 mkdirSync(path.dirname(sqlitePath), { recursive: true });
 

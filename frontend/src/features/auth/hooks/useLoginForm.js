@@ -4,6 +4,7 @@ import { EMPLOYEE_ROUTES } from '../../employees/constants.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { DEFAULT_LOGIN_FORM } from '../constants.js';
 import { AUTH_MESSAGES } from '../messages.js';
+import { sanitizeRedirectPath } from '../utils/redirectPath.js';
 import { hasValidationErrors, validateLoginForm } from '../validation.js';
 
 export function useLoginForm() {
@@ -36,7 +37,8 @@ export function useLoginForm() {
 
     try {
       await login(payload);
-      const redirectTo = location.state?.from ?? EMPLOYEE_ROUTES.directory;
+      const redirectTo =
+        sanitizeRedirectPath(location.state?.from) ?? EMPLOYEE_ROUTES.directory;
       navigate(redirectTo, { replace: true });
     } catch (error) {
       setSubmitError(error.message ?? AUTH_MESSAGES.invalidCredentials);

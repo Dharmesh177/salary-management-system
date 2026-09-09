@@ -1,18 +1,12 @@
 import { EMPLOYEE_ERRORS } from '../constants/employee.js';
+import { createAppError } from '../utils/createAppError.js';
 import { parseEmployeeId } from '../utils/parseEmployeeId.js';
-
-function createEmployeeError({ message, status, code }) {
-  const error = new Error(message);
-  error.status = status;
-  error.code = code;
-  return error;
-}
 
 export function createEmployeeService(employeeRepository, lookupRepository) {
   async function assertValidLookups(payload) {
     const isValid = await lookupRepository.validateEmployeeLookups(payload);
     if (!isValid) {
-      throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_LOOKUP);
+      throw createAppError(EMPLOYEE_ERRORS.INVALID_LOOKUP);
     }
   }
 
@@ -23,11 +17,11 @@ export function createEmployeeService(employeeRepository, lookupRepository) {
     ]);
 
     if (existingCodeId && existingCodeId !== excludeId) {
-      throw createEmployeeError(EMPLOYEE_ERRORS.DUPLICATE);
+      throw createAppError(EMPLOYEE_ERRORS.DUPLICATE);
     }
 
     if (existingEmailId && existingEmailId !== excludeId) {
-      throw createEmployeeError(EMPLOYEE_ERRORS.DUPLICATE);
+      throw createAppError(EMPLOYEE_ERRORS.DUPLICATE);
     }
   }
 
@@ -39,12 +33,12 @@ export function createEmployeeService(employeeRepository, lookupRepository) {
     async getEmployeeById(id) {
       const employeeId = parseEmployeeId(id);
       if (!employeeId) {
-        throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
+        throw createAppError(EMPLOYEE_ERRORS.INVALID_ID);
       }
 
       const employee = await employeeRepository.findEmployeeById(employeeId);
       if (!employee) {
-        throw createEmployeeError(EMPLOYEE_ERRORS.NOT_FOUND);
+        throw createAppError(EMPLOYEE_ERRORS.NOT_FOUND);
       }
 
       return employee;
@@ -61,12 +55,12 @@ export function createEmployeeService(employeeRepository, lookupRepository) {
     async updateEmployee(id, payload) {
       const employeeId = parseEmployeeId(id);
       if (!employeeId) {
-        throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
+        throw createAppError(EMPLOYEE_ERRORS.INVALID_ID);
       }
 
       const existing = await employeeRepository.findEmployeeById(employeeId);
       if (!existing) {
-        throw createEmployeeError(EMPLOYEE_ERRORS.NOT_FOUND);
+        throw createAppError(EMPLOYEE_ERRORS.NOT_FOUND);
       }
 
       await assertValidLookups(payload);
@@ -79,12 +73,12 @@ export function createEmployeeService(employeeRepository, lookupRepository) {
     async deleteEmployee(id) {
       const employeeId = parseEmployeeId(id);
       if (!employeeId) {
-        throw createEmployeeError(EMPLOYEE_ERRORS.INVALID_ID);
+        throw createAppError(EMPLOYEE_ERRORS.INVALID_ID);
       }
 
       const existing = await employeeRepository.findEmployeeById(employeeId);
       if (!existing) {
-        throw createEmployeeError(EMPLOYEE_ERRORS.NOT_FOUND);
+        throw createAppError(EMPLOYEE_ERRORS.NOT_FOUND);
       }
 
       await employeeRepository.deleteEmployee(employeeId);

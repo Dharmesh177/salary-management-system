@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { DASHBOARD_ROUTES } from '../features/dashboard/constants.js';
 import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
@@ -13,6 +13,8 @@ function NavIcon({ children }) {
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const menuButtonRef = useRef(null);
+  const sidebarRef = useRef(null);
   const userInitial = user?.email?.charAt(0).toUpperCase() ?? '?';
 
   useEffect(() => {
@@ -20,6 +22,43 @@ export default function AppLayout() {
     return () => {
       document.body.classList.remove('mobile-nav-open');
     };
+  }, [mobileNavOpen]);
+
+  useEffect(() => {
+    if (!mobileNavOpen) {
+      return undefined;
+    }
+
+    const sidebar = sidebarRef.current;
+    const focusable = sidebar?.querySelectorAll(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    const first = focusable?.[0];
+    const last = focusable?.[focusable.length - 1];
+    first?.focus();
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setMobileNavOpen(false);
+        menuButtonRef.current?.focus();
+        return;
+      }
+
+      if (event.key !== 'Tab' || !focusable?.length) {
+        return;
+      }
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [mobileNavOpen]);
 
   function closeMobileNav() {
@@ -37,7 +76,7 @@ export default function AppLayout() {
         />
       ) : null}
 
-      <aside className={`app-sidebar${mobileNavOpen ? ' open' : ''}`}>
+      <aside ref={sidebarRef} className={`app-sidebar${mobileNavOpen ? ' open' : ''}`}>
         <div className="app-sidebar-brand">
           <span className="app-brand-mark" aria-hidden="true">A</span>
           <div>
@@ -71,6 +110,7 @@ export default function AppLayout() {
       <div className="app-layout-body">
         <header className="app-topbar">
           <button
+            ref={menuButtonRef}
             type="button"
             className="app-menu-button"
             aria-label="Open navigation menu"
@@ -95,7 +135,7 @@ export default function AppLayout() {
           </button>
         </header>
 
-        <main className="app-main">
+        <main id="main-content" className="app-main">
           <Outlet />
         </main>
       </div>

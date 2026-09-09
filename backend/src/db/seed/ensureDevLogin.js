@@ -1,13 +1,10 @@
 import bcrypt from 'bcryptjs';
-
-export const DEV_LOGIN_EMAIL = 'mary.jackson@acme.example';
-export const DEV_LOGIN_PASSWORD = 'password123';
+import { config } from '../../config/env.js';
 
 const DEV_LOGIN_EMPLOYEE = {
   employeeCode: 'EMP-HR-001',
   firstName: 'Mary',
   lastName: 'Jackson',
-  email: DEV_LOGIN_EMAIL,
   countryId: 1,
   departmentId: 3,
   designationId: 4,
@@ -18,10 +15,8 @@ const DEV_LOGIN_EMPLOYEE = {
   currencyCode: 'INR',
 };
 
-async function insertDevEmployeeIfMissing(db) {
-  const existing = await db.queryOne('SELECT id FROM employees WHERE email = ?', [
-    DEV_LOGIN_EMPLOYEE.email,
-  ]);
+async function insertDevEmployeeIfMissing(db, email) {
+  const existing = await db.queryOne('SELECT id FROM employees WHERE email = ?', [email]);
 
   if (existing) {
     return false;
@@ -37,7 +32,7 @@ async function insertDevEmployeeIfMissing(db) {
       DEV_LOGIN_EMPLOYEE.employeeCode,
       DEV_LOGIN_EMPLOYEE.firstName,
       DEV_LOGIN_EMPLOYEE.lastName,
-      DEV_LOGIN_EMPLOYEE.email,
+      email,
       DEV_LOGIN_EMPLOYEE.countryId,
       DEV_LOGIN_EMPLOYEE.departmentId,
       DEV_LOGIN_EMPLOYEE.designationId,
@@ -61,29 +56,25 @@ async function insertDevEmployeeIfMissing(db) {
   return true;
 }
 
-async function insertDevUserIfMissing(db) {
-  const existingUser = await db.queryOne('SELECT id FROM users WHERE email = ?', [
-    DEV_LOGIN_EMAIL,
-  ]);
+async function insertDevUserIfMissing(db, email, password) {
+  const existingUser = await db.queryOne('SELECT id FROM users WHERE email = ?', [email]);
 
   if (existingUser) {
     return false;
   }
 
-  const employee = await db.queryOne('SELECT id FROM employees WHERE email = ?', [
-    DEV_LOGIN_EMAIL,
-  ]);
+  const employee = await db.queryOne('SELECT id FROM employees WHERE email = ?', [email]);
 
   if (!employee) {
     return false;
   }
 
-  const passwordHash = await bcrypt.hash(DEV_LOGIN_PASSWORD, 10);
+  const passwordHash = await bcrypt.hash(password, 10);
   await db.execute(
     `INSERT INTO users (
       employee_id, email, password_hash, is_active, created_at, updated_at
     ) VALUES (?, ?, ?, 1, datetime('now'), datetime('now'))`,
-    [employee.id, DEV_LOGIN_EMAIL, passwordHash],
+    [employee.id, email, passwordHash],
   );
 
   return true;
@@ -91,14 +82,21 @@ async function insertDevUserIfMissing(db) {
 
 /**
  * Ensures the documented dev login account exists (employee + salary + user).
+ * Credentials come from DEV_LOGIN_EMAIL / DEV_LOGIN_PASSWORD env vars.
  */
 export async function ensureDevLoginUser(db) {
+  if (config.isProduction) {
+    return { employeeInserted: false, userInserted: false };
+  }
+
+  const email = config.devLoginEmail;
+  const password = config.devLoginPassword;
   let employeeInserted = false;
   let userInserted = false;
 
   await db.transaction(async () => {
-    employeeInserted = await insertDevEmployeeIfMissing(db);
-    userInserted = await insertDevUserIfMissing(db);
+    employeeInserted = await insertDevEmployeeIfMissing(db, email);
+    userInserted = await insertDevUserIfMissing(db, email, password);
   });
 
   return {

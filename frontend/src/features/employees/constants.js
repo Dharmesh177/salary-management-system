@@ -5,6 +5,10 @@ export const EMPLOYEE_ROUTES = {
   new: '/employees/new',
   detail: (id) => `/employees/${id}`,
   edit: (id) => `/employees/${id}/edit`,
+  salaryEdit: (id) => `/employees/${id}/salary/edit`,
+  editPattern: '/employees/:id/edit',
+  salaryEditPattern: '/employees/:id/salary/edit',
+  detailPattern: '/employees/:id',
 };
 
 export const DEFAULT_EMPLOYEE_FORM = {

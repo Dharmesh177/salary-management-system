@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
+import Loader from '../../../components/Loader.jsx';
 import { AUTH_MESSAGES } from '../messages.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { AUTH_ROUTES } from '../constants.js';
@@ -8,7 +9,7 @@ export function ProtectedRoute({ children }) {
   const location = useLocation();
 
   if (loading) {
-    return <p className="status-message">{AUTH_MESSAGES.loadingSession}</p>;
+    return <Loader message={AUTH_MESSAGES.loadingSession} />;
   }
 
   if (!isAuthenticated) {

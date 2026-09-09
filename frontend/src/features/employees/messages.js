@@ -9,6 +9,7 @@ export const EMPLOYEE_MESSAGES = {
   cancel: 'Cancel',
   deleteEmployee: 'Delete employee',
   confirmDelete: 'Delete this employee? This cannot be undone.',
+  cancelDelete: 'Cancel',
   deleteFailed: 'Unable to delete employee.',
   savingEmployee: 'Saving employee...',
   employeeCodeLabel: 'Employee ID',

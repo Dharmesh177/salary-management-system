@@ -12,19 +12,25 @@ export const dashboardQueries = {
 
   kpis: `
     SELECT
-      (SELECT COUNT(*) FROM employees) AS total_employees,
-      (SELECT COUNT(DISTINCT country_id) FROM employees) AS country_count,
-      (SELECT COUNT(DISTINCT department_id) FROM employees) AS department_count,
-      (
-        SELECT COALESCE(SUM(${COMPENSATION_USD_EXPRESSION}), 0)
-        FROM employee_salaries es
-        INNER JOIN exchange_rates er ON er.currency_code = es.currency_code
-      ) AS total_compensation_usd,
-      (
-        SELECT COALESCE(AVG(${COMPENSATION_USD_EXPRESSION}), 0)
-        FROM employee_salaries es
-        INNER JOIN exchange_rates er ON er.currency_code = es.currency_code
-      ) AS average_compensation_usd
+      stats.total_employees,
+      stats.country_count,
+      stats.department_count,
+      COALESCE(comp.total_compensation_usd, 0) AS total_compensation_usd,
+      COALESCE(comp.average_compensation_usd, 0) AS average_compensation_usd
+    FROM (
+      SELECT
+        COUNT(*) AS total_employees,
+        COUNT(DISTINCT country_id) AS country_count,
+        COUNT(DISTINCT department_id) AS department_count
+      FROM employees
+    ) stats
+    CROSS JOIN (
+      SELECT
+        SUM(${COMPENSATION_USD_EXPRESSION}) AS total_compensation_usd,
+        AVG(${COMPENSATION_USD_EXPRESSION}) AS average_compensation_usd
+      FROM employee_salaries es
+      INNER JOIN exchange_rates er ON er.currency_code = es.currency_code
+    ) comp
   `,
 
   employeeDistributionByCountry: `

@@ -1,11 +1,15 @@
 import { AUTH_MESSAGES } from '../messages.js';
 
-function FieldError({ message }) {
+function FieldError({ id, message }) {
   if (!message) {
     return null;
   }
 
-  return <span className="field-error">{message}</span>;
+  return (
+    <span id={id} className="field-error" role="alert">
+      {message}
+    </span>
+  );
 }
 
 export default function LoginForm({
@@ -19,28 +23,34 @@ export default function LoginForm({
   return (
     <form className="login-form" onSubmit={onSubmit} noValidate>
       <div className="form-grid login-form-grid">
-        <label>
+        <label htmlFor="login-email">
           {AUTH_MESSAGES.emailLabel}
           <input
+            id="login-email"
             type="email"
             name="email"
             autoComplete="username"
             value={values.email}
             onChange={onChange}
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? 'login-email-error' : undefined}
           />
-          <FieldError message={errors.email} />
+          <FieldError id="login-email-error" message={errors.email} />
         </label>
 
-        <label>
+        <label htmlFor="login-password">
           {AUTH_MESSAGES.passwordLabel}
           <input
+            id="login-password"
             type="password"
             name="password"
             autoComplete="current-password"
             value={values.password}
             onChange={onChange}
+            aria-invalid={Boolean(errors.password)}
+            aria-describedby={errors.password ? 'login-password-error' : undefined}
           />
-          <FieldError message={errors.password} />
+          <FieldError id="login-password-error" message={errors.password} />
         </label>
       </div>
 

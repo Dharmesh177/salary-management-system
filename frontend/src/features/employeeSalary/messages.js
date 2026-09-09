@@ -1,4 +1,7 @@
 export const EMPLOYEE_SALARY_MESSAGES = {
+  directoryBreadcrumb: 'Employee Directory',
+  employeeBreadcrumb: 'Employee',
+  loadingSalary: 'Loading salary...',
   editSalaryTitle: 'Edit current salary',
   baseSalaryLabel: 'Base salary',
   bonusLabel: 'Bonus',

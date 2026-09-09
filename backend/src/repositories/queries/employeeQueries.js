@@ -69,12 +69,42 @@ export function countEmployeesQuery(whereSql) {
           ${whereSql}`;
 }
 
-export function listEmployeesQuery(whereSql, orderBySql) {
+export function listEmployeesQuery(whereSql, orderBySql, { useOffset = true } = {}) {
+  const pagingSql = useOffset ? 'LIMIT ? OFFSET ?' : 'LIMIT ?';
   return `SELECT ${EMPLOYEE_SELECT_COLUMNS}
           ${EMPLOYEE_BASE_JOINS}
           ${whereSql}
           ${orderBySql}
-          LIMIT ? OFFSET ?`;
+          ${pagingSql}`;
+}
+
+export function buildKeysetClause(sortOrder, cursor) {
+  if (!cursor) {
+    return { clause: '', params: [] };
+  }
+
+  const operator = sortOrder === 'desc' ? '<' : '>';
+  const params = [
+    cursor.lastName,
+    cursor.lastName,
+    cursor.firstName,
+    cursor.lastName,
+    cursor.firstName,
+    cursor.employeeCode,
+    cursor.lastName,
+    cursor.firstName,
+    cursor.employeeCode,
+    cursor.id,
+  ];
+
+  const clause = ` AND (
+    e.last_name ${operator} ? COLLATE NOCASE
+    OR (e.last_name = ? COLLATE NOCASE AND e.first_name ${operator} ? COLLATE NOCASE)
+    OR (e.last_name = ? COLLATE NOCASE AND e.first_name = ? COLLATE NOCASE AND e.employee_code ${operator} ? COLLATE NOCASE)
+    OR (e.last_name = ? COLLATE NOCASE AND e.first_name = ? COLLATE NOCASE AND e.employee_code = ? COLLATE NOCASE AND e.id ${operator} ?)
+  )`;
+
+  return { clause, params };
 }
 
 export function findEmployeeByIdQuery() {

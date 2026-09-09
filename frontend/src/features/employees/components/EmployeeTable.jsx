@@ -13,6 +13,14 @@ function SortIndicator({ active, sortOrder }) {
   );
 }
 
+function getAriaSort(sortKey, sort) {
+  if (sort.sortBy !== sortKey) {
+    return 'none';
+  }
+
+  return sort.sortOrder === 'asc' ? 'ascending' : 'descending';
+}
+
 export default function EmployeeTable({ employees, sort, onSort }) {
   function handleSort(sortKey) {
     if (sort.sortBy === sortKey) {
@@ -29,7 +37,7 @@ export default function EmployeeTable({ employees, sort, onSort }) {
         <thead>
           <tr>
             {EMPLOYEE_TABLE_COLUMNS.map((column) => (
-              <th key={column.sortKey}>
+              <th key={column.sortKey} aria-sort={getAriaSort(column.sortKey, sort)}>
                 <button
                   type="button"
                   className="sortable-header"

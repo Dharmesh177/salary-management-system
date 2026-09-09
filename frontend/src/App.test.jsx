@@ -26,15 +26,15 @@ vi.mock('./api/auth.js', () => ({
 
 describe('App', () => {
   it('renders the employee directory for authenticated users', async () => {
-    window.localStorage.setItem('auth_token', 'test-token');
     window.history.pushState({}, '', '/employees');
     render(<App />);
     expect(await screen.findByRole('heading', { name: 'Employee Directory' })).toBeInTheDocument();
-    window.localStorage.clear();
   });
 
   it('redirects unknown routes to login when unauthenticated', async () => {
-    window.localStorage.clear();
+    const { fetchSession } = await import('./api/auth.js');
+    fetchSession.mockRejectedValueOnce(new Error('No session'));
+
     window.history.pushState({}, '', '/unknown-route');
     render(<App />);
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument();

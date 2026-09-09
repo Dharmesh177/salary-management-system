@@ -19,7 +19,7 @@ export function normalizePagination({ page, pageSize }) {
   };
 }
 
-export function buildPaginationMeta({ page, pageSize, total }) {
+export function buildPaginationMeta({ page, pageSize, total, nextCursor = null }) {
   const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
-  return { page, pageSize, total, totalPages };
+  return { page, pageSize, total, totalPages, nextCursor };
 }

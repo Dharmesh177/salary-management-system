@@ -1,22 +1,21 @@
-import { createAuthRepository } from '../repositories/authRepository.js';
-import { createAuthService } from '../services/authService.js';
-import { parseLoginPayload, parseRegisterPayload } from '../validators/authPayload.js';
 import { config } from '../config/env.js';
+import { AUTH_COOKIE_NAME, getAuthCookieOptions } from '../constants/cookies.js';
+import { parseLoginPayload, parseRegisterPayload } from '../validators/authPayload.js';
+import { clearCookie, serializeCookie } from '../utils/cookies.js';
 
-function getAuthService(req) {
-  const db = req.app.locals.db;
-  const jwtSecret = req.app.locals.jwtSecret ?? config.jwtSecret;
-  const registrationSecret = req.app.locals.registrationSecret ?? config.registrationSecret;
-  const repository = createAuthRepository(db);
-  return createAuthService(repository, jwtSecret, registrationSecret);
+function setAuthCookie(res, token) {
+  res.setHeader(
+    'Set-Cookie',
+    serializeCookie(AUTH_COOKIE_NAME, token, getAuthCookieOptions({ secure: config.isProduction })),
+  );
 }
 
 export async function login(req, res, next) {
   try {
-    const service = getAuthService(req);
     const payload = parseLoginPayload(req.body);
-    const result = await service.login(payload);
-    res.json({ data: result });
+    const result = await req.app.locals.services.auth.login(payload);
+    setAuthCookie(res, result.token);
+    res.json({ data: { user: result.user, token: result.token } });
   } catch (error) {
     next(error);
   }
@@ -24,13 +23,20 @@ export async function login(req, res, next) {
 
 export async function register(req, res, next) {
   try {
-    const service = getAuthService(req);
     const payload = parseRegisterPayload(req.body);
-    const user = await service.register(payload);
+    const user = await req.app.locals.services.auth.register(payload);
     res.status(201).json({ data: user });
   } catch (error) {
     next(error);
   }
+}
+
+export async function logout(_req, res) {
+  res.setHeader(
+    'Set-Cookie',
+    clearCookie(AUTH_COOKIE_NAME, getAuthCookieOptions({ secure: config.isProduction })),
+  );
+  res.status(204).send();
 }
 
 export async function getSession(req, res, next) {

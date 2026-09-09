@@ -1,8 +1,12 @@
-import { sendJson, fetchJson } from './http.js';
+import { fetchJson, sendJson } from './http.js';
 
 export async function login({ email, password }) {
   const body = await sendJson('POST', '/api/v1/auth/login', { email, password });
   return body.data;
+}
+
+export async function logout() {
+  await sendJson('POST', '/api/v1/auth/logout');
 }
 
 export async function registerUser(payload) {

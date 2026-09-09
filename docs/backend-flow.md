@@ -15,11 +15,12 @@ HTTP request
 
 ## Authentication
 
-| Endpoint | Auth | Purpose |
-|----------|------|---------|
-| `POST /api/v1/auth/login` | Public | Email/password → JWT + user profile |
-| `POST /api/v1/auth/register` | Public, but requires `registrationSecret` | Create user for an existing employee |
-| `GET /api/v1/auth/session` | Bearer token | Return current user profile |
+
+| Endpoint                   | Auth         | Purpose                             |
+| -------------------------- | ------------ | ----------------------------------- |
+| `POST /api/v1/auth/login`  | Public       | Email/password → JWT + user profile |
+| `GET /api/v1/auth/session` | Bearer token | Return current user profile         |
+
 
 **Login flow**
 
@@ -32,28 +33,25 @@ HTTP request
 
 1. Client sends `Authorization: Bearer <token>`.
 2. `authenticate` middleware verifies JWT, reloads user from DB (rejects inactive users).
-3. `req.user` is attached with `{ id, employeeId, email }`.
+3. `req.user` is attached with `{ id, employeeId, email }`
 
-**Register flow**
 
-1. Client sends `{ email, password, employeeId, registrationSecret }`.
-2. `registrationSecret` must match `REGISTRATION_SECRET` env var.
-3. Employee must exist and must not already have a user account.
-4. Wrong secret → `403 REGISTRATION_FORBIDDEN`.
 
 ## Employee and salary APIs
 
 All routes under `/api/v1/employees` use `authenticate` first. Any authenticated user is treated as HR for MVP.
 
-| Route | Purpose |
-|-------|---------|
-| `GET /employees` | Paginated directory with search/filter |
-| `POST /employees` | Create employee master data |
-| `GET /employees/:id` | Employee detail with current compensation |
-| `PUT /employees/:id` | Update employee master data |
-| `DELETE /employees/:id` | Delete employee (salary cascades) |
-| `GET /employees/:id/salary` | Current salary snapshot |
-| `PUT /employees/:id/salary` | Create or update current salary snapshot |
+
+| Route                       | Purpose                                   |
+| --------------------------- | ----------------------------------------- |
+| `GET /employees`            | Paginated directory with search/filter    |
+| `POST /employees`           | Create employee master data               |
+| `GET /employees/:id`        | Employee detail with current compensation |
+| `PUT /employees/:id`        | Update employee master data               |
+| `DELETE /employees/:id`     | Delete employee (salary cascades)         |
+| `GET /employees/:id/salary` | Current salary snapshot                   |
+| `PUT /employees/:id/salary` | Create or update current salary snapshot  |
+
 
 Lookups (`/countries`, `/departments`, `/designations`) require authentication.
 
@@ -78,24 +76,65 @@ Migrations in `backend/src/db/migrations/`.
 
 ## Configuration
 
-| Variable | Purpose |
-|----------|---------|
-| `JWT_SECRET` | Signs and verifies tokens |
-| `REGISTRATION_SECRET` | Required to call `/auth/register` |
-| `SQLITE_PATH` | Database file location |
+
+| Variable      | Purpose                   |
+| ------------- | ------------------------- |
+| `JWT_SECRET`  | Signs and verifies tokens |
+| `SQLITE_PATH` | Database file location    |
+
+
+
+
+## Row mapping
+
+DB rows are mapped to API shapes in `repositories/mappers/` (colocated with repositories, not a separate top-level folder):
+
+- `compensation.js` — shared salary amount math (`totalAmount`)
+- `employee.js` — list/detail DTOs with nested lookups
+- `salary.js` — salary snapshot API shape
+- `auth.js` — internal user record for services
+
+Dashboard analytics mapping stays in `dashboardService.js` because the response is computed, not a direct row map.
 
 ## Tests
 
-`node:test` + Supertest. Auth fixtures in `tests/helpers/authFixtures.js` seed users and provide `authHeader(token)`.
+`node:test` + Supertest. Auth fixtures in `tests/helpers/authFixtures.js` seed users and provide `authHeader(token)`. Employee fixtures and in-memory SQLite live in `tests/helpers/employeeFixtures.js` and `tests/helpers/testDb.js`.
 
-Core auth tests:
+**Integration tests** (`tests/*.test.js`) cover HTTP contracts end-to-end. **Unit tests** (`tests/unit/*.test.js`) cover pure validators and mappers without SQLite.
 
+Foundation:
+
+- `db.test.js` — checked-in migrations apply; transactions roll back
+- `health.test.js` — `GET /health` returns ok when the database is reachable
+- `employeeDirectorySchema.test.js` — lookup/employee tables exist; FK to lookups is enforced
 - `auth.schema.test.js` — migration + one-user-per-employee constraint
+- `employeeSalary.schema.test.js` — one salary row per employee
+
+Auth:
+
 - `auth.login.test.js` — login, session, inactive user
-- `auth.register.test.js` — register with/without secret
+- `auth.register.test.js` — register with valid secret (`201`); invalid secret (`403 REGISTRATION_FORBIDDEN`)
 - `auth.protection.test.js` — 401 and authenticated access
 
-Salary tests:
+Employee APIs:
 
-- `employeeSalary.schema.test.js` — one salary row per employee
+- `employees.list.test.js` — pagination, default page size, sort by employee code
+- `employees.search.test.js` — search by code/name; filter by country, department, designation
+- `employees.detail.test.js` — detail with current compensation; `404 EMPLOYEE_NOT_FOUND`
+- `employees.mutations.test.js` — create/update/delete; validation, duplicate, invalid lookup, salary cascade
+
+Salary:
+
 - `employeeSalary.api.test.js` — GET/PUT current salary snapshot
+
+Lookups and dashboard:
+
+- `lookups.test.js` — authenticated lists for countries, departments, designations
+- `dashboard.analytics.test.js` — KPIs and chart sections; zero compensation when no salaries; `422 MISSING_EXCHANGE_RATE`
+
+Unit tests:
+
+- `unit/compensation.test.js` — salary total calculation
+- `unit/employeeMappers.test.js` — employee/salary row mapping consistency
+- `unit/employeePayload.test.js` — employee create/update payload validation
+

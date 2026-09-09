@@ -1,7 +1,5 @@
 import { fetchJson, parseJsonResponse, sendJson } from './http.js';
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
-
 function buildQuery(params) {
   const searchParams = new URLSearchParams();
 

@@ -1,22 +1,33 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import Loader from './components/Loader.jsx';
 import ProtectedLayout from './components/ProtectedLayout.jsx';
 import { AuthProvider, useAuth } from './features/auth/context/AuthContext.jsx';
 import { AUTH_ROUTES } from './features/auth/constants.js';
 import { DASHBOARD_ROUTES } from './features/dashboard/constants.js';
 import { EMPLOYEE_ROUTES } from './features/employees/constants.js';
-import DashboardPage from './pages/dashboard/DashboardPage.jsx';
-import EmployeeDetailPage from './pages/employee-detail/EmployeeDetailPage.jsx';
-import EmployeeDirectoryPage from './pages/employee-directory/EmployeeDirectoryPage.jsx';
-import EmployeeFormPage from './pages/employee-form/EmployeeFormPage.jsx';
-import EmployeeSalaryFormPage from './pages/employee-salary-form/EmployeeSalaryFormPage.jsx';
-import LoginPage from './pages/login/LoginPage.jsx';
-import RegisterPage from './pages/register/RegisterPage.jsx';
+
+const LoginPage = lazy(() => import('./features/auth/pages/LoginPage.jsx'));
+const RegisterPage = lazy(() => import('./features/auth/pages/RegisterPage.jsx'));
+const DashboardPage = lazy(() => import('./features/dashboard/pages/DashboardPage.jsx'));
+const EmployeeSalaryFormPage = lazy(
+  () => import('./features/employeeSalary/pages/EmployeeSalaryFormPage.jsx'),
+);
+const EmployeeDetailPage = lazy(() => import('./features/employees/pages/EmployeeDetailPage.jsx'));
+const EmployeeDirectoryPage = lazy(
+  () => import('./features/employees/pages/EmployeeDirectoryPage.jsx'),
+);
+const EmployeeFormPage = lazy(() => import('./features/employees/pages/EmployeeFormPage.jsx'));
+
+function RouteFallback() {
+  return <Loader message="Loading page..." />;
+}
 
 function HomeRedirect() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null;
+    return <Loader message="Restoring session..." />;
   }
 
   if (!user) {
@@ -30,7 +41,7 @@ function FallbackRedirect() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null;
+    return <Loader message="Restoring session..." />;
   }
 
   if (!user) {
@@ -44,7 +55,7 @@ function PublicOnlyRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null;
+    return <Loader message="Restoring session..." />;
   }
 
   if (user) {
@@ -70,38 +81,40 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route
-            path={AUTH_ROUTES.login}
-            element={
-              <PublicOnlyRoute>
-                <AuthShell>
-                  <LoginPage />
-                </AuthShell>
-              </PublicOnlyRoute>
-            }
-          />
-          <Route
-            path={AUTH_ROUTES.register}
-            element={
-              <PublicOnlyRoute>
-                <AuthShell>
-                  <RegisterPage />
-                </AuthShell>
-              </PublicOnlyRoute>
-            }
-          />
-          <Route path="/" element={<HomeRedirect />} />
-          <Route element={<ProtectedLayout />}>
-            <Route path={DASHBOARD_ROUTES.dashboard} element={<DashboardPage />} />
-            <Route path={EMPLOYEE_ROUTES.directory} element={<EmployeeDirectoryPage />} />
-            <Route path={EMPLOYEE_ROUTES.new} element={<EmployeeFormPage mode="create" />} />
-            <Route path="/employees/:id/edit" element={<EmployeeFormPage mode="edit" />} />
-            <Route path="/employees/:id/salary/edit" element={<EmployeeSalaryFormPage />} />
-            <Route path="/employees/:id" element={<EmployeeDetailPage />} />
-          </Route>
-          <Route path="*" element={<FallbackRedirect />} />
-        </Routes>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route
+              path={AUTH_ROUTES.login}
+              element={
+                <PublicOnlyRoute>
+                  <AuthShell>
+                    <LoginPage />
+                  </AuthShell>
+                </PublicOnlyRoute>
+              }
+            />
+            <Route
+              path={AUTH_ROUTES.register}
+              element={
+                <PublicOnlyRoute>
+                  <AuthShell>
+                    <RegisterPage />
+                  </AuthShell>
+                </PublicOnlyRoute>
+              }
+            />
+            <Route path="/" element={<HomeRedirect />} />
+            <Route element={<ProtectedLayout />}>
+              <Route path={DASHBOARD_ROUTES.dashboard} element={<DashboardPage />} />
+              <Route path={EMPLOYEE_ROUTES.directory} element={<EmployeeDirectoryPage />} />
+              <Route path={EMPLOYEE_ROUTES.new} element={<EmployeeFormPage mode="create" />} />
+              <Route path="/employees/:id/edit" element={<EmployeeFormPage mode="edit" />} />
+              <Route path="/employees/:id/salary/edit" element={<EmployeeSalaryFormPage />} />
+              <Route path="/employees/:id" element={<EmployeeDetailPage />} />
+            </Route>
+            <Route path="*" element={<FallbackRedirect />} />
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );

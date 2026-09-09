@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchEmployees, fetchLookups } from '../../../api/employees.js';
+import { fetchEmployees } from '../../../api/employees.js';
+import { useLookups } from '../context/LookupsContext.jsx';
 import {
   DEFAULT_EMPLOYEE_FILTERS,
   DEFAULT_EMPLOYEE_SORT,
@@ -8,34 +9,32 @@ import {
 import { EMPLOYEE_MESSAGES } from '../messages.js';
 
 export function useEmployeeDirectory() {
+  const { lookups, error: lookupsError } = useLookups();
   const [employees, setEmployees] = useState([]);
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: EMPLOYEE_PAGE_SIZE,
     total: 0,
     totalPages: 0,
+    nextCursor: null,
   });
-  const [lookups, setLookups] = useState({ countries: [], departments: [], designations: [] });
   const [filters, setFilters] = useState(DEFAULT_EMPLOYEE_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState(DEFAULT_EMPLOYEE_FILTERS);
   const [sort, setSort] = useState(DEFAULT_EMPLOYEE_SORT);
   const [page, setPage] = useState(1);
+  const [listCursor, setListCursor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadLookups = useCallback(async () => {
-    const data = await fetchLookups();
-    setLookups(data);
-  }, []);
-
   const loadEmployees = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(lookupsError);
 
     try {
       const result = await fetchEmployees({
         page,
         pageSize: EMPLOYEE_PAGE_SIZE,
+        cursor: listCursor,
         search: appliedFilters.search,
         countryId: appliedFilters.countryId,
         departmentId: appliedFilters.departmentId,
@@ -52,17 +51,16 @@ export function useEmployeeDirectory() {
     } finally {
       setLoading(false);
     }
-  }, [appliedFilters, page, sort]);
-
-  useEffect(() => {
-    loadLookups().catch(() => {
-      setError(EMPLOYEE_MESSAGES.loadFiltersError);
-    });
-  }, [loadLookups]);
+  }, [appliedFilters, listCursor, lookupsError, page, sort]);
 
   useEffect(() => {
     loadEmployees();
   }, [loadEmployees]);
+
+  function resetPaging() {
+    setPage(1);
+    setListCursor(null);
+  }
 
   function handleFilterChange(event) {
     const { name, value } = event.target;
@@ -71,25 +69,25 @@ export function useEmployeeDirectory() {
 
   function handleApplyFilters(event) {
     event.preventDefault();
-    setPage(1);
+    resetPaging();
     setAppliedFilters(filters);
   }
 
   function handleClearFilters() {
     setFilters(DEFAULT_EMPLOYEE_FILTERS);
     setAppliedFilters(DEFAULT_EMPLOYEE_FILTERS);
-    setPage(1);
+    resetPaging();
   }
 
   function handleRemoveFilter(filterKey) {
     const nextFilters = { ...appliedFilters, [filterKey]: '' };
     setFilters(nextFilters);
     setAppliedFilters(nextFilters);
-    setPage(1);
+    resetPaging();
   }
 
   function handleSort(nextSort) {
-    setPage(1);
+    resetPaging();
     setSort(nextSort);
   }
 
@@ -107,7 +105,13 @@ export function useEmployeeDirectory() {
     handleClearFilters,
     handleRemoveFilter,
     handleSort,
-    goToPreviousPage: () => setPage((current) => current - 1),
-    goToNextPage: () => setPage((current) => current + 1),
+    goToPreviousPage: () => {
+      setListCursor(null);
+      setPage((current) => Math.max(1, current - 1));
+    },
+    goToNextPage: () => {
+      setListCursor((current) => pagination.nextCursor ?? current);
+      setPage((current) => current + 1);
+    },
   };
 }

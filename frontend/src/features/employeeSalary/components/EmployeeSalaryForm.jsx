@@ -1,12 +1,16 @@
 import { SUPPORTED_CURRENCIES } from '../constants.js';
 import { EMPLOYEE_SALARY_MESSAGES } from '../messages.js';
 
-function FieldError({ message }) {
+function FieldError({ id, message }) {
   if (!message) {
     return null;
   }
 
-  return <span className="field-error">{message}</span>;
+  return (
+    <span id={id} className="field-error" role="alert">
+      {message}
+    </span>
+  );
 }
 
 export default function EmployeeSalaryForm({
@@ -21,57 +25,79 @@ export default function EmployeeSalaryForm({
   return (
     <form className="employee-form employee-salary-form" onSubmit={onSubmit} noValidate>
       <div className="form-grid">
-        <label>
+        <label htmlFor="salary-base">
           {EMPLOYEE_SALARY_MESSAGES.baseSalaryLabel}
           <input
+            id="salary-base"
             type="number"
             min="0"
             step="1"
             name="baseSalary"
             value={values.baseSalary}
             onChange={onChange}
+            aria-invalid={Boolean(errors.baseSalary)}
+            aria-describedby={errors.baseSalary ? 'salary-base-error' : undefined}
           />
-          <FieldError message={errors.baseSalary} />
+          <FieldError id="salary-base-error" message={errors.baseSalary} />
         </label>
 
-        <label>
+        <label htmlFor="salary-bonus">
           {EMPLOYEE_SALARY_MESSAGES.bonusLabel}
           <input
+            id="salary-bonus"
             type="number"
             min="0"
             step="1"
             name="bonus"
             value={values.bonus}
             onChange={onChange}
+            aria-invalid={Boolean(errors.bonus)}
+            aria-describedby={errors.bonus ? 'salary-bonus-error' : undefined}
           />
-          <FieldError message={errors.bonus} />
+          <FieldError id="salary-bonus-error" message={errors.bonus} />
         </label>
 
-        <label>
+        <label htmlFor="salary-incentives">
           {EMPLOYEE_SALARY_MESSAGES.incentivesLabel}
           <input
+            id="salary-incentives"
             type="number"
             min="0"
             step="1"
             name="incentives"
             value={values.incentives}
             onChange={onChange}
+            aria-invalid={Boolean(errors.incentives)}
+            aria-describedby={errors.incentives ? 'salary-incentives-error' : undefined}
           />
-          <FieldError message={errors.incentives} />
+          <FieldError id="salary-incentives-error" message={errors.incentives} />
         </label>
 
-        <label>
+        <label htmlFor="salary-currency">
           {EMPLOYEE_SALARY_MESSAGES.currencyLabel}
-          <select name="currencyCode" value={values.currencyCode} onChange={onChange}>
+          <select
+            id="salary-currency"
+            name="currencyCode"
+            value={values.currencyCode}
+            onChange={onChange}
+            aria-invalid={Boolean(errors.currencyCode)}
+            aria-describedby={errors.currencyCode ? 'salary-currency-error' : undefined}
+          >
             {SUPPORTED_CURRENCIES.map((currency) => (
-              <option key={currency} value={currency}>{currency}</option>
+              <option key={currency} value={currency}>
+                {currency}
+              </option>
             ))}
           </select>
-          <FieldError message={errors.currencyCode} />
+          <FieldError id="salary-currency-error" message={errors.currencyCode} />
         </label>
       </div>
 
-      {submitError ? <p className="status-message error">{submitError}</p> : null}
+      {submitError ? (
+        <p className="status-message error" role="alert">
+          {submitError}
+        </p>
+      ) : null}
 
       <div className="form-actions">
         <button type="submit" disabled={isSubmitting}>
