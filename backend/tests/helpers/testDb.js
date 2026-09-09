@@ -1,5 +1,5 @@
-import { createDb } from '../../src/db/client.js';
-import { migrate } from '../../src/db/migrate.js';
+import { createDb } from '../../src/core/db/client.js';
+import { migrate } from '../../src/core/db/migrate.js';
 
 export async function createTestDb() {
   const db = createDb({ filename: ':memory:' });

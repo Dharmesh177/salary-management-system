@@ -93,7 +93,7 @@ Feedback given during the project that shaped the codebase:
 
 ### Backend
 
-- Move SQL into `repositories/queries/` — one file per domain, not inline in repositories.
+- Move SQL into feature `*.queries.js` files — one file per domain, not inline in repositories.
 - Move helpers (pagination, ID parsing) to `utils/` — keep controllers thin.
 - Use **mappers** for DB row → API response shaping.
 - Use **validators** for request bodies and query params.
@@ -139,7 +139,7 @@ Implement end-to-end with TDD:
 2. Implement minimum backend + frontend to pass
 3. Do not add unnecessary tests or out-of-scope tables
 
-Follow existing architecture: routes → controllers → services → repositories.
+Follow existing architecture: features/<domain>/ (routes → controller → service → repository) + core/ for shared infra.
 Keep commits to ~3–6 logical commits (failing tests, then implementation).
 ```
 
@@ -149,7 +149,7 @@ Keep commits to ~3–6 logical commits (failing tests, then implementation).
 After code review, please refactor:
 
 Backend:
-- SQL in repositories/queries/
+- SQL in features/<domain>/*.queries.js
 - Helpers in utils/, not controllers
 - Mappers for API responses, validators for input
 

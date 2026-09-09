@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { toCompensationAmounts } from '../../src/repositories/mappers/compensation.js';
+import { toCompensationAmounts } from '../../src/core/mappers/compensation.js';
 
 describe('toCompensationAmounts', () => {
   it('sums base salary, bonus, and incentives', () => {

@@ -4,8 +4,8 @@ import {
   toCurrentCompensation,
   toEmployeeDetail,
   toEmployeeListItem,
-} from '../../src/repositories/mappers/employee.js';
-import { toSalarySnapshot } from '../../src/repositories/mappers/salary.js';
+} from '../../src/features/employees/employee.mapper.js';
+import { toSalarySnapshot } from '../../src/features/employee-salary/salary.mapper.js';
 
 const employeeRow = {
   id: 1,

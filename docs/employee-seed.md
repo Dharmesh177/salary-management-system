@@ -39,7 +39,7 @@ Examples:
 
 ```bash
 npm run seed:employees -w backend -- --replace --count=500
-node backend/src/db/runSeedEmployees.js --replace --seed=42
+node backend/src/core/db/runSeedEmployees.js --replace --seed=42
 ```
 
 ## What gets generated
@@ -59,9 +59,9 @@ With `--replace`, all auth users and employees are cleared, then new rows are in
 
 | File | Role |
 | ---- | ---- |
-| `backend/src/db/runSeedEmployees.js` | CLI entry (migrate → seed → dev login) |
-| `backend/src/db/seedEmployees.js` | Generator and database insert logic |
-| `backend/src/db/seed/employeeSeedConfig.js` | Lookup weights and salary bands |
-| `backend/src/db/seed/ensureDevLogin.js` | Ensures `mary.jackson@acme.example` |
+| `backend/src/core/db/runSeedEmployees.js` | CLI entry (migrate → seed → dev login) |
+| `backend/src/core/db/seedEmployees.js` | Generator and database insert logic |
+| `backend/src/core/db/seed/employeeSeedConfig.js` | Lookup weights and salary bands |
+| `backend/src/core/db/seed/ensureDevLogin.js` | Ensures `mary.jackson@acme.example` |
 
 See also: [backend-flow.md](./backend-flow.md), [trade-offs.md](./trade-offs.md).

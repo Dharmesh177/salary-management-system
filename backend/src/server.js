@@ -1,10 +1,10 @@
 import path from 'node:path';
 import { mkdirSync } from 'node:fs';
 import { createApp } from './app.js';
-import { config } from './config/env.js';
-import { createDb } from './db/client.js';
-import { migrate } from './db/migrate.js';
-import { logger } from './utils/logger.js';
+import { config } from './core/config/env.js';
+import { createDb } from './core/db/client.js';
+import { migrate } from './core/db/migrate.js';
+import { logger } from './core/utils/logger.js';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 

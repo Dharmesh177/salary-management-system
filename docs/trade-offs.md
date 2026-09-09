@@ -6,7 +6,7 @@ This document explains the main product and technical choices for the ACME Salar
 
 ### Raw SQL instead of an ORM
 
-SQL lives in `repositories/queries/`. Repositories run it through a thin `createDb()` adapter. Row-to-API mapping lives in `repositories/mappers/`.
+SQL lives in each feature's `*.queries.js` file (for example `features/employees/employee.queries.js`). Repositories run it through a thin `createDb()` adapter. Row-to-API mapping lives in feature mappers plus `core/mappers/compensation.js` for shared salary math.
 
 We chose this over Drizzle, Prisma, or similar because the schema is small, queries are explicit (pagination, search, aggregations), and the repository layer is the intended path to PostgreSQL later.
 
@@ -24,7 +24,9 @@ We use Node’s built-in SQLite binding (Node 22+) instead of `better-sqlite3`.
 
 ### Integration Tests & Unit Tests as part of TDD workflow
 
-Backend TDD starts with **Supertest** against a real in-memory SQLite database. That exercises the full path: routes, auth middleware, controllers, services, repositories, and SQL.
+Backend TDD starts with **Supertest** against a real in-memory SQLite database. That exercises the full path: feature routes, auth middleware, controllers, services, repositories, and SQL.
+
+The backend is organized by **feature** (`features/auth`, `features/employees`, …) rather than by technical layer. Cross-feature wiring is centralized in `core/bootstrap/createServices.js` so new domains mostly add files under one folder.
 
 We do **not** unit-test controllers, services, or repositories separately when integration tests already cover them. Controllers are thin wiring; mocking services in unit tests would not catch SQL bugs, constraint failures, or wrong HTTP status codes. Unit tests are reserved for **pure logic**: validators, mappers, and small utilities.
 

@@ -1,39 +1,66 @@
 # Backend flow
 
-## Request path
+## Architecture
+
+The backend uses a **vertical (feature-based) layout**. Each domain owns its routes, controller, service, repository, queries, validators, and constants under `backend/src/features/<name>/`. Shared infrastructure lives in `backend/src/core/`.
+
+```
+backend/src/
+├── app.js                    # Express composition
+├── server.js                 # Bootstrap, migrations, shutdown
+├── core/
+│   ├── bootstrap/createServices.js   # DI wiring (cross-feature deps live here)
+│   ├── config/env.js
+│   ├── constants/cookies.js
+│   ├── db/                   # client, migrations, seed scripts
+│   ├── mappers/compensation.js       # shared salary math
+│   ├── middleware/           # authenticate, errorHandler, requestContext
+│   ├── routes/index.js       # mounts all feature routers
+│   └── utils/                # createAppError, jwt helpers, pagination, logger, …
+└── features/
+    ├── auth/
+    ├── employees/
+    ├── employee-salary/
+    ├── dashboard/
+    ├── lookups/
+    └── health/
+```
+
+**Request path within a feature**
 
 ```
 HTTP request
-  → routes/          (path + middleware)
-  → controllers/     (parse input, map response)
-  → services/        (business rules)
-  → repositories/    (SQL execution)
+  → feature/*.routes.js     (path + middleware)
+  → feature/*.controller.js (parse input, map response)
+  → feature/*.service.js    (business rules)
+  → feature/*.repository.js (SQL execution)
   → SQLite
 ```
 
-`GET /api/v1/health` is the only public domain-adjacent route. All employee, salary, lookup, and auth session routes require a valid JWT.
+**Cross-feature dependencies** are wired only in `core/bootstrap/createServices.js` (for example `employeeService` receives `lookupRepository`; `employeeSalaryService` receives `employeeRepository`). Features should not import another feature's repository directly — use the composition root or a feature's public `index.js`.
 
 ## Authentication
 
 
 | Endpoint                   | Auth         | Purpose                             |
 | -------------------------- | ------------ | ----------------------------------- |
-| `POST /api/v1/auth/login`  | Public       | Email/password → JWT + user profile |
-| `GET /api/v1/auth/session` | Bearer token | Return current user profile         |
+| `POST /api/v1/auth/login`  | Public       | Email/password → JWT + HttpOnly cookie |
+| `POST /api/v1/auth/logout` | Public       | Clears auth cookie                  |
+| `GET /api/v1/auth/session` | Cookie/Bearer | Return current user profile         |
 
 
 **Login flow**
 
 1. Client sends `{ email, password }`.
 2. `authService.login` loads the user, checks `is_active`, verifies password with bcrypt.
-3. On success, a JWT is signed (`sub` = user id) and returned with `{ id, employeeId, email }`.
+3. On success, a JWT is signed (`sub` = user id), set as HttpOnly cookie, and returned with `{ id, employeeId, email }`.
 4. Invalid credentials → `401 INVALID_CREDENTIALS`. Inactive user → `401 USER_INACTIVE`.
 
 **Session flow**
 
-1. Client sends `Authorization: Bearer <token>`.
+1. Client sends cookie or `Authorization: Bearer <token>`.
 2. `authenticate` middleware verifies JWT, reloads user from DB (rejects inactive users).
-3. `req.user` is attached with `{ id, employeeId, email }`
+3. `req.user` is attached with `{ id, employeeId, email }`.
 
 
 
@@ -42,15 +69,15 @@ HTTP request
 All routes under `/api/v1/employees` use `authenticate` first. Any authenticated user is treated as HR for MVP.
 
 
-| Route                       | Purpose                                   |
-| --------------------------- | ----------------------------------------- |
-| `GET /employees`            | Paginated directory with search/filter    |
-| `POST /employees`           | Create employee master data               |
-| `GET /employees/:id`        | Employee detail with current compensation |
-| `PUT /employees/:id`        | Update employee master data               |
-| `DELETE /employees/:id`     | Delete employee (salary cascades)         |
-| `GET /employees/:id/salary` | Current salary snapshot                   |
-| `PUT /employees/:id/salary` | Create or update current salary snapshot  |
+| Route                       | Feature module   | Purpose                                   |
+| --------------------------- | ---------------- | ----------------------------------------- |
+| `GET /employees`            | employees        | Paginated directory with search/filter    |
+| `POST /employees`           | employees        | Create employee master data               |
+| `GET /employees/:id`        | employees        | Employee detail with current compensation |
+| `PUT /employees/:id`        | employees        | Update employee master data               |
+| `DELETE /employees/:id`     | employees        | Delete employee (salary cascades)         |
+| `GET /employees/:id/salary` | employee-salary  | Current salary snapshot                   |
+| `PUT /employees/:id/salary` | employee-salary  | Create or update current salary snapshot  |
 
 
 Lookups (`/countries`, `/departments`, `/designations`) require authentication.
@@ -65,7 +92,7 @@ Returns `422` if any salary references a currency missing from `exchange_rates`.
 
 ## Database
 
-Migrations in `backend/src/db/migrations/`.
+Migrations in `backend/src/core/db/migrations/`.
 
 - `002_employee_directory.sql` — lookups and employees
 - `004_auth_rbac.sql` — `users` table (roles/permissions removed in `005`)
@@ -87,14 +114,14 @@ Migrations in `backend/src/db/migrations/`.
 
 ## Row mapping
 
-DB rows are mapped to API shapes in `repositories/mappers/` (colocated with repositories, not a separate top-level folder):
+DB rows are mapped to API shapes in feature mappers and one shared core mapper:
 
-- `compensation.js` — shared salary amount math (`totalAmount`)
-- `employee.js` — list/detail DTOs with nested lookups
-- `salary.js` — salary snapshot API shape
-- `auth.js` — internal user record for services
+- `core/mappers/compensation.js` — shared salary amount math (`totalAmount`)
+- `features/employees/employee.mapper.js` — list/detail DTOs with nested lookups
+- `features/employee-salary/salary.mapper.js` — salary snapshot API shape
+- `features/auth/auth.mapper.js` — internal user record for services
 
-Dashboard analytics mapping stays in `dashboardService.js` because the response is computed, not a direct row map.
+Dashboard analytics mapping stays in `dashboard.service.js` because the response is computed, not a direct row map.
 
 ## Tests
 
@@ -115,6 +142,7 @@ Auth:
 - `auth.login.test.js` — login, session, inactive user
 - `auth.register.test.js` — register with valid secret (`201`); invalid secret (`403 REGISTRATION_FORBIDDEN`)
 - `auth.protection.test.js` — 401 and authenticated access
+- `auth.jwt.test.js` — tampered, expired, and wrong-secret JWT
 
 Employee APIs:
 
@@ -137,4 +165,3 @@ Unit tests:
 - `unit/compensation.test.js` — salary total calculation
 - `unit/employeeMappers.test.js` — employee/salary row mapping consistency
 - `unit/employeePayload.test.js` — employee create/update payload validation
-

@@ -79,12 +79,12 @@ Run from the repository root:
 ```
 salary-management-system/
   frontend/          React SPA (features/, api/, components/)
-  backend/           Express API (routes → controllers → services → repositories)
+  backend/           Express API (features/<domain>/ + core/ shared infra)
   docs/              Engineering notes and requirements
   .env.example       Environment template (copy to .env)
 ```
 
-Backend uses raw SQL via a repository layer. Frontend organizes code by domain under `features/<name>/` (hooks, components, pages).
+Backend and frontend both organize code by domain under `features/<name>/`. Shared backend infrastructure (DB, middleware, utils) lives in `backend/src/core/`.
 
 ## Environment variables
 

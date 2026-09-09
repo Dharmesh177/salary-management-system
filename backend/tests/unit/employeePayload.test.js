@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { parseEmployeePayload } from '../../src/validators/employeePayload.js';
+import { parseEmployeePayload } from '../../src/features/employees/employee.validator.js';
 
 const validPayload = {
   employeeCode: 'EMP010',
