@@ -4,6 +4,7 @@ import Loader from './components/Loader.jsx';
 import ProtectedLayout from './components/ProtectedLayout.jsx';
 import { AuthProvider, useAuth } from './features/auth/context/AuthContext.jsx';
 import { AUTH_ROUTES } from './features/auth/constants.js';
+import { ANALYTICS_CHAT_ROUTES } from './features/analyticsChat/constants.js';
 import { DASHBOARD_ROUTES } from './features/dashboard/constants.js';
 import { EMPLOYEE_ROUTES } from './features/employees/constants.js';
 
@@ -18,6 +19,7 @@ const EmployeeDirectoryPage = lazy(
   () => import('./features/employees/pages/EmployeeDirectoryPage.jsx'),
 );
 const EmployeeFormPage = lazy(() => import('./features/employees/pages/EmployeeFormPage.jsx'));
+const AnalyticsChatPage = lazy(() => import('./features/analyticsChat/pages/AnalyticsChatPage.jsx'));
 
 function RouteFallback() {
   return <Loader message="Loading page..." />;
@@ -106,6 +108,7 @@ export default function App() {
             <Route path="/" element={<HomeRedirect />} />
             <Route element={<ProtectedLayout />}>
               <Route path={DASHBOARD_ROUTES.dashboard} element={<DashboardPage />} />
+              <Route path={ANALYTICS_CHAT_ROUTES.chat} element={<AnalyticsChatPage />} />
               <Route path={EMPLOYEE_ROUTES.directory} element={<EmployeeDirectoryPage />} />
               <Route path={EMPLOYEE_ROUTES.new} element={<EmployeeFormPage mode="create" />} />
               <Route path="/employees/:id/edit" element={<EmployeeFormPage mode="edit" />} />

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { analyticsChatRouter } from '../../features/analytics-chat/analytics-chat.routes.js';
 import { authRouter } from '../../features/auth/auth.routes.js';
 import { dashboardRouter } from '../../features/dashboard/dashboard.routes.js';
 import { employeeSalaryRouter } from '../../features/employee-salary/employeeSalary.routes.js';
@@ -15,6 +16,7 @@ export const apiRouter = Router();
 apiRouter.use('/health', healthRouter);
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/dashboard', dashboardRouter);
+apiRouter.use('/analytics-chat', analyticsChatRouter);
 apiRouter.use('/employees', employeesRouter);
 apiRouter.use('/employees', employeeSalaryRouter);
 apiRouter.use('/countries', countriesRouter);

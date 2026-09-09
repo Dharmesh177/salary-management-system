@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { ANALYTICS_CHAT_ROUTES } from '../features/analyticsChat/constants.js';
 import { DASHBOARD_ROUTES } from '../features/dashboard/constants.js';
 import { EMPLOYEE_ROUTES } from '../features/employees/constants.js';
 import { AUTH_MESSAGES } from '../features/auth/messages.js';
@@ -98,6 +99,14 @@ export default function AppLayout() {
               </svg>
             </NavIcon>
             Dashboard
+          </NavLink>
+          <NavLink to={ANALYTICS_CHAT_ROUTES.chat} className="app-nav-link" onClick={closeMobileNav}>
+            <NavIcon>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+              </svg>
+            </NavIcon>
+            Analytics Chat
           </NavLink>
           <NavLink to={EMPLOYEE_ROUTES.directory} className="app-nav-link" onClick={closeMobileNav}>
             <NavIcon>

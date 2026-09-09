@@ -58,5 +58,7 @@ export const config = {
   corsOrigin: requiredCorsOrigin(),
   devLoginEmail: process.env.DEV_LOGIN_EMAIL ?? 'mary.jackson@acme.example',
   devLoginPassword: process.env.DEV_LOGIN_PASSWORD ?? 'password123',
-  llmApiKey: process.env.LLM_API_KEY ?? '',
+  bedrockRegion: process.env.AWS_REGION ?? process.env.BEDROCK_REGION ?? '',
+  bedrockModelId: process.env.BEDROCK_MODEL_ID ?? '',
+  bedrockTimeoutMs: Number(process.env.BEDROCK_TIMEOUT_MS ?? 30_000),
 };

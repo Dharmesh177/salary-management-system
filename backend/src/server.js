@@ -19,6 +19,11 @@ const app = createApp({
   corsOrigin: config.corsOrigin,
   jwtSecret: config.jwtSecret,
   registrationSecret: config.registrationSecret,
+  bedrockOptions: {
+    region: config.bedrockRegion,
+    modelId: config.bedrockModelId,
+    timeoutMs: config.bedrockTimeoutMs,
+  },
 });
 
 const server = app.listen(config.port, () => {

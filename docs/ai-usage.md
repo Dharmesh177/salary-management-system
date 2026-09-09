@@ -17,8 +17,6 @@ No production runtime depends on an LLM. The API does not call OpenAI or similar
 
 ---
 
-
-
 ## AI tools used
 
 
@@ -186,8 +184,6 @@ Backend aggregations in SQL; frontend follows existing patterns.
 Separate commits: backend tests+API, frontend, UI polish if needed.
 ```
 
-
-
 ### Bulk seed
 
 ```
@@ -204,6 +200,44 @@ Implement a database seed script for ~10,000 realistic employees:
 
 ---
 
+### Code Review & Refinement Prompt
+
+few points need to revisit and write optimized production ready code for this project.
+
+any specific reasoning behind not using ORM and typescript based code. currently we have write database queries located in queries folder for each feature. node sqlite do not have any ORM support? 🤔
+
+Do we really need mapper folder and employeeMapper.js file as we created directory or folder for just 1 file.
+
+in TDD workflows we are writing testcases first then write its implementation. so currently we are writing functional testcases first under /test/ folder. do we need to write unit cases as well? is it required to write unit testcases according to standard practice in this workflow. if so, currently it looks like we have not write.
+
+frontend:
+do we need pages folder at parent level. like what if we move it into features folderr and for each feature we have pages folder containing its respective files or something similar to what we have for components. hooks folder etc.
+
+what's ideal practice in making production ready code.
+
+check above points and think and implement accordingly.
+This step is being done to improve code readability and scalability.
+
+---
+
+### Production Readiness Audit Checks Prompt
+
+Review the codebase (frontend and backend) for extensibility, scalability, and production readiness. 
+
+Audit for missing error handling, performance bottlenecks, security flaws, poor abstraction, or scaling limitations. Do not write or refactor any code yet—provide a clear list of identified weaknesses and recommended improvements so we can review and decide what to implement.
+
+---
+
+### Backend Restructure Prompt
+
+currrently our backend is not feature or component driven vertically scaled.
+
+currently it is horizontal scaled so there are chances that in future when new feature comes updates will be in most of current files which impact on current features and chances of conflict is there if multiple dev working on the same repo. so is it possible to go with this verticle approach (feature based on for each feature) instead of currnet horizontal approach.
+
+think about it and let me know.
+
+---
+
 ## Where AI was used effectively
 
 - Scaffolding **route → service → repository** stacks from failing tests
@@ -212,8 +246,6 @@ Implement a database seed script for ~10,000 realistic employees:
 - **CSS iteration** from screenshot feedback (layout, chips, charts, forms)
 - **Faker seed generator** with weighted config and CLI flags
 - **Documentation drafts** (then edited to match actual decisions)
-
-
 
 ## Where AI needed correction or guardrails
 

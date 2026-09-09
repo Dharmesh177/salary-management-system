@@ -7,13 +7,25 @@ import { notFound } from './core/middleware/notFound.js';
 import { requestContext } from './core/middleware/requestContext.js';
 import { apiRouter } from './core/routes/index.js';
 
-export function createApp({ db, corsOrigin, jwtSecret, registrationSecret }) {
+export function createApp({
+  db,
+  corsOrigin,
+  jwtSecret,
+  registrationSecret,
+  bedrockOptions = {},
+  llmClientOverride = undefined,
+}) {
   const app = express();
 
   app.locals.db = db;
   app.locals.jwtSecret = jwtSecret;
   app.locals.registrationSecret = registrationSecret;
-  app.locals.services = createServices(db, { jwtSecret, registrationSecret });
+  app.locals.services = createServices(db, {
+    jwtSecret,
+    registrationSecret,
+    bedrockOptions,
+    llmClientOverride,
+  });
 
   app.use(requestContext);
   app.use(helmet());

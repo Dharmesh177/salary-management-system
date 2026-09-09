@@ -1,3 +1,7 @@
+import { createAnalyticsChatRepository } from '../../features/analytics-chat/analytics-chat.repository.js';
+import { createAnalyticsChatService } from '../../features/analytics-chat/analytics-chat.service.js';
+import { createExecuteAnalyticsQueryTool } from '../../features/analytics-chat/execute-analytics-query.tool.js';
+import { createLlmClient } from '../../features/analytics-chat/llm-client.js';
 import { createAuthRepository } from '../../features/auth/auth.repository.js';
 import { createAuthService } from '../../features/auth/auth.service.js';
 import { createDashboardRepository } from '../../features/dashboard/dashboard.repository.js';
@@ -9,12 +13,18 @@ import { createEmployeeSalaryService } from '../../features/employee-salary/empl
 import { createLookupRepository } from '../../features/lookups/lookup.repository.js';
 import { createLookupService } from '../../features/lookups/lookup.service.js';
 
-export function createServices(db, { jwtSecret, registrationSecret }) {
+export function createServices(
+  db,
+  { jwtSecret, registrationSecret, bedrockOptions = {}, llmClientOverride = undefined },
+) {
   const authRepository = createAuthRepository(db);
   const employeeRepository = createEmployeeRepository(db);
   const lookupRepository = createLookupRepository(db);
   const employeeSalaryRepository = createEmployeeSalaryRepository(db);
   const dashboardRepository = createDashboardRepository(db);
+  const analyticsChatRepository = createAnalyticsChatRepository(db);
+  const executeAnalyticsQueryTool = createExecuteAnalyticsQueryTool(analyticsChatRepository);
+  const llmClient = llmClientOverride ?? createLlmClient(bedrockOptions);
 
   return {
     auth: createAuthService(authRepository, jwtSecret, registrationSecret),
@@ -22,5 +32,6 @@ export function createServices(db, { jwtSecret, registrationSecret }) {
     employeeSalary: createEmployeeSalaryService(employeeRepository, employeeSalaryRepository),
     lookup: createLookupService(lookupRepository),
     dashboard: createDashboardService(dashboardRepository),
+    analyticsChat: createAnalyticsChatService({ llmClient, executeAnalyticsQueryTool }),
   };
 }
