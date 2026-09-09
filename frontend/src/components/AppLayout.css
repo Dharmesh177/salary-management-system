@@ -248,6 +248,11 @@ body.mobile-nav-open {
     background: rgba(15, 23, 42, 0.45);
     cursor: pointer;
     z-index: 25;
+    border-radius: 0;
+  }
+
+  .app-sidebar-overlay:hover {
+    background: none;
   }
 
   .app-topbar {
