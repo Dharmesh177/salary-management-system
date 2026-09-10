@@ -1,5 +1,7 @@
 # Backend flow
 
+**Platform diagram:** [ACME Salary Management — AWS reference architecture](./ACME_Salary_Management.drawio.png) (target deployment; this repo’s MVP uses Express + SQLite locally/on Render).
+
 ## Architecture
 
 The backend uses a **vertical (feature-based) layout**. Each domain owns its routes, controller, service, repository, queries, validators, and constants under `backend/src/features/<name>/`. Shared infrastructure lives in `backend/src/core/`.

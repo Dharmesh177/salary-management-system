@@ -131,6 +131,7 @@ Question → Service → Bedrock (SQL JSON) → Validator → Tool → Repositor
 ## References
 
 - Feature guide: [salary-analytics-chat.md](../salary-analytics-chat.md)
-- Diagram: [salary-analytics-chat.drawio](../diagrams/salary-analytics-chat.drawio)
+- Platform diagram: [ACME_Salary_Management.drawio.png](../ACME_Salary_Management.drawio.png)
+- Feature flow diagram: [salary-analytics-chat.drawio](../diagrams/salary-analytics-chat.drawio)
 - AWS Bedrock Converse: https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html
 - Nova 2 inference profiles: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-amazon-nova-2-lite.html

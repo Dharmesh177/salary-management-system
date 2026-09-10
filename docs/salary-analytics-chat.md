@@ -6,8 +6,9 @@ Optional stretch feature that lets an HR Manager ask **natural-language question
 
 | Document | Purpose |
 | -------- | ------- |
+| [ACME system architecture (AWS)](./ACME_Salary_Management.drawio.png) | Full platform diagram including AI analytics on Bedrock |
 | [ADR 001 — Text-to-SQL via AWS Bedrock](./adr/001-analytics-chat-bedrock-text-to-sql.md) | Architecture decisions and alternatives |
-| [Architecture diagram (draw.io)](./diagrams/salary-analytics-chat.drawio) | Visual end-to-end flow |
+| [Analytics chat flow (draw.io)](./diagrams/salary-analytics-chat.drawio) | MVP feature-level sequence (open in [draw.io](https://app.diagrams.net)) |
 | [backend-flow.md](./backend-flow.md) | General backend layout |
 | [ai-usage.md](./ai-usage.md) | How AI tooling was used to build the project |
 

@@ -1,6 +1,6 @@
 # Trade-offs and design decisions
 
-This document explains the main product and technical choices for the ACME Salary Management System. Scope came from the updated requirements and developer review — not from AI. For request flows and code layout, see [backend-flow.md](./backend-flow.md) and [frontend-flow.md](./frontend-flow.md). For how AI was used, see [ai-usage.md](./ai-usage.md).
+This document explains the main product and technical choices for the ACME Salary Management System. Scope came from the updated requirements and developer review — not from AI. For the AWS reference topology, see [ACME_Salary_Management.drawio.png](./ACME_Salary_Management.drawio.png). For request flows and code layout, see [backend-flow.md](./backend-flow.md) and [frontend-flow.md](./frontend-flow.md). For how AI was used, see [ai-usage.md](./ai-usage.md).
 
 ---
 

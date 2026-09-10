@@ -7,6 +7,7 @@ This document records how AI-assisted tooling was used on the ACME Salary Manage
 
 | Topic                              | Document                                                                         |
 | ---------------------------------- | -------------------------------------------------------------------------------- |
+| **System architecture (diagram)**  | [ACME_Salary_Management.drawio.png](./ACME_Salary_Management.drawio.png)       |
 | Layering, dependencies, DB adapter | `[backend-flow.md](./backend-flow.md)`, `[frontend-flow.md](./frontend-flow.md)` |
 | Feature-level trade-offs           | `[trade-offs.md](./trade-offs.md)`                                               |
 | Bulk seed implementation           | `[employee-seed.md](./employee-seed.md)`                                         |

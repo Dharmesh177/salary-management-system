@@ -1,5 +1,7 @@
 # Frontend flow
 
+**Platform diagram:** [ACME Salary Management — AWS reference architecture](./ACME_Salary_Management.drawio.png)
+
 ## Structure
 
 ```

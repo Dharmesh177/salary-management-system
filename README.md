@@ -4,6 +4,8 @@ Web app for HR to manage employee records and current compensation for ACME (~10
 
 **Stack:** React (Vite) frontend · Express JSON API · SQLite · JWT auth · npm workspaces monorepo.
 
+**Architecture:** [System architecture diagram (AWS reference)](docs/ACME_Salary_Management.drawio.png) — CI/CD, edge, ECS, RDS, Bedrock analytics path (target production topology; MVP runs locally on Express + SQLite).
+
 ## What you can do
 
 
@@ -111,6 +113,7 @@ Copy `.env.example` to `.env`. Do not commit `.env`.
 
 | Topic                         | Document                                                                                                                       |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **System architecture (diagram)** | [docs/ACME_Salary_Management.drawio.png](docs/ACME_Salary_Management.drawio.png)                                           |
 | Backend API and layers        | [docs/backend-flow.md](docs/backend-flow.md)                                                                                   |
 | Frontend structure and auth   | [docs/frontend-flow.md](docs/frontend-flow.md)                                                                                 |
 | Database schema               | [docs/database_schema.md](docs/database_schema.md)                                                                             |
