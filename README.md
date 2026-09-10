@@ -4,6 +4,8 @@ Web app for HR to manage employee records and current compensation for ACME (~10
 
 **Stack:** React (Vite) frontend · Express JSON API · SQLite · JWT auth · npm workspaces monorepo.
 
+**Demo Video** - https://drive.google.com/file/d/19_EWqQATDZbNfLt2NM7QSe8PMjMUg1qI/view?usp=sharing
+
 **Architecture:** [System architecture diagram (AWS reference)](docs/ACME_Salary_Management.drawio.png) — CI/CD, edge, ECS, RDS, Bedrock analytics path (target production topology; MVP runs locally on Express + SQLite).
 
 ## What you can do
