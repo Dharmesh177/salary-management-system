@@ -63,3 +63,20 @@ Analytics are computed **at request time** from `employees`, `employee_salaries`
 A dismissible frontend notice explains that USD figures use fixed reference rates, not live market prices.
 
 **Trade-off:** No snapshot or cache tables — the dashboard stays in sync with live data but may need caching at higher scale. Exchange rates are static seed data, suitable for reporting demos, not treasury operations.
+
+---
+
+## Salary Analytics Chat (optional stretch)
+
+Natural-language Q&A uses **AWS Bedrock text-to-SQL** with a deterministic validator before any SQLite execution. See [salary-analytics-chat.md](./salary-analytics-chat.md) and [ADR 001](./adr/001-analytics-chat-bedrock-text-to-sql.md).
+
+| Choice | Rationale | Trade-off |
+| ------ | --------- | --------- |
+| Bedrock Converse (not OpenAI) | AWS credits available; no separate LLM vendor | Requires IAM setup; Nova 2 needs inference profile IDs |
+| Static schema in prompts (no RAG) | Only 6 analytics tables; stable schema | Does not scale to huge schemas without rework |
+| Validator + tool gate | LLM never runs SQL directly | Validator regex may miss exotic SQL edge cases |
+| Max 2 SQL correction retries | Fixes join/column errors without infinite loops | Hard questions may still fail after 3 executions |
+| Stateless (no chat history table) | Simpler MVP stretch scope | No conversation replay or audit log in DB |
+| Service unit tests + mocked Bedrock | Fast CI without AWS costs | Does not catch Bedrock prompt drift in automation |
+
+Core MVP features do not depend on this module. When Bedrock is unconfigured, the API returns `503` and the UI shows a clear message.

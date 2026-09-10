@@ -4,7 +4,8 @@
 
 ```
 src/
-  api/                        HTTP clients (auth, employees, employeeSalary, dashboard, http)
+  api/                        HTTP clients (auth, employees, employeeSalary, dashboard, analyticsChat, http)
+  features/analyticsChat/     optional stretch — natural-language analytics Q&A
   features/<domain>/
     pages/                    route screens (jsx, css, test colocated)
     components/               domain UI
@@ -61,6 +62,14 @@ EmployeeDirectoryPage
 ```
 
 Hooks own loading/error state and mutations (e.g. delete employee). Components receive data via props.
+
+## Analytics Chat (optional stretch)
+
+| Route | Page | Hook |
+| ----- | ---- | ---- |
+| `/analytics-chat` | `features/analyticsChat/pages/AnalyticsChatPage.jsx` | `useAnalyticsChat` |
+
+Flow: user question → `POST /api/v1/analytics-chat/ask` → display answer, record count, optional **View query** (generated SQL). See [salary-analytics-chat.md](./salary-analytics-chat.md).
 
 ## Salary editing
 

@@ -22,6 +22,7 @@ backend/src/
     ├── employees/
     ├── employee-salary/
     ├── dashboard/
+    ├── analytics-chat/         # optional stretch — text-to-SQL Q&A
     ├── lookups/
     └── health/
 ```
@@ -90,6 +91,18 @@ Lookups (`/countries`, `/departments`, `/designations`) require authentication.
 
 Returns `422` if any salary references a currency missing from `exchange_rates`.
 
+## Analytics Chat (optional stretch)
+
+| Route | Purpose |
+|-------|---------|
+| `POST /analytics-chat/ask` | Natural-language question → Bedrock SQL → validated SQLite query → grounded answer |
+
+Requires authentication. Returns `503 LLM_NOT_CONFIGURED` when Bedrock env vars are unset.
+
+**Flow:** controller → `analytics-chat.service` → Bedrock (`generateSql`) → `execute_analytics_query` tool → `sql-validator` → `analytics-chat.repository` → SQLite → Bedrock (`generateAnswer`).
+
+See [salary-analytics-chat.md](./salary-analytics-chat.md) and [ADR 001](./adr/001-analytics-chat-bedrock-text-to-sql.md).
+
 ## Database
 
 Migrations in `backend/src/core/db/migrations/`.
@@ -108,6 +121,9 @@ Migrations in `backend/src/core/db/migrations/`.
 | ------------- | ------------------------- |
 | `JWT_SECRET`  | Signs and verifies tokens |
 | `SQLITE_PATH` | Database file location    |
+| `AWS_REGION`  | Bedrock region (analytics chat) |
+| `BEDROCK_MODEL_ID` | Bedrock model or inference profile ID |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | AWS credentials (or use IAM role / `aws configure`) |
 
 
 
@@ -159,6 +175,14 @@ Lookups and dashboard:
 
 - `lookups.test.js` — authenticated lists for countries, departments, designations
 - `dashboard.analytics.test.js` — KPIs and chart sections; zero compensation when no salaries; `422 MISSING_EXCHANGE_RATE`
+
+Analytics chat (optional stretch):
+
+- `analytics-chat.api.test.js` — auth, validation, mocked LLM success, 503 when unconfigured
+- `unit/sql-validator.test.js` — read-only SQL gate, dangerous SQL rejection
+- `unit/analytics-chat.service.test.js` — orchestration, retry, empty results
+- `unit/execute-analytics-query.tool.test.js` — tool + repository integration
+- `unit/bedrock-llm-client.test.js` — mock Bedrock response parsing
 
 Unit tests:
 

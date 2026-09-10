@@ -14,6 +14,7 @@ Web app for HR to manage employee records and current compensation for ACME (~10
 | **Employee records**   | Create, view, edit, delete master data                                            |
 | **Compensation**       | One current salary per employee with explicit currency                            |
 | **Dashboard**          | KPIs and charts — headcount and USD-normalized compensation by country/department |
+| **Analytics Chat** *(optional)* | Natural-language salary questions via AWS Bedrock text-to-SQL |
 
 
 Any logged-in user has full HR access (no roles in MVP).
@@ -99,6 +100,8 @@ Copy `.env.example` to `.env`. Do not commit `.env`.
 | `REGISTRATION_SECRET` | Required to call `POST /api/v1/auth/register`            |
 | `CORS_ORIGIN`         | Allowed browser origin (default `http://localhost:5173`) |
 | `VITE_API_BASE_URL`   | Leave empty in dev — Vite proxies `/api` to the backend  |
+| `AWS_REGION` / `BEDROCK_MODEL_ID` | Optional — enable Analytics Chat (see docs below) |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | AWS credentials for Bedrock (or use `aws configure`) |
 
 
 
@@ -115,6 +118,7 @@ Copy `.env.example` to `.env`. Do not commit `.env`.
 | Production readiness backlog  | [docs/production-readiness-audit.md](docs/production-readiness-audit.md)                                                       |
 | Bulk employee seed            | [docs/employee-seed.md](docs/employee-seed.md)                                                                                 |
 | AI-assisted development notes | [docs/ai-usage.md](docs/ai-usage.md)                                                                                           |
+| Salary Analytics Chat (AI feature) | [docs/salary-analytics-chat.md](docs/salary-analytics-chat.md) · [ADR 001](docs/adr/001-analytics-chat-bedrock-text-to-sql.md) · [diagram](docs/diagrams/salary-analytics-chat.drawio) |
 | Product requirements          | [docs/Salary Management System Requirements - Updated.pdf](docs/Salary%20Management%20System%20Requirements%20-%20Updated.pdf) |
 
 
@@ -132,4 +136,4 @@ Backend tests favor integration coverage over mocked unit tests. See [docs/trade
 
 ## Out of scope (MVP)
 
-Salary history, RBAC, payslips, CSV import, live FX rates, and AI Q&A are deferred.
+Salary history, RBAC, payslips, CSV import, and live FX rates are deferred. **Analytics Chat** is an optional stretch feature (AWS Bedrock) — see [docs/salary-analytics-chat.md](docs/salary-analytics-chat.md).
