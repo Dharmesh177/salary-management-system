@@ -7,6 +7,7 @@ This document records how AI-assisted tooling was used on the ACME Salary Manage
 
 | Topic                              | Document                                                                         |
 | ---------------------------------- | -------------------------------------------------------------------------------- |
+| Cursor prompts (templates + project prompts) | [`prompts.md`](./prompts.md) |
 | **System architecture (diagram)**  | [ACME_Salary_Management.drawio.png](./ACME_Salary_Management.drawio.png)       |
 | Layering, dependencies, DB adapter | `[backend-flow.md](./backend-flow.md)`, `[frontend-flow.md](./frontend-flow.md)` |
 | Feature-level trade-offs           | `[trade-offs.md](./trade-offs.md)`                                               |
@@ -118,125 +119,9 @@ Feedback given during the project that shaped the codebase:
 
 ---
 
-## Useful prompts (templates that worked)
+## Useful prompts
 
-Copy and adapt these when continuing the project in Cursor or similar tools.
-
-### Feature kickoff (TDD)
-
-```
-Let's implement [FEATURE NAME].
-
-First read:
-- the requirements document
-- existing codebase and patterns
-- database schema document
-
-Only add schema changes required for this feature. Use incremental migrations.
-
-Implement end-to-end with TDD:
-1. Write limited, meaningful failing tests first
-2. Implement minimum backend + frontend to pass
-3. Do not add unnecessary tests or out-of-scope tables
-
-Follow existing architecture: features/<domain>/ (routes → controller → service → repository) + core/ for shared infra.
-Keep commits to ~3–6 logical commits (failing tests, then implementation).
-```
-
-### Code review / refactor pass
-
-```
-After code review, please refactor:
-
-Backend:
-- SQL in features/<domain>/*.queries.js
-- Helpers in utils/, not controllers
-- Mappers for API responses, validators for input
-
-Frontend:
-- features/<domain>/ for hooks and components
-- features/<domain>/pages/ with colocated jsx, css, test
-- messages.js and constants.js for user-facing strings
-
-Do not change behavior. Run full test suite after.
-```
-
-### UI polish from screenshots
-
-```
-[Paste screenshots]
-
-Please fix:
-- [bullet list of UI issues]
-- Keep labels from backend where applicable
-- Fix mobile view: [specific expectation]
-- Do not change unrelated API behavior
-```
-
-### Dashboard / analytics
-
-```
-Implement Dashboard Analytics with TDD.
-
-KPIs: [list]
-Charts: [list]
-Use employee native currency + seeded exchange_rates for USD normalization.
-Do not store duplicate USD columns.
-Backend aggregations in SQL; frontend follows existing patterns.
-Separate commits: backend tests+API, frontend, UI polish if needed.
-```
-
-### Bulk seed
-
-```
-Implement a database seed script for ~10,000 realistic employees:
-- Faker for names and dates
-- Weighted countries/departments
-- Designations consistent with departments
-- Realistic salaries by country/currency
-- Fixed random seed for reproducibility
-- --replace flag to clear employees first
-- CLI from project root
-- Do not change schema or application runtime behavior
-```
-
----
-
-### Code Review & Refinement Prompt
-
-few points need to revisit and write optimized production ready code for this project.
-
-any specific reasoning behind not using ORM and typescript based code. currently we have write database queries located in queries folder for each feature. node sqlite do not have any ORM support? 🤔
-
-Do we really need mapper folder and employeeMapper.js file as we created directory or folder for just 1 file.
-
-in TDD workflows we are writing testcases first then write its implementation. so currently we are writing functional testcases first under /test/ folder. do we need to write unit cases as well? is it required to write unit testcases according to standard practice in this workflow. if so, currently it looks like we have not write.
-
-frontend:
-do we need pages folder at parent level. like what if we move it into features folderr and for each feature we have pages folder containing its respective files or something similar to what we have for components. hooks folder etc.
-
-what's ideal practice in making production ready code.
-
-check above points and think and implement accordingly.
-This step is being done to improve code readability and scalability.
-
----
-
-### Production Readiness Audit Checks Prompt
-
-Review the codebase (frontend and backend) for extensibility, scalability, and production readiness. 
-
-Audit for missing error handling, performance bottlenecks, security flaws, poor abstraction, or scaling limitations. Do not write or refactor any code yet—provide a clear list of identified weaknesses and recommended improvements so we can review and decide what to implement.
-
----
-
-### Backend Restructure Prompt
-
-currrently our backend is not feature or component driven vertically scaled.
-
-currently it is horizontal scaled so there are chances that in future when new feature comes updates will be in most of current files which impact on current features and chances of conflict is there if multiple dev working on the same repo. so is it possible to go with this verticle approach (feature based on for each feature) instead of currnet horizontal approach.
-
-think about it and let me know.
+Reusable templates and the prompts that drove features (directory, salary, login, dashboard, seed, restructure, production audit, analytics chat) live in [`prompts.md`](./prompts.md). Append new prompts there, not here.
 
 ---
 
@@ -283,7 +168,7 @@ AI-generated changes were treated as **untrusted until verified**:
 2. **Test first** for behavior and API contract changes.
 3. **Minimal diff** — do not refactor unrelated code in the same pass.
 4. **Document human decisions** in `trade-offs.md` or the flow docs, not only in chat.
-5. **Update this file** when tooling, verification, or prompt patterns change.
+5. **Update [`prompts.md`](./prompts.md)** when a prompt pattern works well; update this file when tooling or verification changes.
 6. **No live LLM calls in unit tests** for the analytics chat feature — Bedrock is mocked.
 
 ---
@@ -306,163 +191,7 @@ Implemented as an optional stretch feature. Full documentation:
 
 ---
 
-## AI Powered Analytics Chat Feature Prompt
-
-Let's implement the AI-powered Salary Analytics Chat as an optional stretch feature.
-
-First review the current requirements, schema, and existing codebase. Follow the existing architecture and don't disturb the Employee Directory, Salary Management, or Dashboard features.
-
-Goal
-
-Allow the HR Manager to ask natural-language questions about employee and compensation data.
-
-Example:
-
-«What is the average compensation of engineers in India?»
-
-The system should convert the question into a SQL query, execute it through a controlled database tool, and return a clear answer based only on the database result.
-
-Flow
-
-Use this flow:
-
-User question
-→ Analytics Service
-→ LLM generates SQL
-→ SQL validation
-→ "execute_analytics_query" tool
-→ Repository
-→ SQLite
-→ result
-→ LLM generates final answer
-
-The LLM must never have direct database access. Database access should happen only through the controlled tool/repository layer.
-
-Schema Context
-
-Do not use RAG/vector search for the database schema at this stage. The schema is small and stable.
-
-Maintain a compact analytics-specific schema context containing only the tables/columns/relationships needed for analytics:
-
-- employees
-- countries
-- departments
-- designations
-- employee_salaries
-- exchange_rates
-
-Also provide the important business definitions, for example:
-
-- Total compensation = base salary + bonus + incentives
-- USD compensation = total compensation × applicable FX rate
-
-Pass this schema/business context with the SQL-generation request. Don't send the complete database documentation if it isn't required.
-
-Use a few representative question → SQL examples if useful for improving SQL generation.
-
-SQL Generation & Validation
-
-The LLM should return structured output containing the generated SQL and a short explanation.
-
-Only allow safe read-only analytics queries.
-
-Reject:
-
-- INSERT
-- UPDATE
-- DELETE
-- DROP
-- ALTER
-- CREATE
-- ATTACH
-- PRAGMA
-- multiple SQL statements
-- unknown/unapproved tables
-
-Prefer additional safeguards such as a reasonable result-row limit.
-
-Never execute generated SQL directly without validation.
-
-Database Tool
-
-Create a controlled "execute_analytics_query" tool.
-
-The tool should:
-
-1. Validate the generated SQL.
-2. Execute it through the analytics repository.
-3. Return structured query results.
-4. Handle database errors safely.
-
-Keep actual SQLite access inside the repository/data-access layer.
-
-Answer Generation
-
-Use the query result to generate the final response.
-
-The answer must be grounded only in the returned database result. If the question cannot be answered from the available data, say so rather than making assumptions.
-
-Where useful, include the number of employees/records used in the calculation.
-
-Optionally expose the generated SQL behind a "View query" control for debugging/demo purposes.
-
-Error Handling
-
-Handle:
-
-- invalid/generated SQL
-- database errors
-- empty results
-- questions outside the available data
-- LLM failures/timeouts
-
-If generated SQL fails, allow at most 1–2 correction attempts using the database error, then return a useful error instead of looping indefinitely.
-
-Testing / TDD
-
-Follow the project's existing Red → Green → Refactor workflow.
-
-Prioritize deterministic tests for:
-
-- SQL validation
-- dangerous SQL rejection
-- analytics repository queries
-- currency conversion
-- tool execution
-- empty results
-- LLM response parsing
-- SQL correction/error handling
-
-Mock the LLM in automated tests. Don't make the test suite dependent on a live LLM API.
-
-UI
-
-Add a simple analytics chat interface:
-
-- question input
-- Ask button
-- conversation/result area
-- loading state
-- error state
-- clear, readable answers
-
-Keep the UI consistent with the existing dashboard. Don't over-invest in chat animations or visual polish.
-
-Important
-
-- This is an optional stretch feature; don't compromise the core MVP for it.
-- Don't introduce RAG/vector databases for this implementation.
-- Don't create separate AI conversation/message tables unless there is a concrete requirement.
-- Reuse the existing employee, salary, and FX data as the source of truth.
-- Don't duplicate salary/analytics data specifically for AI.
-- Keep the implementation small, understandable, and easy to explain in a technical interview.
-- Follow the existing Controller → Service → Repository architecture.
-- Add only the dependencies actually required for the LLM integration.
-- Keep secrets/API keys in environment variables and never commit them.
-
-If anything important is unclear, stop and ask me before proceeding.
-
-At the end, summarize the architecture, LLM integration, tool flow, validation safeguards, tests, and any new dependencies.
+The kickoff prompt for this feature is in [`prompts.md`](./prompts.md#salary-analytics-chat-bedrock-text-to-sql).
 
 ---
 
@@ -470,4 +199,4 @@ At the end, summarize the architecture, LLM integration, tool flow, validation s
 
 This project was built with **Cursor Agent** as a pair-programming accelerator. The developer directed scope, architecture, schema evolution, UX feedback, and git history. AI accelerated implementation and documentation drafts under those constraints.
 
-If you extend the project with AI tools, append notable prompts and corrections to the sections above.
+If you extend the project with AI tools, append notable prompts to [`prompts.md`](./prompts.md) and corrections to the sections above.

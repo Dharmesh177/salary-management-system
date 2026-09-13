@@ -123,6 +123,7 @@ Copy `.env.example` to `.env`. Do not commit `.env`.
 | Production readiness backlog  | [docs/production-readiness-audit.md](docs/production-readiness-audit.md)                                                       |
 | Bulk employee seed            | [docs/employee-seed.md](docs/employee-seed.md)                                                                                 |
 | AI-assisted development notes | [docs/ai-usage.md](docs/ai-usage.md)                                                                                           |
+| Cursor prompts                    | [docs/prompts.md](docs/prompts.md)                                                                                             |
 | Salary Analytics Chat (AI feature) | [docs/salary-analytics-chat.md](docs/salary-analytics-chat.md) · [ADR 001](docs/adr/001-analytics-chat-bedrock-text-to-sql.md) · [diagram](docs/diagrams/salary-analytics-chat.drawio) |
 | Product requirements          | [docs/Salary Management System Requirements - Updated.pdf](docs/Salary%20Management%20System%20Requirements%20-%20Updated.pdf) |
 

@@ -11,6 +11,7 @@ Optional stretch feature that lets an HR Manager ask **natural-language question
 | [Analytics chat flow (draw.io)](./diagrams/salary-analytics-chat.drawio) | MVP feature-level sequence (open in [draw.io](https://app.diagrams.net)) |
 | [backend-flow.md](./backend-flow.md) | General backend layout |
 | [ai-usage.md](./ai-usage.md) | How AI tooling was used to build the project |
+| [prompts.md](./prompts.md) | Kickoff and other Cursor prompts |
 
 ---
 
